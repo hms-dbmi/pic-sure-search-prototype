@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="/jaxrs-service/webjars/bootstrap/4.6.0/css/bootstrap.css"></link>
+<link type="text/css" rel="stylesheet" href="/jaxrs-service/webjars/font-awesome/5.15.2/css/fontawesome.min.css"></link>
+<link type="text/css" rel="stylesheet" href="/jaxrs-service/webjars/font-awesome/5.15.2/css/solid.css"></link>
+<script src="/jaxrs-service/webjars/requirejs/2.3.5/require.min.js" data-main="/jaxrs-service/main"></script>
+<style>
+	#results{max-width:95%;}
+	#download-cart-button{
+		float:right;
+	}
+	.fa {
+	    border-radius: .2em;
+	    font-size: 1em;
+	    padding: .25em;
+	    margin: .25em;
+	    max-height: 2em;
+	}
+	.required {background-color: aaaaaa;} 
+	.green {color:green;} 
+	.red {color:red;}
+	.row {margin-right:0px;margin-left:0px}
+	.filters {text-align:center;}
+	.filter-block {
+		text-align:center;
+		min-height:5em;
+		border:solid;
+		border-radius:1em;
+		padding: 10px;
+	}
+	.filter-block span {margin: 0px auto;}
+	.filter-toggle {
+		font-size:x-small;
+	}
+	.tag {
+		line-height:1;
+	}
+	.tags {
+		text-align:center;
+	}
+	.neutral-tag {
+		background-color:#f8f9fa;
+	}
+	.search-result-row {
+		width:100%;
+		padding:.5em;
+		margin-left:3em;
+	}
+	.hidden {
+		display:none;
+	}
+	.badge-or-button {
+		border-radius:.2em;
+		font-size:1em;
+		padding:.25em;
+		margin:.25em;
+	    max-height: 2em;
+	}
+	.variable-badge-or-button {
+	    background-color: lightgray;
+	    color: black;
+	}
+	.study-badge-or-button {
+	    background-color: #616365;
+	    color: white;
+	}
+	.tab-content{
+		position:sticky;
+		z-index:4;
+		top:0em;
+		background:white;
+		margin:.5em;
+	}
+	.data-table-badge-or-button {
+	    background-color: #c31f3e;
+	    color: white;
+	}
+	.data-table-label{
+		position:sticky;
+		z-index:2;
+		top:1.5em;
+		background:white;
+		margin:.5em;
+	}
+	.data-table-description{
+		margin:.5em;
+		overflow: hidden;
+	    white-space: nowrap;
+	    text-overflow: ellipsis;
+	}
+	.dt-search-results-toggle {
+		margin:.8em;
+		width:2em;
+	}
+	.dt-search-results {
+		padding-top:10px;
+	}
+	.dt-results-size {
+		padding: .5em;
+	}
+	.variable-description{
+		margin:.5em;
+	}
+	.download-toggles{
+		float:right;
+	}
+	.dt-download-toggles-spacer{
+		width:2em;
+		display:inline-block;
+	}
+	.float-right{
+		float:right;
+	}
+	.nav-tabs {
+		margin-left:2px;
+	}
+	
+</style>
+<div class="container">
+	<input id="search-box"></input>
+	<button type="button"  id="search-btn" class="fas fa-search badge-or-button">search</button>
+	<span class="float-right">
+		<button type="button" id="download-cart-button" class="fas fa-cart-arrow-down badge-or-button"></button>
+		<button type="button" id="participant-count-button" class="fas fa-user-injured badge-or-button"></button>
+	</span>
+</div>
+<div id="results"></div>
+</head>
+<body>
+</body>
+</html>

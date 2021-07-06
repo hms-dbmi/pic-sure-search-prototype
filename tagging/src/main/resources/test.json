@@ -1,0 +1,387 @@
+{
+	"2.0": [
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "HayFevAge",
+				"description": "Hayfever: at about what age did hay fever start",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "CopdAge",
+				"description": "COPD: at about what age did COPD start",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeStopSmokCigar",
+				"description": "Age when completely stopped smoking cigars [years old]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeWheezWhistDK",
+				"description": "Age wheezing started: don't know",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Do not know"
+			}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "EmphAge",
+				"description": "Emphysema: at about what age did it start",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AsthmaAgeDK",
+				"description": "Asthma: asthma as a child; age not known",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Don't Know"
+			}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "Fagerstrom_Index",
+				"description": "Fagerstrom Index",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "Age_Enroll",
+				"description": "Age at enrollment",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "HayFevAgeDK",
+				"description": "Hayfever: hay fever as a child; age not known",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Don't Know"
+			}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeStopSmokPipe",
+				"description": "Age when completely stopped smoking pipe [years old]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "SleepApAge",
+				"description": "Sleep apnea: at about what age did sleep apnea start",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "PneuAge",
+				"description": "Pneumonia: at what age did you first have pneumonia/bronchopneumonia",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeFirstAttackDK",
+				"description": "Age first attack of wheezing: don't know",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Do not know"
+			}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "ChronBroncAge",
+				"description": "Chronic bronchitis: at about what age did it start",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AsthmaAgeStop",
+				"description": "Asthma: if you no longer have asthma at what age did it stop",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "HayFevAgeStop",
+				"description": "Hayfever: if you no longer have hay fever at what age did it stop",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "BronchAgeDK",
+				"description": "Bronchitis: bronchitis as a child; age not known",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Don't Know"
+			}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "BronchAge",
+				"description": "Bronchitis: at about what age did you first have bronchitis",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "PneuAgeDK",
+				"description": "Pneumonia: pneumonia as a child; age not known",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Don't Know"
+			}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeStartSmokPipe",
+				"description": "Age when started to smoke pipe regularly [years old]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeStartSmkCigar",
+				"description": "Age when started to smoke cigars regularly [years old]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AsthmaAge",
+				"description": "Asthma: at about what age did asthma start",
+				"type": "numeric"
+			},
+			"values": {}
+		}
+	],
+	"1.0": [
+		{
+			"metadata": {
+				"unit": "Oz per week",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "SmokTobPerWeek",
+				"description": "On average ounces of tobacco smoked per week [oz per week]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "HayFevStill",
+				"description": "Hayfever: hay fever stopped as a child; age not known",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Don't Know"
+			}
+		},
+		{
+			"metadata": {
+				"unit": "Cigars per week",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "SmokCigarPerWeek",
+				"description": "On average how many cigars did you smoke per week [cigars per week]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "SmokStopAge",
+				"description": "How old were you when you completely stopped smoking? [Years old]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeFirstAttack",
+				"description": "How old when you had first attack of wheezing",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "finalGold",
+				"description": "Final GOLD stage post-QA",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "GOLD 4 (FEV1 < 30% FEV1/FVC < 0.7)"
+			}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "GastroEsophReflx",
+				"description": "Gastroesophageal reflux",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Yes"
+			}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s)",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "OthSmokYrs",
+				"description": "Since age 18 years lived with someone who smoked [years]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "SmokStartAge",
+				"description": "How old were you when you first started cigarette smoking? [Years old]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"unit": "Cigarettes/day",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "CigPerDaySmokAvg",
+				"description": "Average for entire time how many cigarettes smoked per day [cigarettes/day]",
+				"type": "numeric"
+			},
+			"values": {}
+		},
+		{
+			"metadata": {
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AsthmaStopChild",
+				"description": "Asthma: asthma stopped as a child; age not known",
+				"type": "encoded value"
+			},
+			"values": {
+				"": "Don't Know"
+			}
+		},
+		{
+			"metadata": {
+				"unit": "Year(s) old",
+				"coll_interval": "Collected in Exam 1",
+				"variable": "",
+				"name": "AgeWheezWhist",
+				"description": "How old when you had first wheezing/whistling in chest",
+				"type": "numeric"
+			},
+			"values": {}
+		}
+	]
+}

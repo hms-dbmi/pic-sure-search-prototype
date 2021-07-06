@@ -1,0 +1,87 @@
+
+
+<div>
+	<div class="row"><ul class="nav nav-tabs" id="study-tabs" role="tablist">
+		  {{#each filteredStudies}}
+		  <li class="nav-item" role="presentation">
+		    <button id="{{guiId}}-tab" class="nav-link study-results-tab" 
+		    	href="#{{guiId}}" 
+		    	data-toggle="tab"
+		    	data-studyId="{{@key}}"
+		    	 type="button" 
+		    	 role="tab" 
+		    	 aria-controls="{{@key}}" 
+		    	 aria-selected="true">{{@key}} ({{sizeObject this}})
+		   	</button>
+		  </li>
+		  {{/each}}
+		</ul>
+	</div>
+	<div class="row">
+		<div id="filters" class="col-3">
+			{{#if tagStates.requiredTags}}
+				<div id="required-tags" class="row filter-block">
+					<span>Required Tags</span>
+					{{#each tagStates.requiredTags}}
+					    <button type="button" tabindex="0"
+					    class="btn btn-light btn-xs tag filter-toggle-required tag col-12" 
+					    id="results-tag-unquire-{{name}}">
+					    	<span class="fas fa-chevron-down chevron"></span>
+						    {{name}}
+					    </button>
+					{{/each}}
+				</div>
+			{{/if}}
+			{{#if tagStates.tags}}
+				<div id="tags" class="row filter-block">
+					<span>Filter Tags</span>
+					{{#each tagStates.tags}}
+					    <div class="col-12 neutral-tag row  {{#if hidden}} hidden {{/if}}">
+						    <button tabindex="0"
+						    class="btn btn-light btn-xs tag filter-toggle-require tag col-1" 
+						    id="results-tag-require-{{name}}">
+						    <span class="fas fa-chevron-up chevron"></span>
+					    	</button>
+						    <span class="col-9">{{name}} ({{count}})</span>
+						    <button 
+						    class="btn btn-light btn-xs tag filter-toggle-exclude tag col-1" 
+						    id="results-tag-exclude-{{name}}">
+						    <span class="fas fa-chevron-down chevron"></span>
+					    	</button>
+					    </div>
+					{{/each}}
+				</div>
+			{{/if}}
+			{{#if tagStates.excludedTags}}
+				<div id="excluded-tags" class="row filter-block">
+					<span>Excluded Tags</span>
+					{{#each tagStates.excludedTags}}
+					    <button 
+					    class="btn btn-light btn-xs tag filter-toggle-excluded tag col-12" 
+					    id="results-tag-include-{{name}}">
+						    <span class="col-1 fas fa-chevron-up chevron"></span>
+						    {{name}}
+					    </button>
+					{{/each}}
+				</div>
+			{{/if}}
+		</div>
+		<hr>
+		<div id="results-listing" class="col-9">
+			<div class="study-results">
+				<div class="tab-content">
+				  {{#each filteredStudies}}
+				  	<div class="tab-pane" id="{{guiId}}" role="tabpanel" aria-labelledby="{{guiId}}-tab">
+						<span class="badge-or-button study-badge-or-button">{{@key}}</span>
+						<span class="study-name">{{study_name}}</span>
+					</div>
+				  {{/each}}
+				</div>
+				<div id="search-results-listing">
+				
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

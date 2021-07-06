@@ -1,0 +1,154 @@
+define(["backbone", "handlebars", "text!search/search.hbs", "text!search/results.hbs"],
+function(BB,HBS, template, resultsTemplate){
+	return BB.View.extend({
+		initialize: function(opts){
+			this.results = opts.results;
+			this.template = HBS.compile(resultsTemplate);
+			var tags = [];
+			_.each(_.keys(this.results.tags),function(tag){ 
+				if(!/^phs\d{6}\.v\d+$/.test(tag)){
+					tags.push(
+						{"required": false,
+						"excluded":false,
+						"name": tag,
+						"count":this.results.tags[tag]}
+					);					
+				}
+			}.bind(this));
+			this.results.tags = tags;
+			//this.updateTags();
+			this.render();
+		},
+		events:{
+			"click .filter-toggle-required": "reset",
+			"click .filter-toggle-require": "require",
+			"click .filter-toggle-exclude": "exclude",
+			"click .filter-toggle-excluded": "reset"
+		},
+		tagName: "div",
+		render: function(){
+			this.update();
+			this.$el.html(this.template(this.results));
+		},
+		findTarget: function(event){
+			var target = undefined;			
+			var targetName = event.currentTarget.id.substring(20);
+			if(event.currentTarget.classList.contains("tag")){
+				target = _.find(this.results.tags, function(tag){
+					return tag.name === targetName;
+				}.bind(this));
+			}else if(event.currentTarget.classList.contains("std")){
+				target = this.results.studies[targetName];		
+			}
+			return target;	
+		},
+		require: function(event){
+			var  target = this.findTarget(event);
+			target.required = true;
+			target.excluded = false;
+			this.render();
+		},
+		exclude: function(event){
+			var  target = this.findTarget(event);
+			target.required = false;
+			target.excluded = true;
+			this.render();
+		},
+		reset: function(event){
+			var  target = this.findTarget(event);
+			target.required = false;
+			target.excluded = false;
+			this.render();
+		},
+		update: function(){
+			this.updateTags();
+			this.updateStudies();
+			this.filter();
+		},
+		updateTags: function(){
+			var requiredTags = [];
+			var tags = [];
+			var excludedTags = [];
+			this.results.tags.forEach(function(tag){
+				if(tag.required){
+					requiredTags.push(tag);
+				}else if(tag.excluded){
+					excludedTags.push(tag);
+				}else{
+					tags.push(tag);
+				}
+			});
+			this.results.tagStates = {
+				requiredTags:requiredTags, 
+				tags:tags, 
+				excludedTags:excludedTags
+			};
+		},
+		updateStudies: function(){
+			var requiredStudies = [];
+			var studies = [];
+			var excludedStudies = [];
+			_.each(this.results.studies,function(study, key){
+				study.name = key;
+				if(study.required){
+					requiredStudies.push(study);
+				}else if(study.excluded){
+					excludedStudies.push(study);
+				}else{
+					studies.push(study);
+				}
+			});
+			this.results.studyStates = {
+				requiredStudies:requiredStudies, 
+				studies:studies, 
+				excludedStudies:excludedStudies
+			};
+		},
+		filter: function(){
+			var descendingRelevance = _.keys(this.results.results).sort(function(a, b){return b-a});
+			var resultsInOrder = [];
+			var requiredTags = _.keys(this.results.tags).filter(function(tag){
+				return this.results.tags[tag].required===true;
+			}.bind(this)).map(function(tag){return this.results.tags[tag].name;}.bind(this));
+			var excludedTags = _.keys(this.results.tags).filter(function(tag){
+				return this.results.tags[tag].excluded===true;
+			}.bind(this)).map(function(tag){return this.results.tags[tag].name;}.bind(this));
+			
+			var requiredStudies = _.keys(this.results.studies).filter(function(study){
+				return this.results.studies[study].required===true;
+			}.bind(this));
+			var excludedStudies = _.keys(this.results.studies).filter(function(study){
+				return this.results.studies[study].excluded===true;
+			}.bind(this));
+			
+			descendingRelevance.forEach(function(score){
+				this.results.results[score].forEach(function(result){
+					var resultTags = _.union(result.metadata_tags, result.value_tags);
+					result.dataTableDescription = this.results.studies["phs000200.v11"]["pht003403.v3"].description;
+					if(requiredTags.length + excludedTags.length + requiredStudies.length + excludedStudies.length>0){
+						if(
+							_.intersection(excludedTags, resultTags).length===0  && 
+							_.intersection(requiredTags, resultTags).length===requiredTags.length &&
+							(requiredStudies.length === 0 || requiredStudies.includes(result.metadata.study_id))  && 
+							!(excludedStudies.length > 0 && excludedStudies.includes(result.metadata.study_id))
+							){
+							resultsInOrder.push(result);
+						}
+					}else{
+						resultsInOrder.push(result);
+					}
+				}.bind(this));
+			}.bind(this));
+			
+			_.each(this.results.tags, function(tag){
+				tag.count = _.filter(resultsInOrder, function(result){
+                    return result.metadata_tags.includes(tag.name) 
+                    || result.value_tags.includes(tag.name);
+                }).length;
+				tag.hidden = tag.count<1  || tag.count==resultsInOrder.count;
+			});
+			
+			this.results.resultsInOrder = resultsInOrder;
+		}
+	});
+});

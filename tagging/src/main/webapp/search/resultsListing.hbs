@@ -1,0 +1,42 @@
+{{#each this}}
+<div class="data-table-div">
+	<div class="data-table-label row">
+		<button class="badge-or-button fas fa-chevron-down chevron dt-search-results-toggle dt-search-results-chevron-{{makeIdSafe id}}" data-dtid="{{id}}" data-dtidsafe="{{makeIdSafe id}}" style="display:none;" title="Click to hide the variables within this datatable which matched your search."></button>
+		<button class="badge-or-button fas fa-chevron-right chevron dt-search-results-toggle dt-search-results-chevron-{{makeIdSafe id}}" data-dtid="{{id}}" data-dtidsafe="{{makeIdSafe id}}" title="Click to show the variables within this datatable which matched your search."></button>
+		<span class="badge-or-button data-table-badge-or-button">{{id}}</span>
+		<span class="dt-results-size">({{sizeObject results}} results)</span>
+		<span class="col data-table-description" title="{{#if description}}{{description}}{{else}}Variables in this data table contain tags: {{listTags this}}{{/if}}">
+			{{#if description}}
+				{{description}}
+			{{else}}
+				Variables in this data table contain tags: {{listTags this}}
+			{{/if}}
+			<nobr class="download-toggles">
+				<span class="fas fa-filter filter dt-filter-toggle badge-or-button data-table-badge-or-button" data-dtid="{{id}}" id="{{makeIdSafe id}}-filter-btn" title="Click to include only study participants who have data for at least one variable in this datatable."></span>
+				<span class="fas fa-download download dt-download-toggle badge-or-button data-table-badge-or-button" data-dtid="{{id}}" id="{{makeIdSafe id}}-download-btn" title="Click to include all variables from this datatable in your export."></span>
+				<span class="dt-download-toggles-spacer"></span>
+			</nobr>
+		</span>
+		
+	</div>
+	<div class="row dt-search-results" id="dt-search-results-{{makeIdSafe id}}" style="display:none;">
+		{{#each results}}
+		<div class="search-result-row row">
+			<button type="button" class="var-label-btn badge-or-button variable-badge-or-button">{{this.metadata.varId}}</button>
+			<span class="col variable-description">
+				{{this.metadata.var_report_description}} 
+				{{this.metadata.var_report_comment}} 
+				<nobr class="download-toggles">
+					<span class="fas fa-filter filter var-filter-toggle badge-or-button variable-badge-or-button" 
+					data-varid="{{this.metadata.varId}}" data-varidsafe="{{makeIdSafe this.metadata.varId}}" 
+					id="{{makeIdSafe this.metadata.varId}}" title="Click to define a participant filter using this variable."></span>
+					<span class="fas fa-download download var-download-toggle badge-or-button variable-badge-or-button" 
+					data-varid="{{this.metadata.varId}}"  data-varidsafe="{{makeIdSafe this.metadata.varId}}" 
+					id="{{makeIdSafe this.metadata.varId}}" title="Click to include this variable in your export."></span>
+				</nobr>
+			</span>
+		</div>
+		{{/each}}
+	</div>
+</div>
+{{/each}}

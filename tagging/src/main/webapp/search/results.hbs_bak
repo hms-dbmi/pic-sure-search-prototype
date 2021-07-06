@@ -1,0 +1,130 @@
+<style scoped> 
+.required {background-color:aaaaaa;} 
+.green {color:green;} 
+.red {color:red;}
+.row {margin-right:0px;margin-left:0px}
+.filters {text-align:center;}
+.filter-block {text-align:center;min-height:5em;border:solid;border-radius:1em;}
+.filter-block span {margin: 0px auto;}
+.filter-toggle {font-size:x-small;}
+.tag {line-height:1;}
+.tags {text-align:center;}
+.neutral-tag {background-color:#f8f9fa;}
+.search-result-row {width:100%;padding:.5em;}
+.hidden {display:none;}
+.id-badge {border-radius:.2em;font-size:1em;}
+.variable-id-badge {
+    background-color: lightgray;
+    color: black;
+}
+.data-table-id-badge {
+    background-color: #c31f3e;
+    color: white;
+}
+.study-id-badge {
+    background-color: #616365;
+    color: white;
+}
+</style>
+
+<div>
+	<div class="row">
+		<div id="filters" class="col-3">
+			<div id="required-tags" class="row filter-block">
+				<span>Required Tags</span>
+				{{#each tagStates.requiredTags}}
+				    <a 
+				    class="btn btn-light btn-xs tag filter-toggle-required tag col-12" 
+				    id="results-tag-unquire-{{name}}">
+				    	<span class="fas fa-chevron-down chevron"></span>
+					    {{name}}
+				    </a>
+				{{/each}}
+			</div>
+			<div id="tags" class="row filter-block">
+				<span>Unfiltered Tags</span>
+				{{#each tagStates.tags}}
+				    <div class="col-12 neutral-tag row  {{#if hidden}} hidden {{/if}}">
+					    <a 
+					    class="btn btn-light btn-xs tag filter-toggle-require tag col-1" 
+					    id="results-tag-require-{{name}}">
+					    <span class="fas fa-chevron-up chevron"></span>
+				    	</a>
+					    <span class="col-9">{{name}} ({{count}})</span>
+					    <a 
+					    class="btn btn-light btn-xs tag filter-toggle-exclude tag col-1" 
+					    id="results-tag-exclude-{{name}}">
+					    <span class="fas fa-chevron-down chevron"></span>
+				    	</a>
+				    </div>
+				{{/each}}
+			</div>
+			<div id="excluded-tags" class="row filter-block">
+				<span>Excluded Tags</span>
+				{{#each tagStates.excludedTags}}
+				    <a 
+				    class="btn btn-light btn-xs tag filter-toggle-excluded tag col-12" 
+				    id="results-tag-include-{{name}}">
+					    <span class="col-1 fas fa-chevron-up chevron"></span>
+					    {{name}}
+				    </a>
+				{{/each}}
+			</div>
+			
+			<br>
+			<div id="required-studies" class="row filter-block">
+				<span>Required Studies</span>
+				{{#each studyStates.requiredStudies}}
+				    <a 
+				    class="btn btn-light btn-xs std filter-toggle-required std col-12" 
+				    id="results-std-unquire-{{name}}">
+				    {{name}}
+				    </a>
+				{{/each}}
+			</div>
+			<div id="studies" class="row filter-block">
+				<span>Unfiltered Studies</span>
+				{{#each studyStates.studies}}
+				    <div class="col-12 neutral-tag row">
+					    <a 
+					    class="btn btn-light btn-xs std filter-toggle-require std col-1" 
+					    id="results-std-require-{{name}}">
+					    <span class="fas fa-chevron-up chevron"></span>
+				    	</a>
+					    <span class="col-9">{{name}}</span>
+					    <a 
+					    class="btn btn-light btn-xs std filter-toggle-exclude std col-1" 
+					    id="results-std-exclude-{{name}}">
+					    <span class="fas fa-chevron-down chevron"></span>
+				    	</a>
+				    </div>
+				{{/each}}
+			</div>
+			<div id="excluded-studies" class="row filter-block">
+				<span>Excluded Studies</span>
+				{{#each studyStates.excludedStudies}}
+				    <a 
+				    class="btn btn-light btn-xs std filter-toggle-excluded std col-12" 
+				    id="results-std-include-{{name}}">
+				    {{name}}
+				    </a>
+				{{/each}}
+			</div>
+		</div>
+		<div id="results-listing" class="col-9">
+			<div>
+			{{#each resultsInOrder}}
+				<div class="search-result-row row">
+					<span class="col-12">{{this.metadata.var_report_description}} {{this.metadata.var_report_comment}}</span>
+					<div class="col-6"></div>
+					<div class="col-6">
+						<span class="col-4 id-badge variable-id-badge">{{this.metadata.varId}}</span>
+						<span class="col-4 id-badge data-table-id-badge">{{this.metadata.dataTableId}}</span>
+						<span class="col-4 id-badge study-id-badge">{{this.metadata.study_id}}</span>
+					</div>
+				</div>
+			{{/each}}
+			</div>
+		</div>
+	</div>
+</div>
