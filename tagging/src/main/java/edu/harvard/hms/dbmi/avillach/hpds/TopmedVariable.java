@@ -61,7 +61,7 @@ public class TopmedVariable implements Serializable  {
 	private HashSet<String> metadata_tags = new HashSet<>();
 	private HashSet<String> value_tags = new HashSet<>();
 	private String dtId;
-	String studyId;
+	private String studyId;
 
 	public TopmedVariable(){
 		

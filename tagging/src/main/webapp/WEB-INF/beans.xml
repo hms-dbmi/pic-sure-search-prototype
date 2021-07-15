@@ -11,6 +11,7 @@
     <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
             <bean class="edu.harvard.hms.dbmi.avillach.hpds.HelloWorld"/>
+            <bean class="edu.harvard.hms.dbmi.avillach.hpds.TagSearchResource"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>

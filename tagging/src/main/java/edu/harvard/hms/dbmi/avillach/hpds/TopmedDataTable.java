@@ -1,10 +1,7 @@
 package edu.harvard.hms.dbmi.avillach.hpds;
 
 import java.io.Serializable;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.jsoup.nodes.Document;
@@ -40,7 +37,11 @@ public class TopmedDataTable implements Serializable {
 	}
 
 	public Map<Double,List<TopmedVariable>> search(String input) {
-		Map<Double, List<TopmedVariable>> relevantVars = variables.values().parallelStream()
+		return searchVariables(input, variables.values());
+	}
+
+	public static Map<Double, List<TopmedVariable>> searchVariables(String input, Collection<TopmedVariable> values) {
+		Map<Double, List<TopmedVariable>> relevantVars = values.parallelStream()
 				.filter((variable)->{
 					return variable.relevance(input)>=1;
 				}).collect(

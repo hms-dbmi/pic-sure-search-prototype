@@ -129,52 +129,6 @@ function(BB,HBS, resultsTemplate, resultsListingTemplate){
 				tags:tags.length > 0 ? tags : false, 
 				excludedTags:excludedTags.length > 0 ? excludedTags : false
 			};
-		},
-		filter: function(){
-			var descendingRelevance = _.keys(this.results.results).sort(function(a, b){return b-a});
-			var resultsInOrder = [];
-			var requiredTags = _.keys(this.results.tags).filter(function(tag){
-				return this.results.tags[tag].required===true;
-			}.bind(this)).map(function(tag){return this.results.tags[tag].name;}.bind(this));
-			var excludedTags = _.keys(this.results.tags).filter(function(tag){
-				return this.results.tags[tag].excluded===true;
-			}.bind(this)).map(function(tag){return this.results.tags[tag].name;}.bind(this));
-			
-			var filteredStudies = {};
-			descendingRelevance.forEach(function(score){
-				this.results.results[score].forEach(function(result){
-					var resultTags = _.union(result.metadata_tags, result.value_tags);
-					if(
-						_.intersection(excludedTags, resultTags).length===0  && 
-						_.intersection(requiredTags, resultTags).length===requiredTags.length){
-						if(this.activeStudy === result.metadata.study_id){
-							resultsInOrder.push(result);
-						}
-						filteredStudies[result.metadata.study_id] = this.results.studies[result.metadata.study_id];
-					}
-				}.bind(this));
-			}.bind(this));
-			
-			_.each(this.results.tags, function(tag){
-				tag.count = _.filter(resultsInOrder, function(result){
-                    return result.metadata_tags.includes(tag.name) 
-                    || result.value_tags.includes(tag.name);
-                }).length;
-				tag.hidden = tag.count<1  || tag.count==resultsInOrder.length;
-			});
-			resultsInOrder = _.groupBy(resultsInOrder, function(result){
-				return result.metadata.dataTableId;
-			});
-			var resultsWithTableMeta =  [];
-			_.each(resultsInOrder, function(table, tableId){
-				resultsWithTableMeta.push({id:tableId, description:this.results.dataTables[tableId],results:table});
-			}.bind(this));
-			resultsWithTableMeta = _.sortBy(resultsWithTableMeta, function(table){
-				return table.description;
-			});
-			this.results.resultsWithTableMeta = resultsWithTableMeta;
-			this.results.filteredStudies = filteredStudies;
-			this.results.resultsInOrder = resultsInOrder;
 		}
 	});
 });

@@ -28,6 +28,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
 
+import edu.harvard.dbmi.avillach.service.IResourceRS;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -36,86 +37,22 @@ import org.jsoup.nodes.Element;
 @Path("/")
 public class HelloWorld {
 
-	private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
 	private TreeMap<String, TopmedDataTable> fhsDictionary;
+	private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
 
-	public HelloWorld() throws IOException {
-		fhsDictionary = new TreeMap<>();
-
-		//		if(! new File(TMP_DICTIONARY_JAVABIN).exists()) {
-
-		for(File studyFolder : new File("/Users/jason/avl/2021/tagging/dicts/").listFiles()) {
-			if(studyFolder!=null) {
-				Arrays.stream(new File(studyFolder, "rawData")
-					.list((file, name)->{
-						return name.endsWith("data_dict.xml");}
-							)).forEach((table)->{
-								TopmedDataTable topmedDataTable;
-								try {
-									topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
-									fhsDictionary.put(topmedDataTable.metadata.get("id"), topmedDataTable);
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							});
-			}
-		}
-
-		for(File studyFolder : new File("/Users/jason/avl/2021/tagging/dicts/").listFiles()) {
-			Arrays.stream(new File(studyFolder, "rawData").list((file, name)->{
-				return name.endsWith("var_report.xml");}
-					)).forEach((table)->{
-						String[] split = table.split("\\.");
-						if(split.length > 2) {
-							String tableId = split[2] + "." + split[3];
-							System.out.println(tableId);
-							TopmedDataTable topmedDataTable = fhsDictionary.get(tableId);
-							if(topmedDataTable!=null) {
-								try {
-									Document doc = Jsoup.parse(new File(studyFolder.getAbsolutePath()+"/rawData/"+table), "UTF-8");
-									topmedDataTable.loadVarReport(doc);
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-						}
-					});
-		}
-		TreeSet<String> tags = new TreeSet<>();
-		for(TopmedDataTable table : fhsDictionary.values()) {
-			Collection<TopmedVariable> variables = table.variables.values();
-			for(TopmedVariable variable : variables) {
-				tags.addAll(variable.getMetadata_tags());
-				tags.addAll(variable.getValue_tags());
-			}
-		}
-
-		//			try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(TMP_DICTIONARY_JAVABIN));){
-		//				oos.writeObject(fhsDictionary);
-		//				oos.flush();
-		//				oos.close();
-		//			}
-
-		//		}else {
-		//			try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN));){
-		//				fhsDictionary = (TreeMap<String, TopmedDataTable>) ois.readObject();
-		//			} catch (ClassNotFoundException e) {
-		//				// TODO Auto-generated catch block
-		//				e.printStackTrace();
-		//			}
-		//		}
-
-
+	public HelloWorld() {
+		fhsDictionary = readDictionary();
 	}
 
-	private TopmedDataTable loadDataTable(String pathname) throws IOException {
-		Document doc = Jsoup.parse(new File(pathname), "UTF-8");
-		TopmedDataTable topmedDataTable = new TopmedDataTable(doc);
-		return topmedDataTable;
-	}
 
+	private TreeMap<String, TopmedDataTable> readDictionary() {
+		try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN));){
+			return (TreeMap<String, TopmedDataTable>) ois.readObject();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return new TreeMap<>();
+	}
 
 
 	@GET
@@ -193,6 +130,7 @@ public class HelloWorld {
 				return (List<TopmedVariable>)entry.getValue();}));
 		;
 
+
 		return Response.ok(Map.of(
 				"studies", studies,
 				"dataTables", fhsDictionary.entrySet().parallelStream().filter((table)->{
@@ -202,6 +140,7 @@ public class HelloWorld {
 						(table)->{return table.getValue().metadata.get("description");
 						})),
 				"tags", tagStats,
+				// todo: paginate
 				"results", results)).build();
 	}
 

@@ -15,9 +15,10 @@ function(BB,HBS, template, results){
 		search: function(){
 			this.searchTerm = $('#search-box').val();
 			$.ajax({
-			 	url: window.location.origin + "/jaxrs-service/rest/search/" + this.searchTerm,
-			 	type: 'GET',
+			 	url: window.location.origin + "/jaxrs-service/rest/pic-sure/search",
+			 	type: 'POST',
 			 	contentType: 'application/json',
+				data: JSON.stringify({query: {searchTerm: this.searchTerm, includedTags: ["pressure", "systolic"]}}),
 			 	success: function(response){
 					if(this.results){
 						this.results.remove();
@@ -30,7 +31,27 @@ function(BB,HBS, template, results){
 				}.bind(this)
 			});
 
-		},		
+		},
+		query: function(){
+			this.searchTerm = $('#search-box').val();
+			$.ajax({
+			 	url: window.location.origin + "/jaxrs-service/rest/pic-sure/query/sync",
+			 	type: 'POST',
+			 	contentType: 'application/json',
+				data: JSON.stringify({query: {searchTerm: this.searchTerm, includedTags: ["pressure", "systolic"]}}),
+			 	success: function(response){
+					if(this.results){
+						this.results.remove();
+					}
+					this.render({term:this.searchTerm});
+					this.results = new results({el:$("#results"), results:response});
+			 	}.bind(this),
+			 	error: function(response){
+					console.log(response);
+				}.bind(this)
+			});
+
+		},
 		handleKeyPress: function(event){
 			if(event.target.id!=="search-box"){
 				console.log(event.keyCode);
