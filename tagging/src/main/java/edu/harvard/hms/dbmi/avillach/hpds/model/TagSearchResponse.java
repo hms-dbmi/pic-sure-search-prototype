@@ -8,4 +8,5 @@ import java.util.List;
 public class TagSearchResponse {
     private final List<TagResult> tags;
     private final List<SearchResult> searchResults;
+    private final Integer numResults;
 }

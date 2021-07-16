@@ -18,7 +18,12 @@ function(BB,HBS, template, results){
 			 	url: window.location.origin + "/jaxrs-service/rest/pic-sure/search",
 			 	type: 'POST',
 			 	contentType: 'application/json',
-				data: JSON.stringify({query: {searchTerm: this.searchTerm, includedTags: ["pressure", "systolic"]}}),
+				data: JSON.stringify({query: {
+						searchTerm: this.searchTerm,
+						includedTags: ["pressure", "systolic"],
+						returnTags: true,
+						returnAllResults: false
+				}}),
 			 	success: function(response){
 					if(this.results){
 						this.results.remove();
@@ -32,25 +37,23 @@ function(BB,HBS, template, results){
 			});
 
 		},
-		query: function(){
-			this.searchTerm = $('#search-box').val();
+		getDataTable: function() {
 			$.ajax({
-			 	url: window.location.origin + "/jaxrs-service/rest/pic-sure/query/sync",
-			 	type: 'POST',
-			 	contentType: 'application/json',
-				data: JSON.stringify({query: {searchTerm: this.searchTerm, includedTags: ["pressure", "systolic"]}}),
-			 	success: function(response){
+				url: window.location.origin + "/jaxrs-service/rest/pic-sure/query/sync",
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({query: {id: "pht000015.v3", entityType: "DATA_TABLE"}}),
+				success: function(response){
 					if(this.results){
 						this.results.remove();
 					}
 					this.render({term:this.searchTerm});
 					this.results = new results({el:$("#results"), results:response});
-			 	}.bind(this),
-			 	error: function(response){
+				}.bind(this),
+				error: function(response){
 					console.log(response);
 				}.bind(this)
 			});
-
 		},
 		handleKeyPress: function(event){
 			if(event.target.id!=="search-box"){

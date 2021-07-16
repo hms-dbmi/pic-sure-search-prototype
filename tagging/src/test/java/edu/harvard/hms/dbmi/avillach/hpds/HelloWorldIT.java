@@ -8,10 +8,11 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class HelloWorldIT {
     @Test
     public void testJsonRoundtrip() throws Exception {
         List<Object> providers = new ArrayList<>();
-        providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+        providers.add(new JacksonJsonProvider());
         JsonBean inputBean = new JsonBean();
         inputBean.setVal1("Maple");
         WebClient client = WebClient.create(endpointUrl + "/hello/jsonBean", providers);
