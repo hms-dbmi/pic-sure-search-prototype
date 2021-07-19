@@ -49,13 +49,23 @@ public class TagSearchResource implements IResourceRS {
         for(TopmedDataTable table : fhsDictionary.values()) {
             Collection<TopmedVariable> variablesMatchingTags;
             if (searchQuery.getIncludedTags() != null) {
-                variablesMatchingTags = table.variables.values().stream().filter(variable -> {
-                    for (String includedTag : searchQuery.getIncludedTags()) {
-                        if (variable.relevance(includedTag) == 0)
-                            return false;
-                    }
-                    return true;
-                }).collect(Collectors.toList());
+                variablesMatchingTags = table.variables.values().stream()
+                        // Filter variables that don't match the included tags in the query
+                        .filter(variable -> {
+                            for (String includedTag : searchQuery.getIncludedTags()) {
+                                if (variable.relevance(includedTag) == 0)
+                                    return false;
+                            }
+                            return true;
+                        })
+                        .filter(variable -> {
+                            for (String includedTag : searchQuery.getExcludedTags()) {
+                                if (variable.relevance(includedTag) > 0)
+                                    return false;
+                            }
+                            return true;
+                        })
+                        .collect(Collectors.toList());
             } else {
                 variablesMatchingTags = table.variables.values();
             }

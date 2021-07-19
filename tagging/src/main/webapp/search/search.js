@@ -20,7 +20,8 @@ function(BB,HBS, template, results){
 			 	contentType: 'application/json',
 				data: JSON.stringify({query: {
 						searchTerm: this.searchTerm,
-						includedTags: ["pressure", "systolic"],
+						includedTags: [/*"pressure", "systolic"*/],
+						excludedTags: ["pressure", "systolic"],
 						returnTags: true,
 						returnAllResults: false
 				}}),
