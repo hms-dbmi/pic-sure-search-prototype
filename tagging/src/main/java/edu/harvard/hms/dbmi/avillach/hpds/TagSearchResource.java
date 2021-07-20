@@ -47,9 +47,9 @@ public class TagSearchResource implements IResourceRS {
         TreeMap<String,Integer> tagStats = new TreeMap<String, Integer>();
         TreeSet<String> tags = new TreeSet<>();
         for(TopmedDataTable table : fhsDictionary.values()) {
-            Collection<TopmedVariable> variablesMatchingTags;
+            Collection<TopmedVariable> variablesMatchingTags = table.variables.values();
             if (searchQuery.getIncludedTags() != null) {
-                variablesMatchingTags = table.variables.values().stream()
+                variablesMatchingTags = variablesMatchingTags.stream()
                         // Filter variables that don't match the included tags in the query
                         .filter(variable -> {
                             for (String includedTag : searchQuery.getIncludedTags()) {
@@ -58,6 +58,11 @@ public class TagSearchResource implements IResourceRS {
                             }
                             return true;
                         })
+                        .collect(Collectors.toList());
+            }
+            if (searchQuery.getExcludedTags() != null) {
+                variablesMatchingTags = variablesMatchingTags.stream()
+                        // Filter variables that don't match the included tags in the query
                         .filter(variable -> {
                             for (String includedTag : searchQuery.getExcludedTags()) {
                                 if (variable.relevance(includedTag) > 0)
@@ -66,8 +71,6 @@ public class TagSearchResource implements IResourceRS {
                             return true;
                         })
                         .collect(Collectors.toList());
-            } else {
-                variablesMatchingTags = table.variables.values();
             }
 
             Map<Double, List<TopmedVariable>> search = TopmedDataTable.searchVariables(searchQuery.getSearchTerm(), variablesMatchingTags);
