@@ -6,10 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 public class RawDataImporter {
 

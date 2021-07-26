@@ -72,7 +72,7 @@ public class TopmedVariable implements Serializable  {
 		this.values = new HashMap<>();
 		e.getAllElements().stream().forEach((element)->{
 			if(element.tag().getName().equalsIgnoreCase("value")) {
-				this.values.put(element.attr("id"), element.ownText());
+				this.values.put(element.attr("code"), element.ownText());
 			} else {
 				if(!element.tag().getName().equalsIgnoreCase("comment")) {
 					this.metadata.put(element.tagName(), element.ownText());
@@ -181,5 +181,21 @@ public class TopmedVariable implements Serializable  {
 
 	public void setValue_tags(HashSet<String> value_tags) {
 		this.value_tags = value_tags;
+	}
+
+	public String getDtId() {
+		return dtId;
+	}
+
+	public void setDtId(String dtId) {
+		this.dtId = dtId;
+	}
+
+	public String getStudyId() {
+		return studyId;
+	}
+
+	public void setStudyId(String studyId) {
+		this.studyId = studyId;
 	}
 }
