@@ -85,6 +85,8 @@ public class TagSearchResource implements IResourceRS {
                 }
                 resultsForScore.addAll(search.get(score).stream().map((result)->{
                     result.getMetadata().put("dataTableId", table.metadata.get("id"));
+                    result.getMetadata().put("dataTableDescription", table.metadata.get("description"));
+                    result.getMetadata().put("dataTableName", table.metadata.get("name"));
                     return result;
                 }).collect(Collectors.toList()));
                 results.put(score, resultsForScore);

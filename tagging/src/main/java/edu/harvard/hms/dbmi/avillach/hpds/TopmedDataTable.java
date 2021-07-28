@@ -18,9 +18,10 @@ public class TopmedDataTable implements Serializable {
 
 	}
 
-	public TopmedDataTable(Document doc){
+	public TopmedDataTable(Document doc, String data_dict_file){
 		metadata = new TreeMap<>();
 		metadata.put("id", getDataTableAttribute(doc, "id"));
+		metadata.put("name", data_dict_file.split(".")[4]);
 		metadata.put("study_id", getDataTableAttribute(doc, "study_id"));
 		metadata.put("participant_set", getDataTableAttribute(doc, "participant_set"));
 		metadata.put("date_created", getDataTableAttribute(doc, "date_created"));

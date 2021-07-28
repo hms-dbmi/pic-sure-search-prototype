@@ -72,8 +72,9 @@ public class TopmedDataTableTest {
 	}
 
 	private TopmedDataTable loadDataTable(String pathname, HashMap<String, Integer> tagStats) throws IOException {
-		Document doc = Jsoup.parse(new File(pathname), "UTF-8");
-		TopmedDataTable topmedDataTable = new TopmedDataTable(doc);
+		File dataDictFile = new File(pathname);
+		Document doc = Jsoup.parse(dataDictFile, "UTF-8");
+		TopmedDataTable topmedDataTable = new TopmedDataTable(doc, dataDictFile.getName());
 		
 		return topmedDataTable;
 	}
