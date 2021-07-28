@@ -200,8 +200,9 @@
 					</container>
 					<configuration>
 						<properties>
+							<cargo.jvmargs>-Xmx2g -Xms1g </cargo.jvmargs>
 							<cargo.port.offset>1</cargo.port.offset>
-							<cargo.start.jvmargs>-Xmx8g -Xms8g </cargo.start.jvmargs>
+							<cargo.start.jvmargs>-Xmx2g -Xms1g </cargo.start.jvmargs>
 							<!-- cargo.start.jvmargs>
 								-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000
 							</cargo.start.jvmargs -->
@@ -264,6 +265,30 @@
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>RawDataImporter</id>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<classifier>RawDataImporter</classifier>
+							<finalName>RawDataImporter</finalName>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

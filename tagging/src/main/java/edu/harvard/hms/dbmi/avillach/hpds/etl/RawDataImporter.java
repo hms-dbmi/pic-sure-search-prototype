@@ -12,13 +12,18 @@ public class RawDataImporter {
 
     private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
+    private String inputDirectory;
 
-    public void run() {
+    public RawDataImporter(String inputDirectory) {
+		this.inputDirectory = inputDirectory;
+	}
+
+	public void run() {
         fhsDictionary = new TreeMap<>();
 
         //		if(! new File(TMP_DICTIONARY_JAVABIN).exists()) {
 
-        for(File studyFolder : new File("/Users/ryanamari/dev/pic-sure-search-prototype/dicts").listFiles()) {
+        for(File studyFolder : new File(inputDirectory).listFiles()) {
             if(studyFolder!=null) {
                 Arrays.stream(new File(studyFolder, "rawData")
                         .list((file, name)->{
@@ -36,7 +41,7 @@ public class RawDataImporter {
             }
         }
 
-        for(File studyFolder : new File("/Users/ryanamari/dev/pic-sure-search-prototype/dicts").listFiles()) {
+        for(File studyFolder : new File(inputDirectory).listFiles()) {
             Arrays.stream(new File(studyFolder, "rawData").list((file, name)->{
                 return name.endsWith("var_report.xml");}
             )).forEach((table)->{
@@ -102,6 +107,6 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) {
-        new RawDataImporter().run();
+        new RawDataImporter(args[0]).run();
     }
 }
