@@ -133,7 +133,7 @@ public class TopmedVariable implements Serializable  {
 			metadata.put(entry.getKey().intern(), entry.getValue().intern());
 		}
 		this.metadata = metadata;
-		for(Entry<String, String> entry : this.metadata.entrySet()) {
+		for(Entry<String, String> entry : this.values.entrySet()) {
 			values.put(entry.getKey().intern(), entry.getValue().intern());
 		}
 		this.values = values;
