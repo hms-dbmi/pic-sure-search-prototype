@@ -123,34 +123,6 @@ public class TopmedVariable implements Serializable  {
 								return var.toUpperCase();}).collect(Collectors.toList());
 	}
 
-	public void internStrings() {
-		HashMap<String, String> metadata = new HashMap<>();
-		HashMap<String, String> values = new HashMap<>();
-		HashSet<String> metadata_tags = new HashSet<>();
-		HashSet<String> value_tags = new HashSet<>();
-		HashSet<String> allTagsLowercase = new HashSet<>();
-		for(Entry<String, String> entry : this.metadata.entrySet()) {
-			metadata.put(entry.getKey().intern(), entry.getValue().intern());
-		}
-		this.metadata = metadata;
-		for(Entry<String, String> entry : this.values.entrySet()) {
-			values.put(entry.getKey().intern(), entry.getValue().intern());
-		}
-		this.values = values;
-		for(String entry : this.metadata_tags) {
-			metadata_tags.add(entry.intern());
-		}
-		this.metadata_tags = metadata_tags;
-		for(String entry : this.value_tags) {
-			value_tags.add(entry.intern());
-		}
-		this.value_tags = value_tags;
-		for(String entry : this.allTagsLowercase) {
-			allTagsLowercase.add(entry.intern());
-		}
-		this.allTagsLowercase = allTagsLowercase;
-	}
-
 	private String lastInput = "";
 	private double lastScore;
 

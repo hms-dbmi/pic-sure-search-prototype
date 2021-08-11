@@ -28,16 +28,6 @@ public class TagSearchResource implements IResourceRS {
 
     public TagSearchResource() {
         fhsDictionary = readDictionary();
-        for(TopmedDataTable table : fhsDictionary.values()) {
-        	for(TopmedVariable variable : table.variables.values()) {
-        		/*
-        		 * Due to significant duplication of tags across variables, string interning
-        		 * saves a ton of memory. Unfortunately interning must be done inside each
-        		 * instance of the JVM, so this must be done on each startup.
-        		 */
-        		variable.internStrings();
-        	}
-        }
     }
 
 
