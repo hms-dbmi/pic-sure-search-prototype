@@ -30,20 +30,6 @@ public class TagSearchResource implements IResourceRS {
         fhsDictionary = readDictionary();
         for(TopmedDataTable table : fhsDictionary.values()) {
         	for(TopmedVariable variable : table.variables.values()) {
-        		HashSet<String> metadataTags = new HashSet<String>();
-        		HashSet<String> valueTags = new HashSet<String>();
-        		for(String tag: variable.getMetadata_tags()) {
-        			String internedTag = tag.intern();
-        			internedTag.hashCode();
-        			metadataTags.add(internedTag);
-        		}
-        		for(String tag: variable.getValue_tags()) {
-        			String internedTag = tag.intern();
-        			internedTag.hashCode();
-					metadataTags.add(internedTag);
-        		}
-        		variable.setMetadata_tags(metadataTags);
-        		variable.setValue_tags(valueTags);
         		/*
         		 * Due to significant duplication of tags across variables, string interning
         		 * saves a ton of memory. Unfortunately interning must be done inside each
