@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class RawDataImporter {
 
@@ -74,14 +76,17 @@ public class RawDataImporter {
 
         TreeMap<String, TopmedDataTable> dictionary = readDictionary();
         dictionary.keySet().forEach(key -> {
-            System.out.println(key);
-            dictionary.get(key).variables.values().forEach(value -> value.getValue_tags().forEach(System.out::println));
+            System.out.println("variable : " + key);
+            dictionary.get(key).variables.values().forEach(value -> { 
+	        	value.getValue_tags().forEach(System.out::println);
+	        	value.getMetadata_tags().forEach(System.out::println);
+            });
         });
 
     }
 
     private TreeMap<String, TopmedDataTable> readDictionary() {
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN));){
+        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN)));){
             return (TreeMap<String, TopmedDataTable>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -90,7 +95,7 @@ public class RawDataImporter {
     }
 
     private void writeDictionary() {
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(TMP_DICTIONARY_JAVABIN))){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(TMP_DICTIONARY_JAVABIN)))){
             oos.writeObject(fhsDictionary);
             oos.flush();
         } catch (IOException e) {
