@@ -64,6 +64,7 @@ public class TopmedVariable implements Serializable  {
 	private HashSet<String> metadata_tags = new HashSet<>();
 	private HashSet<String> value_tags = new HashSet<>();
 	private HashSet<String> allTagsLowercase = new HashSet<>();
+	
 	private String studyId;
 	private String dtId;
 	private String varId;
@@ -119,7 +120,8 @@ public class TopmedVariable implements Serializable  {
 					return val2.length() > 1 
 							&& !val2.matches("^\\d+$") 
 							&& !EXCLUDED_WORDS_LIST.contains(val2.toUpperCase()) 
-							&& !val2.toUpperCase().matches("V\\d+");}).map((String var)->{
+							&& !val2.toUpperCase().matches("^PHV\\d+$") 
+							&& !val2.toUpperCase().matches("^V\\d+$");}).map((String var)->{
 								return var.toUpperCase();}).collect(Collectors.toList());
 	}
 
@@ -133,16 +135,13 @@ public class TopmedVariable implements Serializable  {
 		}
 		lastInput = inputTrimmed;
 		double[] score = {0};
-		String[] inputs = inputTrimmed.split("\\s+");
+		String[] inputs = inputTrimmed.split("[\\s\\p{Punct}]+");
 		for(String input2 : inputs) {
-			
-			String regex = ".*\\s+"+input2+"\\s+.*";
 			allTagsLowercase.stream().filter((tag)->{
 				return tag.contains(input2);
 			}).forEach((tag)->{
 				score[0] = score[0] +
-						(tag.equalsIgnoreCase(input2)?3:
-							tag.matches(regex)?2:1);
+						(tag.contentEquals(input2)?3:1);
 			});
 			
 		}
@@ -197,6 +196,14 @@ public class TopmedVariable implements Serializable  {
 
 	public void setValue_tags(HashSet<String> value_tags) {
 		this.value_tags = value_tags;
+	}
+
+	public String getVarId() {
+		return varId;
+	}
+
+	public void setVarId(String varId) {
+		this.varId = varId;
 	}
 
 	public String getDtId() {

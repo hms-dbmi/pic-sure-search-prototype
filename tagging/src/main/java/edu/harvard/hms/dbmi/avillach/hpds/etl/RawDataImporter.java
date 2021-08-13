@@ -27,18 +27,18 @@ public class RawDataImporter {
 
         for(File studyFolder : new File(inputDirectory).listFiles()) {
             if(studyFolder!=null) {
-                Arrays.stream(new File(studyFolder, "rawData")
-                        .list((file, name)->{
-                            return name.endsWith("data_dict.xml");}
-                        )).forEach((table)->{
-                    TopmedDataTable topmedDataTable;
-                    try {
-                        topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
-                        fhsDictionary.put(topmedDataTable.metadata.get("id"), topmedDataTable);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+            	Arrays.stream(new File(studyFolder, "rawData")
+                    .list((file, name)->{
+                        return name.endsWith("data_dict.xml");}
+                    )).forEach((table)->{
+                TopmedDataTable topmedDataTable;
+                try {
+                    topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
+                    fhsDictionary.put(topmedDataTable.metadata.get("id"), topmedDataTable);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 });
             }
         }
@@ -66,6 +66,8 @@ public class RawDataImporter {
         TreeSet<String> tags = new TreeSet<>();
         for(TopmedDataTable table : fhsDictionary.values()) {
             Collection<TopmedVariable> variables = table.variables.values();
+            table.generateTagMap();
+            
             for(TopmedVariable variable : variables) {
                 tags.addAll(variable.getMetadata_tags());
                 tags.addAll(variable.getValue_tags());

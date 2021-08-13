@@ -35,7 +35,6 @@ public class TopmedDataTable implements Serializable {
 		doc.getElementsByTag("variable").stream().forEach(variable -> {
 			variables.put(variable.attr("id"), new TopmedVariable(this, variable));
 		});
-		generateTagMap();
 	}
 
 	public void generateTagMap() {
@@ -62,18 +61,11 @@ public class TopmedDataTable implements Serializable {
 		return doc.getElementsByTag("data_table").first().attr(attrName);
 	}
 
-		public Map<Double,List<TopmedVariable>> search(String input) {
-			return searchVariables(SearchQuery.builder().searchTerm(input).build());
-		}
-
-
-
 	public Map<Double, List<TopmedVariable>> searchVariables(SearchQuery searchQuery) {
 		Set<TopmedVariable> variablesInScope = new HashSet<TopmedVariable>(variables.values());
 		String input = searchQuery.getSearchTerm();
 		List<String> requiredTags = searchQuery.getIncludedTags();
 		List<String> excludedTags = searchQuery.getExcludedTags();
-		
 		HashMap<String, Set<TopmedVariable>> variablesPerTag = new HashMap<>();
 		for(String tag : requiredTags) {
 			Set<TopmedVariable> variablesForTag = tagMap.get(tag);
