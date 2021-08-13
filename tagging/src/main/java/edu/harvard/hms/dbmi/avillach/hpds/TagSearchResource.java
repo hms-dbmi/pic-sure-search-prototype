@@ -1,6 +1,5 @@
 package edu.harvard.hms.dbmi.avillach.hpds;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.harvard.hms.dbmi.avillach.hpds.model.*;
 import edu.harvard.hms.dbmi.avillach.hpds.model.domain.*;
 import lombok.SneakyThrows;
@@ -16,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 
 @Path("/pic-sure")
 @Produces({"application/json"})
@@ -25,7 +25,6 @@ public class TagSearchResource implements IResourceRS {
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
     private static final int INITIAL_RESULTS_SIZE = 20;
-    private final ObjectMapper mapper = new ObjectMapper();
 
     public TagSearchResource() {
         fhsDictionary = readDictionary();
@@ -45,35 +44,9 @@ public class TagSearchResource implements IResourceRS {
         final SearchQuery searchQuery = searchRequest.getQuery();
         Map<Double, List<TopmedVariable>> results = new TreeMap<>();
         TreeMap<String,Integer> tagStats = new TreeMap<String, Integer>();
-        TreeSet<String> tags = new TreeSet<>();
         for(TopmedDataTable table : fhsDictionary.values()) {
-            Collection<TopmedVariable> variablesMatchingTags = table.variables.values();
-            if (searchQuery.getIncludedTags() != null) {
-                variablesMatchingTags = variablesMatchingTags.stream()
-                        // Filter variables that don't match the included tags in the query
-                        .filter(variable -> {
-                            for (String includedTag : searchQuery.getIncludedTags()) {
-                                if (variable.relevance(includedTag) == 0)
-                                    return false;
-                            }
-                            return true;
-                        })
-                        .collect(Collectors.toList());
-            }
-            if (searchQuery.getExcludedTags() != null) {
-                variablesMatchingTags = variablesMatchingTags.stream()
-                        // Filter variables that don't match the included tags in the query
-                        .filter(variable -> {
-                            for (String includedTag : searchQuery.getExcludedTags()) {
-                                if (variable.relevance(includedTag) > 0)
-                                    return false;
-                            }
-                            return true;
-                        })
-                        .collect(Collectors.toList());
-            }
 
-            Map<Double, List<TopmedVariable>> search = TopmedDataTable.searchVariables(searchQuery.getSearchTerm(), variablesMatchingTags);
+            Map<Double, List<TopmedVariable>> search = table.searchVariables(searchQuery);
             if (search.size() == 0) {
                 continue;
             }
@@ -82,28 +55,28 @@ public class TagSearchResource implements IResourceRS {
                 List<TopmedVariable> resultsForScore = results.get(score);
                 if(resultsForScore==null) {
                     resultsForScore = new ArrayList<>();
+                    results.put(score, resultsForScore);
                 }
-                resultsForScore.addAll(search.get(score).stream().map((result)->{
-                    result.getMetadata().put("dataTableId", table.metadata.get("id"));
-                    result.getMetadata().put("dataTableDescription", table.metadata.get("description"));
-                    result.getMetadata().put("dataTableName", table.metadata.get("name"));
-                    return result;
-                }).collect(Collectors.toList()));
-                results.put(score, resultsForScore);
+                resultsForScore.addAll(search.get(score));
+             }
+        }
+        int numberOfVariables = 0;
+        for(List<TopmedVariable> resultsForScore : results.values()) {
+            numberOfVariables += resultsForScore.size();
+        }
+        final int numVars = numberOfVariables;
 
-                if (searchQuery.isReturnTags()) {
-                    for(TopmedVariable variable : resultsForScore) {
-                        tags.addAll(variable.getMetadata_tags());
-                        tags.addAll(variable.getValue_tags());
-                    }
-                }
-            }
+        Stream<TagResult> tagResults = Stream.empty();
+        if (searchQuery.isReturnTags()) {
+        	//flatten the tags from each score and each variable into a single list
+        	Set<String> tags = results.values().parallelStream().flatMap(List::stream).map((TopmedVariable variable)->{
+        		return Stream.concat(variable.getMetadata_tags().stream(),variable.getValue_tags().stream()).collect(Collectors.toSet());
+        	}).flatMap(Set::stream).collect(Collectors.toSet());
+
             for(String tag : tags) {
                 tagStats.put(tag, 0);
             }
-        }
-
-        if (searchQuery.isReturnTags()) {
+            
             for(List<TopmedVariable> scoreResults : results.values()) {
                 for(TopmedVariable result : scoreResults) {
 
@@ -115,31 +88,26 @@ public class TagSearchResource implements IResourceRS {
                     }
                 }
             }
+            tagResults = tagStats.entrySet().stream()
+                    .map(entry -> new TagResult(entry.getKey(), entry.getValue()));
+            if(tagStats.size()>10) {
+                tagResults = tagResults.filter(result -> 
+                	result.getTag().matches("PHS\\d{6}+.*") || 
+                	(result.getScore() > numVars * .05 && result.getScore() < numVars * .95)
+                );
+            }
+            tagResults = tagResults.sorted(Comparator.comparing(TagResult::getScore).reversed());
         }
-        int numberOfVariables = 0;
-        for(List<TopmedVariable> resultsForScore : results.values()) {
-            numberOfVariables += resultsForScore.size();
-        }
-        final int numVars = numberOfVariables;
 
+        // flatten the results for each score into a list of search results
         List<SearchResult> searchResults = results.entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream().map(topmedVariable -> new SearchResult(topmedVariable, entry.getKey())))
                 .sorted(Comparator.comparing(SearchResult::getScore).reversed().thenComparing(result -> result.getResult().getMetadata().get("description")))
                 .collect(Collectors.toList());
 
-        Stream<TagResult> tagResults = Stream.empty();
-        if (searchQuery.isReturnTags()) {
-            tagResults = tagStats.entrySet().stream()
-                    .map(entry -> new TagResult(entry.getKey(), entry.getValue()));
-            if(tagStats.size()>10) {
-                tagResults = tagResults.filter(result -> result.getScore() > numVars * .05 && result.getScore() < numVars * .95);
-            }
-            tagResults = tagResults.sorted(Comparator.comparing(TagResult::getScore).reversed());
-        }
-
         int searchResultsSize = searchResults.size();
         if (!searchRequest.getQuery().isReturnAllResults()) {
-            searchResults = searchResults.subList(0, Math.min(INITIAL_RESULTS_SIZE, searchResults.size() - 1));
+            searchResults = searchResults.subList(0, Math.min(INITIAL_RESULTS_SIZE, searchResults.size()));
         }
         TagSearchResponse tagSearchResponse = new TagSearchResponse(
                 tagResults.collect(Collectors.toList()),
@@ -190,7 +158,7 @@ public class TagSearchResource implements IResourceRS {
 
 
     private TreeMap<String, TopmedDataTable> readDictionary() {
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN));){
+        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN)));){
             return (TreeMap<String, TopmedDataTable>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
