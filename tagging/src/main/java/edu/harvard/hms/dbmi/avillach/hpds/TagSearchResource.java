@@ -88,15 +88,29 @@ public class TagSearchResource implements IResourceRS {
                     }
                 }
             }
+            int[] minMax = {Integer.MAX_VALUE, Integer.MIN_VALUE};
+            tagStats.values().forEach((value)->{
+            	if(minMax[0]>value) {
+            		minMax[0] = value;
+            	}
+            	if(minMax[1]<value) {
+            		minMax[1] = value;
+            	}
+            });
             tagResults = tagStats.entrySet().stream()
-                    .map(entry -> new TagResult(entry.getKey(), entry.getValue()));
+                    .map(entry -> {
+                    	return new TagResult(entry.getKey(), entry.getValue());
+                    }).sorted(Comparator.comparing(TagResult::getScore).reversed());
             if(tagStats.size()>10) {
                 tagResults = tagResults.filter(result -> 
                 	result.getTag().matches("PHS\\d{6}+.*") || 
                 	(result.getScore() > numVars * .05 && result.getScore() < numVars * .95)
                 );
             }
-            tagResults = tagResults.sorted(Comparator.comparing(TagResult::getScore).reversed());
+//          int midpoint = (minMax[1] + minMax[0])/2;
+//            tagResults = tagResults.sorted((a, b)->{
+//            	return Integer.valueOf(Math.abs(midpoint - a.getScore())).compareTo(Math.abs(midpoint - b.getScore()));
+//            });
         }
 
         // flatten the results for each score into a list of search results
@@ -146,8 +160,8 @@ public class TagSearchResource implements IResourceRS {
         }
     }
 
-    private Response getDataTable(String id) {
-        TopmedDataTable topmedDataTable = fhsDictionary.get(String.valueOf(id));
+    private Response getDataTable(String dataTableId) {
+        TopmedDataTable topmedDataTable = fhsDictionary.get(String.valueOf(dataTableId));
         return Response.ok(topmedDataTable).build();
     }
 

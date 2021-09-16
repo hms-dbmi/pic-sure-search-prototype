@@ -1,5 +1,6 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl;
 
+import edu.harvard.hms.dbmi.avillach.hpds.HPDSPathLookup;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import org.jsoup.Jsoup;
@@ -15,12 +16,14 @@ public class RawDataImporter {
     private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
+    private static HPDSPathLookup mapping;
 
     public RawDataImporter(String inputDirectory) {
 		this.inputDirectory = inputDirectory;
 	}
 
-	public void run() {
+	public void run() throws IOException {
+		mapping = new HPDSPathLookup();
         fhsDictionary = new TreeMap<>();
 
         //		if(! new File(TMP_DICTIONARY_JAVABIN).exists()) {
@@ -69,6 +72,11 @@ public class RawDataImporter {
             table.generateTagMap();
             
             for(TopmedVariable variable : variables) {
+            	variable.getMetadata().put("HPDS_PATH", mapping.getMappings().get(
+            			"\\" +
+            			variable.getStudyId().split("\\.")[0] + "\\"+
+            			variable.getDtId().split("\\.")[0]+ "\\"+
+            			variable.getVarId().split("\\.")[0]+"\\"));
                 tags.addAll(variable.getMetadata_tags());
                 tags.addAll(variable.getValue_tags());
             }
@@ -113,7 +121,7 @@ public class RawDataImporter {
         return topmedDataTable;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         new RawDataImporter(args[0]).run();
     }
 }
