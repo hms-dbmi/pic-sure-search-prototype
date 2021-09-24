@@ -1,7 +1,9 @@
 package edu.harvard.hms.dbmi.avillach.hpds;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class HPDSPathLookup {
 			mappings.put(entries[1].replaceAll("\"", ""),entries[0].replaceAll("\"", ""));
 			line = reader.readLine();
 		}
+		
 		
 	}
 }

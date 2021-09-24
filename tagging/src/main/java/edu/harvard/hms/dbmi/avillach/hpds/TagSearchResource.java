@@ -42,10 +42,13 @@ public class TagSearchResource implements IResourceRS {
     @Path("/search")
     public SearchResults search(SearchRequest searchRequest) {
         final SearchQuery searchQuery = searchRequest.getQuery();
+        final int resultOffset = searchQuery.getOffset();
+        final int resultLimit = searchQuery.getLimit() > 0 ? searchQuery.getLimit() : INITIAL_RESULTS_SIZE;
         Map<Double, List<TopmedVariable>> results = new TreeMap<>();
         TreeMap<String,Integer> tagStats = new TreeMap<String, Integer>();
-        for(TopmedDataTable table : fhsDictionary.values()) {
-
+        Collection<TopmedDataTable> allTables = fhsDictionary.values();
+    	System.out.println(allTables.size());
+        for(TopmedDataTable table : allTables) {
             Map<Double, List<TopmedVariable>> search = table.searchVariables(searchQuery);
             if (search.size() == 0) {
                 continue;
@@ -120,12 +123,12 @@ public class TagSearchResource implements IResourceRS {
                 .collect(Collectors.toList());
 
         int searchResultsSize = searchResults.size();
-        if (!searchRequest.getQuery().isReturnAllResults()) {
-            searchResults = searchResults.subList(0, Math.min(INITIAL_RESULTS_SIZE, searchResults.size()));
-        }
+//        if (!searchRequest.getQuery().isReturnAllResults()) {
+//            searchResults = searchResults.subList(0, Math.min(INITIAL_RESULTS_SIZE, searchResults.size()));
+//        }
         TagSearchResponse tagSearchResponse = new TagSearchResponse(
                 tagResults.collect(Collectors.toList()),
-                searchResults,
+                searchResults.subList(resultOffset, Math.min(searchResults.size(),resultOffset + resultLimit)),
                 searchResultsSize
         );
         return new SearchResults()
@@ -153,14 +156,14 @@ public class TagSearchResource implements IResourceRS {
     @Path("/query/sync")
     public Response querySync(QueryRequest queryRequest) {
         switch (queryRequest.getQuery().getEntityType()) {
-            case DATA_TABLE:
-                return getDataTable(queryRequest.getQuery().getId());
+	        case DATA_TABLE:
+	            return getDataTable(queryRequest.getQuery().getId());
             default:
                 throw new RuntimeException("Invalid Entity type");
         }
     }
 
-    private Response getDataTable(String dataTableId) {
+	private Response getDataTable(String dataTableId) {
         TopmedDataTable topmedDataTable = fhsDictionary.get(String.valueOf(dataTableId));
         return Response.ok(topmedDataTable).build();
     }

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jsoup.nodes.Element;
 
@@ -30,16 +31,26 @@ public class TopmedVariable implements Serializable  {
 			"BEEN",
 			"BEING",
 			"BETWEEN",
+			"BR",
 			"BY",
+			"C0",
+			"C1",
+			"C2",
+			"C3",
+			"C4",
 			"CODE",
 			"CONTAIN",
 			"DEFINITIONS",
 			"DESCRIBING",
 			"DID",
+			"DO",
 			"DOCUMENT",
 			"DON",
+			"EDU",
 			"ESPECIALLY",
+			"ETC",
 			"EVER",
+			"FILE",
 			"FOR",
 			"FROM",
 			"GIVEN",
@@ -47,6 +58,8 @@ public class TopmedVariable implements Serializable  {
 			"HAS",
 			"HAVE",
 			"HAVING",
+			"HOW",
+			"HTTP",
 			"IF",
 			"IN",
 			"INFORMATION",
@@ -57,6 +70,7 @@ public class TopmedVariable implements Serializable  {
 			"MAYBE",
 			"MEANINGS",
 			"NEW",
+			"NO",
 			"NOT",
 			"OF",
 			"ON",
@@ -65,11 +79,30 @@ public class TopmedVariable implements Serializable  {
 			"OTHER",
 			"OTHERS",
 			"OUT",
+			"P1",
+			"P1",
+			"P2",
+			"P3",
+			"P4",
+			"P5",
+			"P6",
+			"P7",
+			"P8",
+			"P9",
+			"P10",
+			"P11",
+			"P12",
+			"P13",
+			"P14",
+			"P15",
+			"P16",
+			"P17",
 			"PAST",
 			"PROVIDED",
 			"SEE",
 			"SINCE",
 			"SOME",
+			"SHE",
 			"STUDY",
 			"STRING",
 			"SUBJECTS",
@@ -89,6 +122,7 @@ public class TopmedVariable implements Serializable  {
 			"WHERE",
 			"WHEREVER",
 			"WHILE",
+			"WWW",
 			"YOU",
 			"YOUR"
 			);
@@ -133,18 +167,19 @@ public class TopmedVariable implements Serializable  {
 
 	private void determineVariableType() {
 		String type = null;
-		if(this.metadata.containsKey("type") && !this.metadata.get("type").isEmpty()) {
+		if(this.metadata.containsKey("calculated_type") && !this.metadata.get("calculated_type").isEmpty()) {
+			type = this.metadata.get("calculated_type");
+		}else if(this.metadata.containsKey("type") && !this.metadata.get("type").isEmpty()) {
 			type = this.metadata.get("type");
 		}else if(this.metadata.containsKey("reported_type") && !this.metadata.get("reported_type").isEmpty()) {
 			type = this.metadata.get("reported_type");
-		}else if(this.metadata.containsKey("calculated_type") && !this.metadata.get("calculated_type").isEmpty()) {
-			type = this.metadata.get("calculated_type");
 		}
 		if(type.equalsIgnoreCase("decimal")
 				||type.equalsIgnoreCase("numeric")
 				||type.equalsIgnoreCase("integer")
 				||type.equalsIgnoreCase("Numeral")
 				||type.equalsIgnoreCase("decimal, encoded")
+				||type.equalsIgnoreCase("decimal, encoded value")
 				||type.equalsIgnoreCase("number")
 				||type.equalsIgnoreCase("Num")
 				||type.equalsIgnoreCase("real, encoded value")
@@ -161,6 +196,10 @@ public class TopmedVariable implements Serializable  {
 				|| type.equalsIgnoreCase("coded") 
 				|| type.equalsIgnoreCase("encoded,string") 
 				|| type.equalsIgnoreCase("encoded value") 
+				|| type.equalsIgnoreCase("string, encoded value") 
+				|| type.equalsIgnoreCase("year") 
+				|| type.equalsIgnoreCase("DATETIME") 
+				|| type.equalsIgnoreCase("character") 
 				|| type.equalsIgnoreCase("enum_integer") 
 				|| type.equalsIgnoreCase("empty field") 
 				|| type.equalsIgnoreCase("encoded values") 
@@ -171,12 +210,16 @@ public class TopmedVariable implements Serializable  {
 			this.setIs_continuous(false);
 			return;
 		}
-		throw new RuntimeException("Could not determine type of variable : " + varId);
+		throw new RuntimeException("Could not determine type of variable : " + varId + " : " + this.metadata.get("type") + " : " + this.metadata.get("calculated_type") + " : " + this.metadata.get("reported_type"));
 	}
 
 	private void buildTags() {
-		for(String value : metadata.values()) {
-			metadata_tags.addAll(filterTags(value));
+		for(Entry<String, String> entry : metadata.entrySet()) {
+			if(!entry.getKey().contentEquals("dataTableDescription")
+					&& !entry.getKey().contentEquals("dataTableName")
+					) {
+				metadata_tags.addAll(filterTags(entry.getValue()));
+			}
 		}
 		for(String value : values.values()) {
 			value_tags.addAll(filterTags(value));
@@ -206,7 +249,7 @@ public class TopmedVariable implements Serializable  {
 	private String lastInput = "";
 	private double lastScore;
 
-	double relevance(String input) {
+	synchronized double relevance(String input) {
 		String inputTrimmed = input.toLowerCase().trim();
 		if(inputTrimmed.contentEquals(lastInput)) {
 			return lastScore;
@@ -215,13 +258,13 @@ public class TopmedVariable implements Serializable  {
 		double[] score = {0};
 		String[] inputs = inputTrimmed.split("[\\s\\p{Punct}]+");
 		for(String input2 : inputs) {
-			allTagsLowercase.stream().filter((tag)->{
+			Stream<String> tagsContainingInput = allTagsLowercase.stream().filter((tag)->{
 				return tag.contains(input2);
-			}).forEach((tag)->{
-				score[0] = score[0] +
-						(tag.contentEquals(input2)?3:1);
 			});
-
+			tagsContainingInput.forEach((tag)->{
+				score[0] = score[0] +
+						(tag.contentEquals(input2)?100:1);
+			});
 		}
 		lastScore = score[0];
 		return score[0];

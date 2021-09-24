@@ -86,10 +86,8 @@ public class RawDataImporter {
 
         TreeMap<String, TopmedDataTable> dictionary = readDictionary();
         dictionary.keySet().forEach(key -> {
-            System.out.println("variable : " + key);
-            dictionary.get(key).variables.values().forEach(value -> { 
-	        	value.getValue_tags().forEach(System.out::println);
-	        	value.getMetadata_tags().forEach(System.out::println);
+            dictionary.get(key).variables.values().forEach((TopmedVariable value) -> { 
+	        	System.out.println("\\" + value.getStudyId().split("\\.")[0] + "\\" + value.getDtId().split("\\.")[0] + "\\" + value.getVarId().split("\\.")[0] + "\\");
             });
         });
 
@@ -112,7 +110,6 @@ public class RawDataImporter {
             e.printStackTrace();
         }
     }
-
 
     private TopmedDataTable loadDataTable(String pathname) throws IOException {
         File dataDictFile = new File(pathname);
