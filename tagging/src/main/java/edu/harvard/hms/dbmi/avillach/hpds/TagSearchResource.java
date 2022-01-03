@@ -23,7 +23,7 @@ import java.util.zip.GZIPInputStream;
 public class TagSearchResource implements IResourceRS {
 
     private TreeMap<String, TopmedDataTable> fhsDictionary;
-    private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
+    private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
     private static final int INITIAL_RESULTS_SIZE = 20;
 
     public TagSearchResource() {
@@ -47,8 +47,7 @@ public class TagSearchResource implements IResourceRS {
         Map<Double, List<TopmedVariable>> results = new TreeMap<>();
         TreeMap<String,Integer> tagStats = new TreeMap<String, Integer>();
         Collection<TopmedDataTable> allTables = fhsDictionary.values();
-    	System.out.println(allTables.size());
-        for(TopmedDataTable table : allTables) {
+    	for(TopmedDataTable table : allTables) {
             Map<Double, List<TopmedVariable>> search = table.searchVariables(searchQuery);
             if (search.size() == 0) {
                 continue;
@@ -91,29 +90,18 @@ public class TagSearchResource implements IResourceRS {
                     }
                 }
             }
-            int[] minMax = {Integer.MAX_VALUE, Integer.MIN_VALUE};
-            tagStats.values().forEach((value)->{
-            	if(minMax[0]>value) {
-            		minMax[0] = value;
-            	}
-            	if(minMax[1]<value) {
-            		minMax[1] = value;
-            	}
-            });
             tagResults = tagStats.entrySet().stream()
                     .map(entry -> {
                     	return new TagResult(entry.getKey(), entry.getValue());
                     }).sorted(Comparator.comparing(TagResult::getScore).reversed());
             if(tagStats.size()>10) {
                 tagResults = tagResults.filter(result -> 
-                	result.getTag().matches("PHS\\d{6}+.*") || 
+                result.getScore() > 1 && (
+        		result.getTag().matches("PHS\\d{6}+.*") || 
+        		result.getTag().toUpperCase().matches("PHT\\d{6}+.*") || 
                 	(result.getScore() > numVars * .05 && result.getScore() < numVars * .95)
-                );
+                ));
             }
-//          int midpoint = (minMax[1] + minMax[0])/2;
-//            tagResults = tagResults.sorted((a, b)->{
-//            	return Integer.valueOf(Math.abs(midpoint - a.getScore())).compareTo(Math.abs(midpoint - b.getScore()));
-//            });
         }
 
         // flatten the results for each score into a list of search results
@@ -175,7 +163,7 @@ public class TagSearchResource implements IResourceRS {
 
 
     private TreeMap<String, TopmedDataTable> readDictionary() {
-        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN)));){
+        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(JAVABIN)));){
             return (TreeMap<String, TopmedDataTable>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

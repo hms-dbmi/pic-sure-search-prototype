@@ -31,6 +31,7 @@ public class TopmedVariable implements Serializable  {
 			"BEEN",
 			"BEING",
 			"BETWEEN",
+			"BUT",
 			"BR",
 			"BY",
 			"C0",
@@ -241,7 +242,6 @@ public class TopmedVariable implements Serializable  {
 					return val2.length() > 1 
 							&& !val2.matches("^\\d+$") 
 							&& !EXCLUDED_WORDS_LIST.contains(val2.toUpperCase()) 
-							&& !val2.toUpperCase().matches("^PHV\\d+$") 
 							&& !val2.toUpperCase().matches("^V\\d+$");}).map((String var)->{
 								return var.toUpperCase();}).collect(Collectors.toList());
 	}

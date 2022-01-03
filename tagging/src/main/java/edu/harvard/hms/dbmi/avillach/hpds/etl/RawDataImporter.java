@@ -13,7 +13,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class RawDataImporter {
 
-    private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
+    private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
     private static HPDSPathLookup mapping;
@@ -94,7 +94,7 @@ public class RawDataImporter {
     }
 
     private TreeMap<String, TopmedDataTable> readDictionary() {
-        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN)));){
+        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(JAVABIN)));){
             return (TreeMap<String, TopmedDataTable>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -103,7 +103,7 @@ public class RawDataImporter {
     }
 
     private void writeDictionary() {
-        try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(TMP_DICTIONARY_JAVABIN)))){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(JAVABIN)))){
             oos.writeObject(fhsDictionary);
             oos.flush();
         } catch (IOException e) {
