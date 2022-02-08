@@ -1,6 +1,5 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl;
 
-import edu.harvard.hms.dbmi.avillach.hpds.HPDSPathLookup;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import org.jsoup.Jsoup;
