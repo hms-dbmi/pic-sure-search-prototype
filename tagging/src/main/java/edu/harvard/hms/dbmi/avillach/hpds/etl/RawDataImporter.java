@@ -16,14 +16,12 @@ public class RawDataImporter {
     private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
-    private static HPDSPathLookup mapping;
 
     public RawDataImporter(String inputDirectory) {
 		this.inputDirectory = inputDirectory;
 	}
 
 	public void run() throws IOException {
-		mapping = new HPDSPathLookup();
         fhsDictionary = new TreeMap<>();
 
         //		if(! new File(TMP_DICTIONARY_JAVABIN).exists()) {
@@ -72,11 +70,10 @@ public class RawDataImporter {
             table.generateTagMap();
             
             for(TopmedVariable variable : variables) {
-            	variable.getMetadata().put("HPDS_PATH", mapping.getMappings().get(
-            			"\\" +
+            	variable.getMetadata().put("HPDS_PATH", "\\" +
             			variable.getStudyId().split("\\.")[0] + "\\"+
             			variable.getDtId().split("\\.")[0]+ "\\"+
-            			variable.getVarId().split("\\.")[0]+"\\"));
+            			variable.getVarId().split("\\.")[0]+"\\");
                 tags.addAll(variable.getMetadata_tags());
                 tags.addAll(variable.getValue_tags());
             }
