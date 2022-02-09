@@ -69,10 +69,7 @@ public class RawDataImporter {
             table.generateTagMap();
             
             for(TopmedVariable variable : variables) {
-            	variable.getMetadata().put("HPDS_PATH", "\\" +
-            			variable.getStudyId().split("\\.")[0] + "\\"+
-            			variable.getDtId().split("\\.")[0]+ "\\"+
-            			variable.getVarId().split("\\.")[0]+"\\");
+            	variable.getMetadata().put("HPDS_PATH", buildVariableConceptPath(variable));
                 tags.addAll(variable.getMetadata_tags());
                 tags.addAll(variable.getValue_tags());
             }
@@ -83,11 +80,19 @@ public class RawDataImporter {
         TreeMap<String, TopmedDataTable> dictionary = readDictionary();
         dictionary.keySet().forEach(key -> {
             dictionary.get(key).variables.values().forEach((TopmedVariable value) -> { 
-	        	System.out.println("\\" + value.getStudyId().split("\\.")[0] + "\\" + value.getDtId().split("\\.")[0] + "\\" + value.getVarId().split("\\.")[0] + "\\");
+	        	System.out.println(buildVariableConceptPath(value));
             });
         });
 
     }
+
+	private String buildVariableConceptPath(TopmedVariable variable) {
+		return "\\" +
+				variable.getStudyId().split("\\.")[0] + "\\"+
+				variable.getDtId().split("\\.")[0]+ "\\"+
+				variable.getVarId().split("\\.")[0]+"\\"+
+		    	variable.getMetadata().get("name")+"\\";
+	}
 
     private TreeMap<String, TopmedDataTable> readDictionary() {
         try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(JAVABIN)));){
