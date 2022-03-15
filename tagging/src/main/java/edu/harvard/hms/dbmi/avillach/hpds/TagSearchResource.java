@@ -157,8 +157,10 @@ public class TagSearchResource implements IResourceRS {
     }
 
     @Override
+    @POST
+    @Path("/query/format")
     public Response queryFormat(QueryRequest resultRequest) {
-        return null;
+        return Response.ok(resultRequest.getQuery()).build();
     }
 
 
