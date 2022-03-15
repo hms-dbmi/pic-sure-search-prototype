@@ -1,0 +1,5 @@
+FROM openjdk:11-jre-slim as loader
+ADD  ./target/RawDataImporter-jar-with-dependencies.jar .
+
+ENTRYPOINT ["java", "-Xmx8192m", "-jar", "RawDataImporter-jar-with-dependencies.jar"]
+CMD [ "/local/source/" ]"
