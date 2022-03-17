@@ -16,9 +16,13 @@ public class RawDataImporter {
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
 
+    private String dictionaryType;
+    
     public RawDataImporter(String inputDirectory) {
-		this.inputDirectory = inputDirectory;
-	}
+
+    	this.inputDirectory = inputDirectory;
+
+    }
 
 	public void run() throws IOException {
         fhsDictionary = new TreeMap<>();
@@ -27,19 +31,22 @@ public class RawDataImporter {
 
         for(File studyFolder : new File(inputDirectory).listFiles()) {
             if(studyFolder!=null) {
-            	Arrays.stream(new File(studyFolder, "rawData")
-                    .list((file, name)->{
-                        return name.endsWith("data_dict.xml");}
-                    )).forEach((table)->{
-                TopmedDataTable topmedDataTable;
-                try {
-                    topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
-                    fhsDictionary.put(topmedDataTable.metadata.get("id"), topmedDataTable);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                });
+            	// needs to be changed to be for any xml
+            	if(dictionaryType.equalsIgnoreCase("xml")) {
+	            	Arrays.stream(new File(studyFolder, "rawData")
+	                    .list((file, name)->{
+	                        return name.endsWith("data_dict.xml");}
+	                    )).forEach((table)->{
+	                TopmedDataTable topmedDataTable;
+	                try {
+	                    topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
+	                    fhsDictionary.put(topmedDataTable.metadata.get("id"), topmedDataTable);
+	                } catch (IOException e) {
+	                    // TODO Auto-generated catch block
+	                    e.printStackTrace();
+	                }
+	                });
+            	}
             }
         }
 
