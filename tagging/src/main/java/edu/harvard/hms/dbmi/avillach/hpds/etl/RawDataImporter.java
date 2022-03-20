@@ -83,7 +83,7 @@ public class RawDataImporter {
 	public void run() throws IOException {
         fhsDictionary = new TreeMap<>();
         columnMetaDictionary = new TreeMap<>();
-        
+        System.out.println(inputDirectory);
         for(File studyFolder : new File(inputDirectory).listFiles()) {
         	if(studyFolder.isFile()) continue;
             if(studyFolder!=null) {
