@@ -5,11 +5,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jsoup.nodes.Element;
+
+import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter.ColumnMetaCSVRecord;
 
 public class TopmedVariable implements Serializable  {
 
@@ -166,6 +169,65 @@ public class TopmedVariable implements Serializable  {
 		buildTags();
 	}
 
+
+	public TopmedVariable(TopmedDataTable topmedDataTable, ColumnMetaCSVRecord csvr) {
+		this.metadata = new HashMap<>();
+		this.values = new HashMap<>();
+		
+		if(csvr.categorical) {
+			for(String value: csvr.categoryValues) {
+				value = value.trim();
+				this.values.put(value, value);
+				this.value_tags.add(value);
+				this.allTagsLowercase.add(value.toLowerCase());
+			}
+		} else {
+			this.values = new HashMap<>();
+			this.value_tags = new HashSet<>();
+			this.allTagsLowercase = new HashSet<>();
+			metadata.put("min", String.valueOf(csvr.min));
+			metadata.put("max", String.valueOf(csvr.max));
+		}
+		this.dtId = topmedDataTable.metadata.get("id");
+		this.studyId = topmedDataTable.metadata.get("study_id");
+		this.is_categorical = csvr.categorical ? true: false;
+		this.is_continuous = csvr.categorical ? false: true;
+		metadata.put("study_id", studyId);
+		metadata.put("dataTableId", topmedDataTable.metadata.get("id"));
+		metadata.put("observationCount", String.valueOf(csvr.observationCount));
+		metadata.put("patientCount", String.valueOf(csvr.patientCount));
+		metadata.put("HPDS_PATH", csvr.name);
+		String[] patharr = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
+		
+		if(patharr.length == 4) {
+			this.varId = patharr[2];
+			metadata.put("variable", patharr[3]);
+			
+		} 
+		if(patharr.length == 3) {
+			this.varId = patharr[2];
+			metadata.put("variable", patharr[2]);
+			
+		} 
+		if(patharr.length == 2) {
+			this.varId = patharr[1];
+			metadata.put("variable", patharr[1]);
+			
+		} 
+		if(patharr.length == 1) {
+			this.varId = patharr[0];
+			metadata.put("variable", patharr[0]);
+			
+		}
+		
+		for(String metaKey : this.metadata.keySet()) {
+			this.metadata_tags.add(metaKey);
+			this.allTagsLowercase.add(metaKey.toLowerCase());
+		}
+		
+		
+	}
+
 	private void determineVariableType() {
 		String type = null;
 		if(this.metadata.containsKey("calculated_type") && !this.metadata.get("calculated_type").isEmpty()) {
@@ -214,7 +276,7 @@ public class TopmedVariable implements Serializable  {
 		throw new RuntimeException("Could not determine type of variable : " + varId + " : " + this.metadata.get("type") + " : " + this.metadata.get("calculated_type") + " : " + this.metadata.get("reported_type"));
 	}
 
-	private void buildTags() {
+	public void buildTags() {
 		for(Entry<String, String> entry : metadata.entrySet()) {
 			if(!entry.getKey().contentEquals("dataTableDescription")
 					&& !entry.getKey().contentEquals("dataTableName")

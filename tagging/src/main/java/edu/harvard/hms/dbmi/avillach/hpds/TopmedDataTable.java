@@ -8,6 +8,8 @@ import org.jsoup.nodes.Document;
 
 import com.google.common.collect.Sets;
 
+import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter.ColumnMetaCSVRecord;
 import edu.harvard.hms.dbmi.avillach.hpds.model.SearchQuery;
 
 public class TopmedDataTable implements Serializable {
@@ -36,11 +38,58 @@ public class TopmedDataTable implements Serializable {
 			TopmedVariable tVar;
 			try {
 				tVar = new TopmedVariable(this, variable);
-				variables.put(variable.attr("id"), tVar);
+				variables.put(variable.attr("id").replaceAll("\\.v.*", ""), tVar);
 			}catch(Exception e) {
 				e.printStackTrace();
 			}
 		});
+	}
+
+	public TopmedDataTable(RawDataImporter.ColumnMetaCSVRecord csvr) {
+		metadata = new TreeMap<>();
+		variables = new TreeMap<>();
+		
+		String[] concept = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
+		int studyDepth = concept.length;
+		if(studyDepth == 4) {
+			metadata.put("id", concept[1]);
+			metadata.put("study_id", concept[0]);
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[2], var);
+		}
+		if(studyDepth == 3) {
+			metadata.put("id", concept[1]);
+			metadata.put("study_id", concept[0]);
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[2], var);
+		}
+		if(studyDepth == 2) {
+			metadata.put("id", concept[1]);
+			metadata.put("study_id", concept[0]);
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[1], var);
+		}
+		if(studyDepth == 1) {
+			metadata.put("id", concept[0]);
+			metadata.put("study_id", concept[0]);
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[0], var);
+		}
+		//csvr.categoryValues
+		//metadata.put("participant_set", "");
+		//metadata.put("date_created", "");
+		//metadata.put("description", "");
+		//variables = new TreeMap<>();
+		/*
+		doc.getElementsByTag("variable").stream().forEach(variable -> {
+			TopmedVariable tVar;
+			try {
+				tVar = new TopmedVariable(this, variable);
+				variables.put(variable.attr("id"), tVar);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		});*/
 	}
 
 	public void generateTagMap() {

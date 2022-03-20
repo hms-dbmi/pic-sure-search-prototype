@@ -1,14 +1,34 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl;
 
-import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
-import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.*;
-import java.util.*;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.RFC4180Parser;
+import com.opencsv.RFC4180ParserBuilder;
+
+import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
+import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 
 public class RawDataImporter {
 
@@ -16,7 +36,11 @@ public class RawDataImporter {
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
 
-    private String dictionaryType;
+    private TreeMap<String, TopmedDataTable> columnMetaDictionary;
+
+    
+    
+    private String dictionaryType = "xml";
     
     public RawDataImporter(String inputDirectory) {
 
@@ -24,33 +48,66 @@ public class RawDataImporter {
 
     }
 
+    public class ColumnMetaCSVRecord {
+    	public String name;
+    	public int widthInBytes;
+    	public int columnOffset;
+    	public boolean categorical;
+    	public List<String> categoryValues;
+    	public Double min, max;
+    	public long allObservationsOffset;
+    	public long allObservationsLength;
+    	public int observationCount;
+    	public int patientCount;
+    	
+		public ColumnMetaCSVRecord(String[] metaRecord) {
+			
+			this.name = metaRecord[0];
+			this.widthInBytes = NumberUtils.isCreatable(metaRecord[1]) ? Integer.valueOf(metaRecord[1]): null;
+			this.columnOffset = NumberUtils.isCreatable(metaRecord[2]) ? Integer.valueOf(metaRecord[2]): null;
+			this.categorical = Boolean.parseBoolean(metaRecord[3]);
+			this.categoryValues = categorical ? Arrays.asList(metaRecord[4].substring(1,metaRecord[4].length()-1).split(",")) : null;
+			this.min =  NumberUtils.isCreatable(metaRecord[5]) ? Double.valueOf(metaRecord[5]): null;
+			this.max = NumberUtils.isCreatable(metaRecord[6]) ? Double.valueOf(metaRecord[6]): null;
+			this.allObservationsOffset = NumberUtils.isCreatable(metaRecord[7]) ? Long.valueOf(metaRecord[7]): null;
+			this.allObservationsLength = NumberUtils.isCreatable(metaRecord[8]) ? Long.valueOf(metaRecord[8]): null;
+			this.observationCount = NumberUtils.isCreatable(metaRecord[9]) ? Integer.valueOf(metaRecord[9]): null;
+			this.patientCount = NumberUtils.isCreatable(metaRecord[10]) ? Integer.valueOf(metaRecord[10]): null;
+
+		
+		}
+    	
+    	
+    	
+    }
 	public void run() throws IOException {
         fhsDictionary = new TreeMap<>();
-
-        //		if(! new File(TMP_DICTIONARY_JAVABIN).exists()) {
-
+        columnMetaDictionary = new TreeMap<>();
+        
         for(File studyFolder : new File(inputDirectory).listFiles()) {
+        	if(studyFolder.isFile()) continue;
             if(studyFolder!=null) {
             	// needs to be changed to be for any xml
-            	if(dictionaryType.equalsIgnoreCase("xml")) {
-	            	Arrays.stream(new File(studyFolder, "rawData")
-	                    .list((file, name)->{
-	                        return name.endsWith("data_dict.xml");}
-	                    )).forEach((table)->{
-	                TopmedDataTable topmedDataTable;
-	                try {
-	                    topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
-	                    fhsDictionary.put(topmedDataTable.metadata.get("id"), topmedDataTable);
-	                } catch (IOException e) {
-	                    // TODO Auto-generated catch block
-	                    e.printStackTrace();
-	                }
-	                });
-            	}
+            	Arrays.stream(new File(studyFolder, "rawData")
+                    .list((file, name)->{
+                        return name.endsWith("data_dict.xml");}
+                    )).forEach((table)->{
+                TopmedDataTable topmedDataTable;
+                try {
+                    topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
+                    fhsDictionary.put(topmedDataTable.metadata.get("id").replaceAll("\\.v.*", ""), topmedDataTable);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                });
+            	
             }
         }
 
         for(File studyFolder : new File(inputDirectory).listFiles()) {
+        	if(studyFolder.isFile()) continue;
+
             Arrays.stream(new File(studyFolder, "rawData").list((file, name)->{
                 return name.endsWith("var_report.xml");}
             )).forEach((table)->{
@@ -71,6 +128,36 @@ public class RawDataImporter {
             });
         }
         TreeSet<String> tags = new TreeSet<>();
+        
+        
+        System.out.println("###-Syncing values to column metadata-###");
+        try(BufferedReader buffer = Files.newBufferedReader(Paths.get(inputDirectory + "/columnMeta.csv"))) {
+        	
+        	RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
+        	
+        	CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(buffer)
+        			.withCSVParser(rfc4180Parser);
+        	
+        	CSVReader csvreader = csvReaderBuilder.build();
+        	
+        	csvreader.forEach(columnMetaCSVRecord -> {
+        		ColumnMetaCSVRecord csvr = new ColumnMetaCSVRecord(columnMetaCSVRecord);
+        		String[] arr = csvr.name.split("\\\\");
+        		System.out.println(arr[3]);
+        		String pht = csvr.name.split("\\\\").length > 0 ? csvr.name.split("\\\\")[2] : null;
+        		if(pht != null) {
+        			if(columnMetaDictionary.containsKey(pht)) {
+        				TopmedVariable var =  new TopmedVariable(columnMetaDictionary.get(pht), csvr);
+        				columnMetaDictionary.get(pht).variables.put(var.getVarId(), var);
+        			} else {
+        				columnMetaDictionary.put(pht, new TopmedDataTable(csvr));
+        			}
+        		}
+        	});
+        	
+        }
+        
+        
         for(TopmedDataTable table : fhsDictionary.values()) {
             Collection<TopmedVariable> variables = table.variables.values();
             table.generateTagMap();
@@ -81,9 +168,13 @@ public class RawDataImporter {
                 tags.addAll(variable.getValue_tags());
             }
         }
-
+        // merge xml dictionaries to column metadata
+        mergeDictionaries();
+        
+        buildVarTags();
+        
         writeDictionary();
-
+        
         TreeMap<String, TopmedDataTable> dictionary = readDictionary();
         dictionary.keySet().forEach(key -> {
             dictionary.get(key).variables.values().forEach((TopmedVariable value) -> { 
@@ -92,6 +183,41 @@ public class RawDataImporter {
         });
 
     }
+
+	private void buildVarTags() {
+		for(Entry<String, TopmedDataTable> columnDict: columnMetaDictionary.entrySet()) {
+			
+			columnDict.getValue().variables.forEach((varid, var) -> {
+				var.buildTags();
+			});
+			
+		}
+		
+	}
+
+	private void mergeDictionaries() {
+		for(Entry<String, TopmedDataTable> columnDict: columnMetaDictionary.entrySet()) {
+			if(fhsDictionary.containsKey(columnDict.getKey())) {
+				TopmedDataTable fhsTDT = fhsDictionary.get(columnDict.getKey());
+				// set dt metatags will ignore any fhs meta that matches column meta as column meta is truth of hpds data
+				for(Entry<String,String> metadata: fhsTDT.metadata.entrySet()) {
+					String metakey = "dict_" + metadata.getKey();
+					columnDict.getValue().metadata.put(metakey, metadata.getValue());
+				}
+				for(Entry<String,TopmedVariable> fhsVariable: fhsTDT.variables.entrySet()) {
+					if(columnDict.getValue().variables.containsKey(fhsVariable.getKey())) {
+						for(Entry<String,String> fhsVarMeta :fhsVariable.getValue().getMetadata().entrySet()) {
+							if(!columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().containsKey(fhsVarMeta.getKey())) {
+								columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().put(fhsVarMeta.getKey(),fhsVarMeta.getValue());;
+							}
+						}
+					}
+				}
+			}
+			
+		}
+		
+	}
 
 	private String buildVariableConceptPath(TopmedVariable variable) {
 		return "\\" +
@@ -112,7 +238,7 @@ public class RawDataImporter {
 
     private void writeDictionary() {
         try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(JAVABIN)))){
-            oos.writeObject(fhsDictionary);
+            oos.writeObject(columnMetaDictionary);
             oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,6 +253,7 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
-        new RawDataImporter(args[0]).run();
+    	
+        new RawDataImporter("./data/").run();
     }
 }
