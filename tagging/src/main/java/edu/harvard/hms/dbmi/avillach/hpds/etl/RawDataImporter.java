@@ -143,7 +143,7 @@ public class RawDataImporter {
         	csvreader.forEach(columnMetaCSVRecord -> {
         		ColumnMetaCSVRecord csvr = new ColumnMetaCSVRecord(columnMetaCSVRecord);
         		String[] arr = csvr.name.split("\\\\");
-        		System.out.println(arr[3]);
+        		//System.out.println(arr[3]);
         		String pht = csvr.name.split("\\\\").length > 0 ? csvr.name.split("\\\\")[2] : null;
         		if(pht != null) {
         			if(columnMetaDictionary.containsKey(pht)) {
