@@ -267,7 +267,6 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
-    	args = new String[]{"./data/" };
         new RawDataImporter(args[0]).run();
     }
 }
