@@ -142,15 +142,29 @@ public class RawDataImporter {
         	
         	csvreader.forEach(columnMetaCSVRecord -> {
         		ColumnMetaCSVRecord csvr = new ColumnMetaCSVRecord(columnMetaCSVRecord);
-        		String[] arr = csvr.name.split("\\\\");
+        		String[] concept = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
         		//System.out.println(arr[3]);
-        		String pht = csvr.name.split("\\\\").length > 0 ? csvr.name.split("\\\\")[2] : null;
-        		if(pht != null) {
-        			if(columnMetaDictionary.containsKey(pht)) {
-        				TopmedVariable var =  new TopmedVariable(columnMetaDictionary.get(pht), csvr);
-        				columnMetaDictionary.get(pht).variables.put(var.getVarId(), var);
+        		String dt = null; // = csvr.name.split("\\\\").length > 0 ? csvr.name.split("\\\\")[2] : null;
+        		int studyDepth = concept.length;
+        		
+        		if(studyDepth == 4) {
+        			dt = concept[1];
+        		}
+        		if(studyDepth == 3) {
+        			dt = concept[1];
+        		}
+        		if(studyDepth == 2) {
+        			dt = concept[0];
+        		}
+        		if(studyDepth == 1) {
+        			dt = concept[0];
+        		}
+        		if(dt != null) {
+        			if(columnMetaDictionary.containsKey(dt)) {
+        				TopmedVariable var =  new TopmedVariable(columnMetaDictionary.get(dt), csvr);
+        				columnMetaDictionary.get(dt).variables.put(var.getVarId(), var);
         			} else {
-        				columnMetaDictionary.put(pht, new TopmedDataTable(csvr));
+        				columnMetaDictionary.put(dt, new TopmedDataTable(csvr));
         			}
         		}
         	});
@@ -190,7 +204,7 @@ public class RawDataImporter {
 			columnDict.getValue().variables.forEach((varid, var) -> {
 				var.buildTags();
 			});
-			
+			columnDict.getValue().generateTagMap();
 		}
 		
 	}
@@ -253,7 +267,7 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
-    	
+    	args = new String[]{"./data/" };
         new RawDataImporter(args[0]).run();
     }
 }
