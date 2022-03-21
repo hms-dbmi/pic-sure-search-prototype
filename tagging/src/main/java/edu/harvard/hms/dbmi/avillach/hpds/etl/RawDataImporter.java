@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -133,6 +134,8 @@ public class RawDataImporter {
         
         System.out.println("###-Syncing values to column metadata-###");
         long columnMetaRecCount = 0;
+    	ConcurrentSkipListSet<String> nonIngestedMetaRecords = new ConcurrentSkipListSet<String>();
+
         try(BufferedReader buffer = Files.newBufferedReader(Paths.get(inputDirectory + "/columnMeta.csv"))) {
         	
         	RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
@@ -141,7 +144,6 @@ public class RawDataImporter {
         			.withCSVParser(rfc4180Parser);
         	
         	CSVReader csvreader = csvReaderBuilder.build();
-        	
         	csvreader.forEach(columnMetaCSVRecord -> {
         		
         		ColumnMetaCSVRecord csvr = new ColumnMetaCSVRecord(columnMetaCSVRecord);
@@ -170,6 +172,7 @@ public class RawDataImporter {
         				columnMetaDictionary.put(dt, new TopmedDataTable(csvr));
         			}
         		} else {
+        			nonIngestedMetaRecords.add(csvr.name);
         			System.err.println("Dictionary not created for=" + csvr.name);
         		}
         	});
@@ -221,6 +224,11 @@ public class RawDataImporter {
         // dictionary size can be smaller as _studies_consents holds nested variables in it's concept path.
         System.out.println("Dictionary data table records = " + dictionary.size());
         System.out.println("Dictionary variable records = " + dictionaryTotalVars);
+        
+        System.out.println("Non-ingested metadata:");
+        nonIngestedMetaRecords.forEach(str -> {
+        	System.err.println(str);
+        });
     }
 
 	private void buildVarTags() {
