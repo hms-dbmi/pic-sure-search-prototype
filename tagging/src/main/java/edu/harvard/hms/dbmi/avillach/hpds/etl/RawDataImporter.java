@@ -38,7 +38,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 
 public class RawDataImporter {
 
-    private static final String JAVABIN = "./data/dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
+    private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
 
@@ -336,7 +336,6 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
-    	args = new String[]{ "./data/" };
         new RawDataImporter(args[0]).run();
     }
 }
