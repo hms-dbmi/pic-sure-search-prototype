@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -34,11 +35,13 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 
 public class RawDataImporter {
 
-    private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
+    private static final String JAVABIN = "./data/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
 
     private TreeMap<String, TopmedDataTable> columnMetaDictionary;
+
+    private String dictionaryType = "xml";
     
     public RawDataImporter(String inputDirectory) {
 
@@ -193,9 +196,11 @@ public class RawDataImporter {
         TreeMap<String, TopmedDataTable> dictionary = readDictionary();
         
         Set<String> invalidDict = new HashSet<String>();
-        
+        AtomicInteger dictionaryTotalVars = new AtomicInteger();
         dictionary.keySet().forEach(key -> {
+        	        
         	dictionary.get(key).variables.values().forEach((TopmedVariable value) -> {
+        		dictionaryTotalVars.getAndIncrement();
         		if(value.getMetadata().containsKey("HPDS_PATH")) {
         			System.out.println(value.getMetadata().get("HPDS_PATH"));
         		} else {
@@ -212,7 +217,8 @@ public class RawDataImporter {
         });        
         System.out.println("ColumnMetadata records = " + columnMetaRecCount);
         // dictionary size can be smaller as _studies_consents holds nested variables in it's concept path.
-        System.out.println("Dictionary records = " + dictionary.size());
+        System.out.println("Dictionary data table records = " + dictionary.size());
+        System.out.println("Dictionary variable records = " + dictionaryTotalVars);
     }
 
 	private void buildVarTags() {
@@ -284,6 +290,7 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
+    	args = new String[] {"./data/"};
         new RawDataImporter(args[0]).run();
     }
 }
