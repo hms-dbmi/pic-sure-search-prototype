@@ -169,6 +169,8 @@ public class RawDataImporter {
         			} else {
         				columnMetaDictionary.put(dt, new TopmedDataTable(csvr));
         			}
+        		} else {
+        			System.err.println("Dictionary not created for=" + csvr.name);
         		}
         	});
         	
