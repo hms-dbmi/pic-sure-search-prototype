@@ -11,8 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
@@ -37,10 +39,6 @@ public class RawDataImporter {
     private String inputDirectory;
 
     private TreeMap<String, TopmedDataTable> columnMetaDictionary;
-
-    
-    
-    private String dictionaryType = "xml";
     
     public RawDataImporter(String inputDirectory) {
 
@@ -131,6 +129,7 @@ public class RawDataImporter {
         
         
         System.out.println("###-Syncing values to column metadata-###");
+        long columnMetaRecCount = 0;
         try(BufferedReader buffer = Files.newBufferedReader(Paths.get(inputDirectory + "/columnMeta.csv"))) {
         	
         	RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
@@ -141,6 +140,7 @@ public class RawDataImporter {
         	CSVReader csvreader = csvReaderBuilder.build();
         	
         	csvreader.forEach(columnMetaCSVRecord -> {
+        		
         		ColumnMetaCSVRecord csvr = new ColumnMetaCSVRecord(columnMetaCSVRecord);
         		String[] concept = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
         		//System.out.println(arr[3]);
@@ -169,6 +169,7 @@ public class RawDataImporter {
         		}
         	});
         	
+        	columnMetaRecCount = csvreader.getLinesRead();
         }
         
         
@@ -190,12 +191,28 @@ public class RawDataImporter {
         writeDictionary();
         
         TreeMap<String, TopmedDataTable> dictionary = readDictionary();
+        
+        Set<String> invalidDict = new HashSet<String>();
+        
         dictionary.keySet().forEach(key -> {
+        	dictionary.get(key).variables.values().forEach((TopmedVariable value) -> {
+        		if(value.getMetadata().containsKey("HPDS_PATH")) {
+        			System.out.println(value.getMetadata().get("HPDS_PATH"));
+        		} else {
+        			System.err.println("Dictionary variable missing required metadata=" + value.getStudyId() + " - " + value.getVarId());
+        		}
+        	});
+        	/* this method call is no longer valid as non dbgap studies are not 4 level of concept depth
+        	 * each dictionary variable has an hpds_path saved in it's metadata will display that instead
+        	 * 
             dictionary.get(key).variables.values().forEach((TopmedVariable value) -> { 
 	        	System.out.println(buildVariableConceptPath(value));
-            });
-        });
-
+            });*/
+            
+        });        
+        System.out.println("ColumnMetadata records = " + columnMetaRecCount);
+        // dictionary size can be smaller as _studies_consents holds nested variables in it's concept path.
+        System.out.println("Dictionary records = " + dictionary.size());
     }
 
 	private void buildVarTags() {

@@ -201,23 +201,24 @@ public class TopmedVariable implements Serializable  {
 		
 		if(patharr.length == 4) {
 			this.varId = patharr[2];
-			metadata.put("variable", patharr[3]);
+			metadata.put("varId", patharr[3]);
+			metadata.put("name", patharr[3]);
 			
 		} 
 		if(patharr.length == 3) {
 			this.varId = patharr[2];
-			metadata.put("variable", patharr[2]);
-			
+			metadata.put("varId", patharr[2]);
+			metadata.put("name", patharr[2]);
 		} 
 		if(patharr.length == 2) {
 			this.varId = patharr[1];
-			metadata.put("variable", patharr[1]);
-			
+			metadata.put("varId", patharr[1]);
+			metadata.put("name", patharr[1]);
 		} 
 		if(patharr.length == 1) {
 			this.varId = patharr[0];
-			metadata.put("variable", patharr[0]);
-			
+			metadata.put("varId", patharr[0]);
+			metadata.put("name", patharr[0]);
 		}
 		
 		for(String metaKey : this.metadata.keySet()) {
