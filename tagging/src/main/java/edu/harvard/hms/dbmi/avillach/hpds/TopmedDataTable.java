@@ -54,24 +54,31 @@ public class TopmedDataTable implements Serializable {
 		if(studyDepth == 4) {
 			metadata.put("id", concept[1]);
 			metadata.put("study_id", concept[0]);
+			metadata.put("description", concept[1]);
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[2], var);
 		}
 		if(studyDepth == 3) {
 			metadata.put("id", concept[1]);
 			metadata.put("study_id", concept[0]);
+			metadata.put("description", concept[1]);
+
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[2], var);
 		}
 		if(studyDepth == 2) {
 			metadata.put("id", concept[1]);
 			metadata.put("study_id", concept[0]);
+			metadata.put("description", concept[1]);
+
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[1], var);
 		}
 		if(studyDepth == 1) {
 			metadata.put("id", concept[0]);
 			metadata.put("study_id", concept[0]);
+			metadata.put("description", concept[1]);
+
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[0], var);
 		}

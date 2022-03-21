@@ -11,8 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -36,7 +38,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 
 public class RawDataImporter {
 
-    private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
+    private static final String JAVABIN = "./data/dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
 
@@ -202,12 +204,29 @@ public class RawDataImporter {
         
         Set<String> invalidDict = new HashSet<String>();
         AtomicInteger dictionaryTotalVars = new AtomicInteger();
+        
         dictionary.keySet().forEach(key -> {
         	if(dictionary.get(key).variables.values().isEmpty()) {
         		nonIngestedMetaRecords.add(dictionary.get(key).metadata.get("id") + " - " + dictionary.get(key).metadata.get("study_id"));
         	}
+        	if(!dictionary.get(key).metadata.containsKey("description")) {
+        		System.err.println("Dictionary table does not have a description=" + dictionary.get(key));
+        		nonIngestedMetaRecords.add(dictionary.get(key) + " - Data Table missing Description");
+        	}
+        	if(dictionary.get(key).metadata.containsKey("description") && dictionary.get(key).metadata.get("description").isBlank()) {
+
+        		System.err.println("Dictionary table description is blank=" + dictionary.get(key).metadata.get("id"));
+        		nonIngestedMetaRecords.add(dictionary.get(key) + " - Data Table blank Description");
+        	}
         	dictionary.get(key).variables.values().forEach((TopmedVariable value) -> {
+        
         		dictionaryTotalVars.getAndIncrement();
+        		if(value.getMetadata().containsKey("description") && value.getMetadata().get("description").isBlank()) {
+        			System.err.println("Dictionary description for variable is blank=" + value.getStudyId() + " - " + value.getVarId());
+        		}
+        		if(!value.getMetadata().containsKey("description")) {
+        			System.err.println("Dictionary description for variable is missing=" + value.getStudyId() + " - " + value.getVarId());
+        		}
         		if(value.getMetadata().containsKey("HPDS_PATH")) {
         			System.out.println(value.getMetadata().get("HPDS_PATH"));
         		} else {
@@ -227,7 +246,7 @@ public class RawDataImporter {
         System.out.println("Dictionary data table records = " + dictionary.size());
         System.out.println("Dictionary variable records = " + dictionaryTotalVars);
         
-        System.out.println("Non-ingested metadata:");
+        System.out.println("Non-ingested or invalid metadata:");
         nonIngestedMetaRecords.forEach(str -> {
         	System.err.println(str);
         });
@@ -250,16 +269,31 @@ public class RawDataImporter {
 				TopmedDataTable fhsTDT = fhsDictionary.get(columnDict.getKey());
 				// set dt metatags will ignore any fhs meta that matches column meta as column meta is truth of hpds data
 				for(Entry<String,String> metadata: fhsTDT.metadata.entrySet()) {
-					String metakey = "dict_" + metadata.getKey();
-					columnDict.getValue().metadata.put(metakey, metadata.getValue());
+					if(metadata.getValue().isEmpty()) continue;
+					if(columnDict.getValue().metadata.containsKey(metadata.getKey())) {
+						String newMetaKey = "columnmeta_" + metadata.getKey();
+						String newMetaVal = columnDict.getValue().metadata.get(metadata.getKey());
+						columnDict.getValue().metadata.put(newMetaKey,newMetaVal);
+					}
+					
+					columnDict.getValue().metadata.put(metadata.getKey(), metadata.getValue());
 				}
 				for(Entry<String,TopmedVariable> fhsVariable: fhsTDT.variables.entrySet()) {
 					if(columnDict.getValue().variables.containsKey(fhsVariable.getKey())) {
 						for(Entry<String,String> fhsVarMeta :fhsVariable.getValue().getMetadata().entrySet()) {
-							if(!columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().containsKey(fhsVarMeta.getKey())) {
+							// overwrite all metadata derived from data dictionaries 
+							// rename metadata for overwritten columnmeta meta.
+							if(columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().containsKey(fhsVarMeta.getKey())) {
+								String cmvarnewkey = "columnmeta_" + fhsVarMeta.getKey();
+								String cmvarnewval = columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().get(fhsVarMeta.getKey());
+								
+								columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().put(cmvarnewkey,cmvarnewval);
 								columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().put(fhsVarMeta.getKey(),fhsVarMeta.getValue());;
 							}
+							
 						}
+						
+						
 					}
 				}
 			}
@@ -302,6 +336,7 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
+    	args = new String[]{ "./data/" };
         new RawDataImporter(args[0]).run();
     }
 }

@@ -195,6 +195,7 @@ public class TopmedVariable implements Serializable  {
 		metadata.put("study_id", studyId);
 		metadata.put("dataTableId", topmedDataTable.metadata.get("id"));
 		metadata.put("observationCount", String.valueOf(csvr.observationCount));
+		metadata.put("dataTableDescription", topmedDataTable.metadata.get("description"));
 		metadata.put("patientCount", String.valueOf(csvr.patientCount));
 		metadata.put("HPDS_PATH", csvr.name);
 		String[] patharr = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
@@ -203,22 +204,25 @@ public class TopmedVariable implements Serializable  {
 			this.varId = patharr[2];
 			metadata.put("varId", patharr[3]);
 			metadata.put("name", patharr[3]);
-			
+			metadata.put("description", patharr[3]);
 		} 
 		if(patharr.length == 3) {
 			this.varId = patharr[2];
 			metadata.put("varId", patharr[2]);
 			metadata.put("name", patharr[2]);
+			metadata.put("description", patharr[2]);
 		} 
 		if(patharr.length == 2) {
 			this.varId = patharr[1];
 			metadata.put("varId", patharr[1]);
 			metadata.put("name", patharr[1]);
+			metadata.put("description", patharr[1]);
 		} 
 		if(patharr.length == 1) {
 			this.varId = patharr[0];
 			metadata.put("varId", patharr[0]);
 			metadata.put("name", patharr[0]);
+			metadata.put("description", patharr[0]);
 		}
 		
 		for(String metaKey : this.metadata.keySet()) {
