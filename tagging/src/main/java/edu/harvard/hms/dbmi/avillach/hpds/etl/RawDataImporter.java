@@ -336,6 +336,7 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
+    	
         new RawDataImporter(args[0]).run();
     }
 }
