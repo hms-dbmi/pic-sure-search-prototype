@@ -203,7 +203,9 @@ public class RawDataImporter {
         Set<String> invalidDict = new HashSet<String>();
         AtomicInteger dictionaryTotalVars = new AtomicInteger();
         dictionary.keySet().forEach(key -> {
-        	        
+        	if(dictionary.get(key).variables.values().isEmpty()) {
+        		nonIngestedMetaRecords.add(dictionary.get(key).metadata.get("id") + " - " + dictionary.get(key).metadata.get("study_id"));
+        	}
         	dictionary.get(key).variables.values().forEach((TopmedVariable value) -> {
         		dictionaryTotalVars.getAndIncrement();
         		if(value.getMetadata().containsKey("HPDS_PATH")) {
