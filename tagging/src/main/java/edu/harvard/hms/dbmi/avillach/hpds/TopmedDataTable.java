@@ -77,7 +77,7 @@ public class TopmedDataTable implements Serializable {
 		if(studyDepth == 1) {
 			metadata.put("id", concept[0]);
 			metadata.put("study_id", concept[0]);
-			metadata.put("description", concept[1]);
+			metadata.put("description", concept[0]);
 
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[0], var);
