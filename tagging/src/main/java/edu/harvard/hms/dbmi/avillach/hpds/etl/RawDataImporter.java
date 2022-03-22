@@ -28,6 +28,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.RFC4180Parser;
@@ -37,14 +39,12 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 
 public class RawDataImporter {
+    private static String outputDirectory = "/usr/local/docker-config/search/";
 
-    private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
+    private static final String JAVABIN = outputDirectory + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
-
     private TreeMap<String, TopmedDataTable> columnMetaDictionary;
-
-    private String dictionaryType = "xml";
     
     public RawDataImporter(String inputDirectory) {
 
@@ -99,7 +99,7 @@ public class RawDataImporter {
                 TopmedDataTable topmedDataTable;
                 try {
                     topmedDataTable = loadDataTable(studyFolder.getAbsolutePath()+"/rawData/"+table);
-                    fhsDictionary.put(topmedDataTable.metadata.get("id").replaceAll("\\.v.*", ""), topmedDataTable);
+                    fhsDictionary.put(topmedDataTable.metadata.get("study_id").replaceAll("\\.v.*", "") + "_" + topmedDataTable.metadata.get("id").replaceAll("\\.v.*", ""), topmedDataTable);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -117,7 +117,7 @@ public class RawDataImporter {
             )).forEach((table)->{
                 String[] split = table.split("\\.");
                 if(split.length > 2) {
-                    String tableId = split[2] + "." + split[3];
+                    String tableId = split[0] + "_" + split[2];
                     TopmedDataTable topmedDataTable = fhsDictionary.get(tableId);
                     if(topmedDataTable!=null) {
                         try {
@@ -155,10 +155,10 @@ public class RawDataImporter {
         		int studyDepth = concept.length;
         		
         		if(studyDepth == 4) {
-        			dt = concept[1];
+        			dt = concept[0] + "_" + concept[1];
         		}
         		if(studyDepth == 3) {
-        			dt = concept[1];
+        			dt = concept[0] + "_" + concept[1];
         		}
         		if(studyDepth == 2) {
         			dt = concept[0];
@@ -326,6 +326,18 @@ public class RawDataImporter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+			String jsonOut = mapper.writeValueAsString(columnMetaDictionary);
+			
+			Files.write(Paths.get(outputDirectory + "dictionary.json"), jsonOut.getBytes());
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     private TopmedDataTable loadDataTable(String pathname) throws IOException {
@@ -336,7 +348,8 @@ public class RawDataImporter {
     }
 
     public static void main(String[] args) throws IOException {
-    	System.out.println("args0=" + args[0]);
+//    	System.out.println("args0=" + args[0]);
+    	//args = new String[] { "./data/" };
         new RawDataImporter(args[0]).run();
     }
 }
