@@ -52,32 +52,32 @@ public class TopmedDataTable implements Serializable {
 		String[] concept = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
 		int studyDepth = concept.length;
 		if(studyDepth == 4) {
-			metadata.put("id", concept[1]);
-			metadata.put("study_id", concept[0]);
-			metadata.put("description", concept[1]);
+			metadata.put("columnmeta_id", concept[1]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[1]);
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[2], var);
 		}
 		if(studyDepth == 3) {
-			metadata.put("id", concept[1]);
-			metadata.put("study_id", concept[0]);
-			metadata.put("description", concept[1]);
+			metadata.put("columnmeta_id", concept[1]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[1]);
 
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[2], var);
 		}
 		if(studyDepth == 2) {
-			metadata.put("id", concept[1]);
-			metadata.put("study_id", concept[0]);
-			metadata.put("description", concept[1]);
+			metadata.put("columnmeta_id", concept[1]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[1]);
 
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[1], var);
 		}
 		if(studyDepth == 1) {
-			metadata.put("id", concept[0]);
-			metadata.put("study_id", concept[0]);
-			metadata.put("description", concept[0]);
+			metadata.put("columnmeta_id", concept[0]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[0]);
 
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[0], var);

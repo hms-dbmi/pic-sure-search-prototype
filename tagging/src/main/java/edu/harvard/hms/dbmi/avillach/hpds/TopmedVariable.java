@@ -185,19 +185,19 @@ public class TopmedVariable implements Serializable  {
 			this.values = new HashMap<>();
 			this.value_tags = new HashSet<>();
 			this.allTagsLowercase = new HashSet<>();
-			metadata.put("min", String.valueOf(csvr.min));
-			metadata.put("max", String.valueOf(csvr.max));
+			metadata.put("columnmeta_min", String.valueOf(csvr.min));
+			metadata.put("columnmeta_max", String.valueOf(csvr.max));
 		}
-		this.dtId = topmedDataTable.metadata.get("id");
-		this.studyId = topmedDataTable.metadata.get("study_id");
+		this.dtId = topmedDataTable.metadata.get("columnmeta_id");
+		this.studyId = topmedDataTable.metadata.get("columnmeta_study_id");
 		this.is_categorical = csvr.categorical ? true: false;
 		this.is_continuous = csvr.categorical ? false: true;
 		metadata.put("columnmeta_study_id", studyId);
-		metadata.put("columnmeta_var_group_id", topmedDataTable.metadata.get("id"));
+		metadata.put("columnmeta_var_group_id", topmedDataTable.metadata.get("columnmeta_id"));
 		metadata.put("columnmeta_observation_count", String.valueOf(csvr.observationCount));
-		metadata.put("columnmeta_var_group_description", topmedDataTable.metadata.get("description"));
+		metadata.put("columnmeta_var_group_description", topmedDataTable.metadata.get("columnmeta_description"));
 		metadata.put("columnmeta_patient_count", String.valueOf(csvr.patientCount));
-		metadata.put("HPDS_PATH", csvr.name);
+		metadata.put("columnmeta_HPDS_PATH", csvr.name);
 		metadata.put("columnmeta_data_type", csvr.categorical ? "categorical": "continuous");
 		String[] patharr = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
 		
@@ -206,7 +206,7 @@ public class TopmedVariable implements Serializable  {
 			metadata.put("columnmeta_var_id", patharr[3]);
 			metadata.put("columnmeta_name", patharr[3]);
 			metadata.put("columnmeta_description", patharr[3]);
-			metadata.put("description", patharr[3]);
+			//metadata.put("description", patharr[3]);
 
 		} 
 		if(patharr.length == 3) {
@@ -214,7 +214,7 @@ public class TopmedVariable implements Serializable  {
 			metadata.put("columnmeta_var_id", patharr[2]);
 			metadata.put("columnmeta_name", patharr[2]);
 			metadata.put("columnmeta_description", patharr[2]);
-			metadata.put("description", patharr[2]);
+			//metadata.put("description", patharr[2]);
 
 		} 
 		if(patharr.length == 2) {
@@ -222,7 +222,7 @@ public class TopmedVariable implements Serializable  {
 			metadata.put("columnmeta_var_id", patharr[1]);
 			metadata.put("columnmeta_name", patharr[1]);
 			metadata.put("columnmeta_description", patharr[1]);
-			metadata.put("description", patharr[1]);
+			//metadata.put("description", patharr[1]);
 
 		} 
 		if(patharr.length == 1) {
@@ -230,7 +230,7 @@ public class TopmedVariable implements Serializable  {
 			metadata.put("columnmeta_var_id", patharr[0]);
 			metadata.put("columnmeta_name", patharr[0]);
 			metadata.put("columnmeta_description", patharr[0]);
-			metadata.put("description", patharr[0]);
+			//metadata.put("description", patharr[0]);
 
 		}
 		

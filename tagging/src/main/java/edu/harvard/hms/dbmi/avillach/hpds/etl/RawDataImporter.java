@@ -166,6 +166,18 @@ public class RawDataImporter {
         		if(studyDepth == 1) {
         			dt = concept[0];
         		}
+        		if(concept[0].equals("_studies_consents")) {
+        			if(studyDepth == 3) {
+            			dt = concept[0] + "_" + concept[2];
+            		}
+            		if(studyDepth == 2) {
+            			dt = concept[0] + "_" + concept[1];
+            		}
+            		if(studyDepth == 1) {
+            			dt = concept[0];
+            		}
+        		}
+        		System.out.println(dt);
         		if(dt != null) {
         			if(columnMetaDictionary.containsKey(dt)) {
         				TopmedVariable var =  new TopmedVariable(columnMetaDictionary.get(dt), csvr);
@@ -188,7 +200,7 @@ public class RawDataImporter {
             table.generateTagMap();
             
             for(TopmedVariable variable : variables) {
-            	variable.getMetadata().put("HPDS_PATH", buildVariableConceptPath(variable));
+            	//variable.getMetadata().put("HPDS_PATH", buildVariableConceptPath(variable));
                 tags.addAll(variable.getMetadata_tags());
                 tags.addAll(variable.getValue_tags());
             }
@@ -205,15 +217,31 @@ public class RawDataImporter {
         Set<String> invalidDict = new HashSet<String>();
         AtomicInteger dictionaryTotalVars = new AtomicInteger();
         
+        Set<String> dictKS = new HashSet<String>();
+        Set<String> cmdKS = new HashSet<String>();
+        columnMetaDictionary.keySet().forEach(key -> {
+        	columnMetaDictionary.get(key).variables.keySet().forEach(k -> {
+            	cmdKS.add(key + ":" + k);
+
+        	});
+        });
+        
         dictionary.keySet().forEach(key -> {
+        	dictionary.get(key).variables.keySet().forEach(k -> {
+        		dictKS.add(key + ":" + k);
+
+        	});        
+        });
+
+        dictionary.keySet().forEach(key -> { 
         	if(dictionary.get(key).variables.values().isEmpty()) {
         		nonIngestedMetaRecords.add(dictionary.get(key).metadata.get("id") + " - " + dictionary.get(key).metadata.get("study_id"));
         	}
-        	if(!dictionary.get(key).metadata.containsKey("description")) {
+        	if(!dictionary.get(key).metadata.containsKey("columnmeta_description")) {
         		System.err.println("Dictionary table does not have a description=" + dictionary.get(key));
         		nonIngestedMetaRecords.add(dictionary.get(key) + " - Data Table missing Description");
         	}
-        	if(dictionary.get(key).metadata.containsKey("description") && dictionary.get(key).metadata.get("description").isBlank()) {
+        	if(dictionary.get(key).metadata.containsKey("columnmeta_description") && dictionary.get(key).metadata.get("columnmeta_description").isBlank()) {
 
         		System.err.println("Dictionary table description is blank=" + dictionary.get(key).metadata.get("id"));
         		nonIngestedMetaRecords.add(dictionary.get(key) + " - Data Table blank Description");
@@ -221,14 +249,14 @@ public class RawDataImporter {
         	dictionary.get(key).variables.values().forEach((TopmedVariable value) -> {
         
         		dictionaryTotalVars.getAndIncrement();
-        		if(value.getMetadata().containsKey("description") && value.getMetadata().get("description").isBlank()) {
+        		if(value.getMetadata().containsKey("columnmeta_description") && value.getMetadata().get("columnmeta_description").isBlank()) {
         			System.err.println("Dictionary description for variable is blank=" + value.getStudyId() + " - " + value.getVarId());
         		}
-        		if(!value.getMetadata().containsKey("description")) {
+        		if(!value.getMetadata().containsKey("columnmeta_description")) {
         			System.err.println("Dictionary description for variable is missing=" + value.getStudyId() + " - " + value.getVarId());
         		}
-        		if(value.getMetadata().containsKey("HPDS_PATH")) {
-        			System.out.println(value.getMetadata().get("HPDS_PATH"));
+        		if(value.getMetadata().containsKey("columnmeta_HPDS_PATH")) {
+        			System.out.println(value.getMetadata().get("columnmeta_HPDS_PATH"));
         		} else {
         			System.err.println("Dictionary variable missing required metadata=" + value.getStudyId() + " - " + value.getVarId());
         		}
@@ -250,6 +278,8 @@ public class RawDataImporter {
         nonIngestedMetaRecords.forEach(str -> {
         	System.err.println(str);
         });
+        System.out.println(dictKS.size());
+        System.out.println(cmdKS.size());
     }
 
 	private void buildVarTags() {
