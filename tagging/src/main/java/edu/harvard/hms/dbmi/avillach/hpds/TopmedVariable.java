@@ -143,7 +143,8 @@ public class TopmedVariable implements Serializable  {
 	private boolean is_continuous;
 
 	public TopmedVariable(){
-
+		this.metadata = new HashMap<>();
+		this.values = new HashMap<>();
 	}
 
 	public TopmedVariable(TopmedDataTable topmedDataTable, Element e){

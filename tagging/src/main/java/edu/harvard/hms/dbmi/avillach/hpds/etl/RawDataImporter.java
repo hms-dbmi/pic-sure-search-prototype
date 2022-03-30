@@ -11,10 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -29,6 +27,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -37,15 +36,18 @@ import com.opencsv.RFC4180ParserBuilder;
 
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.metadata.model.DefaultJsonDataDictionaryBuilder;
 
 public class RawDataImporter {
-    private static String outputDirectory = "/usr/local/docker-config/search/";
+    private static String outputDirectory = "./data/";//"/usr/local/docker-config/search/";
 
     private static final String JAVABIN = outputDirectory + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
     private TreeMap<String, TopmedDataTable> columnMetaDictionary;
-    
+    private TreeMap<String, TopmedDataTable> jsonMetaDictionary;
+    private TreeMap<String, String> harmonizedMetaDictionary;
+
     public RawDataImporter(String inputDirectory) {
 
     	this.inputDirectory = inputDirectory;
@@ -87,11 +89,19 @@ public class RawDataImporter {
 	public void run() throws IOException {
         fhsDictionary = new TreeMap<>();
         columnMetaDictionary = new TreeMap<>();
+        jsonMetaDictionary  = new TreeMap<>();
+        harmonizedMetaDictionary  = new TreeMap<>();
+        
         System.out.println(inputDirectory);
         for(File studyFolder : new File(inputDirectory).listFiles()) {
         	if(studyFolder.isFile()) continue;
             if(studyFolder!=null) {
             	// needs to be changed to be for any xml
+            	if(Arrays.stream(new File(studyFolder, "rawData")
+                    .list((file, name)->{
+                        return name.endsWith("data_dict.xml");}
+                    )) == null) continue;
+                    
             	Arrays.stream(new File(studyFolder, "rawData")
                     .list((file, name)->{
                         return name.endsWith("data_dict.xml");}
@@ -132,6 +142,10 @@ public class RawDataImporter {
             });
         }
         TreeSet<String> tags = new TreeSet<>();
+        
+        buildJsonMetaDictionary();
+
+        buildHarmonizedMetaDictionary();
         
         
         System.out.println("###-Syncing values to column metadata-###");
@@ -177,7 +191,6 @@ public class RawDataImporter {
             			dt = concept[0];
             		}
         		}
-        		System.out.println(dt);
         		if(dt != null) {
         			if(columnMetaDictionary.containsKey(dt)) {
         				TopmedVariable var =  new TopmedVariable(columnMetaDictionary.get(dt), csvr);
@@ -249,18 +262,29 @@ public class RawDataImporter {
         	dictionary.get(key).variables.values().forEach((TopmedVariable value) -> {
         
         		dictionaryTotalVars.getAndIncrement();
-        		if(value.getMetadata().containsKey("columnmeta_description") && value.getMetadata().get("columnmeta_description").isBlank()) {
-        			System.err.println("Dictionary description for variable is blank=" + value.getStudyId() + " - " + value.getVarId());
-        		}
+        		
         		if(!value.getMetadata().containsKey("columnmeta_description")) {
         			System.err.println("Dictionary description for variable is missing=" + value.getStudyId() + " - " + value.getVarId());
+        			nonIngestedMetaRecords.add(dictionary.get(key) + " - Dictionary description for variable is missing=" + value.getStudyId() + " - " + value.getVarId());
         		}
-        		if(value.getMetadata().containsKey("columnmeta_HPDS_PATH")) {
-        			System.out.println(value.getMetadata().get("columnmeta_HPDS_PATH"));
-        		} else {
-        			System.err.println("Dictionary variable missing required metadata=" + value.getStudyId() + " - " + value.getVarId());
+        		if(value.getMetadata().containsKey("columnmeta_description") && value.getMetadata().get("columnmeta_description").isBlank()) {
+        			System.err.println("Dictionary description for variable is blank=" + value.getStudyId() + " - " + value.getVarId());
+        			nonIngestedMetaRecords.add(dictionary.get(key) + " - Dictionary description for variable is blank=" + value.getStudyId() + " - " + value.getVarId());
+        		}
+        		if(!value.getMetadata().containsKey("columnmeta_HPDS_PATH")) {
+        			System.err.println("Dictionary variable missing columnmeta_HPDS_PATH=" + value.getStudyId() + " - " + value.getVarId());
+        		} 
+        	    if (value.getMetadata().get("columnmeta_description").equals(value.getMetadata().get("columnmeta_name"))) {
+        			System.err.println("Dictionary variable name equals description - " + value.getStudyId() + ":" + value.getVarId());
         		}
         	});
+        	dictionary.get(key).variables.forEach((k,v ) -> {
+				String colDesc = v.getMetadata().get("columnmeta_description");
+				String colName = v.getMetadata().get("columnmeta_name");
+				if(colDesc.equals(colName)) {
+					
+				}
+			});
         	/* this method call is no longer valid as non dbgap studies are not 4 level of concept depth
         	 * each dictionary variable has an hpds_path saved in it's metadata will display that instead
         	 * 
@@ -281,6 +305,47 @@ public class RawDataImporter {
         System.out.println(dictKS.size());
         System.out.println(cmdKS.size());
     }
+
+	private void buildHarmonizedMetaDictionary() {
+		for(File studyFolder : new File(inputDirectory).listFiles()) {
+        	if(studyFolder.isFile()) continue;
+        	if(studyFolder.getName().contains("hrmn")) {
+				if(Arrays.stream(new File(studyFolder, "rawData")
+		                .list((file, name)->{
+		                    return name.endsWith(".json");}
+		                )) == null) continue;
+		                
+		        	Arrays.stream(new File(studyFolder, "rawData")
+		                .list((file, name)->{
+		                    return name.endsWith(".json");}
+		                )).forEach(file -> {
+		                	harmonizedMetaDictionary.putAll(DefaultJsonDataDictionaryBuilder.buildHarmonized(new File(studyFolder.getAbsolutePath()+"/rawData/"+ file)));
+		                });
+				//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
+        	}
+		}			
+	}
+
+	private void buildJsonMetaDictionary() {
+		for(File studyFolder : new File(inputDirectory).listFiles()) {
+        	if(studyFolder.isFile()) continue;
+        	if(studyFolder.getName().contains("hrmn")) continue;
+			if(Arrays.stream(new File(studyFolder, "rawData")
+	                .list((file, name)->{
+	                    return name.endsWith("metadata.json");}
+	                )) == null) continue;
+	                
+	        	Arrays.stream(new File(studyFolder, "rawData")
+	                .list((file, name)->{
+	                    return name.endsWith("metadata.json");}
+	                )).forEach(file -> {
+	                	jsonMetaDictionary.putAll(DefaultJsonDataDictionaryBuilder.build(new File(studyFolder.getAbsolutePath()+"/rawData/"+ file)));
+	                });
+			//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
+		}	
+		//return null; //DefaultJsonDataDictionaryBuilder.build(f);
+		
+	}
 
 	private void buildVarTags() {
 		for(Entry<String, TopmedDataTable> columnDict: columnMetaDictionary.entrySet()) {
@@ -320,13 +385,63 @@ public class RawDataImporter {
 								columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().put(cmvarnewkey,cmvarnewval);
 								columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().put(fhsVarMeta.getKey(),fhsVarMeta.getValue());;
 							}
-							
+							if(fhsVarMeta.getKey().equalsIgnoreCase("description")) {
+								columnDict.getValue().variables.get(fhsVariable.getKey()).getMetadata().put("columnmeta_description", fhsVarMeta.getValue());
+							}
 						}
 						
 						
 					}
 				}
 			}
+			if(jsonMetaDictionary.containsKey(columnDict.getKey())) {
+				TopmedDataTable jsonTDT = jsonMetaDictionary.get(columnDict.getKey());
+				for(Entry<String,TopmedVariable> jsonVariable: jsonTDT.variables.entrySet()) {
+					if(columnDict.getValue().variables.containsKey(jsonVariable.getKey())) {
+						columnDict.getValue().variables.get(jsonVariable.getKey()).getMetadata().put("columnmeta_description",
+								jsonVariable.getValue().getMetadata().get("columnmeta_description"));
+					}
+				}
+				
+			}
+			if(columnDict.getKey().contains("DCC Harmonized data set")) {
+				columnDict.getValue().variables.forEach((key,var ) -> {
+					if(harmonizedMetaDictionary.containsKey(key)) {
+						var.getMetadata().put("columnmeta_description", harmonizedMetaDictionary.get(key));
+					} else if(key.startsWith("age_at_")) {
+						String subKey = key.replace("age_at_", "");
+						if(harmonizedMetaDictionary.containsKey(subKey)) {
+							var.getMetadata().put("columnmeta_description", "Age at - " + harmonizedMetaDictionary.get(key));
+						}
+						
+					} else if(key.startsWith("unit_")) {
+						String subKey = key.replace("unit_", "");
+						if(harmonizedMetaDictionary.containsKey(subKey)) {
+							var.getMetadata().put("columnmeta_description", "Unit - " + harmonizedMetaDictionary.get(subKey));
+						}
+					} else if(key.startsWith("unit_")) {
+						String subKey = key.replace("unit_", "");
+						if(harmonizedMetaDictionary.containsKey(subKey)) {
+							var.getMetadata().put("columnmeta_description", "Unit - " + harmonizedMetaDictionary.get(subKey));
+						}
+					}
+					/// no metadata for the following harmonized variables 
+					if(key.equals("ethnicity_1")) {
+						var.getMetadata().put("columnmeta_description", "Ethnicity");
+					} 
+					if(key.equals("unit_ethnicity_1")) {
+						var.getMetadata().put("columnmeta_description", "Ethnicity (Unit)");
+					} 
+					if(key.equals("race_1")) {
+						var.getMetadata().put("columnmeta_description", "Race");
+					} 
+					if(key.equals("unit_race_1")) {
+						var.getMetadata().put("columnmeta_description", "Race (Unit)");
+					} 
+				});
+			} // check for non-decoded variable names
+			
+				
 			
 		}
 		
@@ -379,7 +494,7 @@ public class RawDataImporter {
 
     public static void main(String[] args) throws IOException {
 //    	System.out.println("args0=" + args[0]);
-    	//args = new String[] { "./data/" };
+    	args = new String[] { "./data/" };
         new RawDataImporter(args[0]).run();
     }
 }

@@ -33,7 +33,9 @@ public class TopmedDataTable implements Serializable {
 		metadata.put("participant_set", getDataTableAttribute(doc, "participant_set"));
 		metadata.put("date_created", getDataTableAttribute(doc, "date_created"));
 		metadata.put("description", doc.getElementsByTag("data_table").first().getElementsByTag("description").first().text());
+		
 		variables = new TreeMap<>();
+		
 		doc.getElementsByTag("variable").stream().forEach(variable -> {
 			TopmedVariable tVar;
 			try {
