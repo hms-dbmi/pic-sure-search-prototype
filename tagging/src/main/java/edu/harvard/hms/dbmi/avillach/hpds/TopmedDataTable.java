@@ -84,21 +84,7 @@ public class TopmedDataTable implements Serializable {
 			TopmedVariable var =  new TopmedVariable(this, csvr);
 			variables.put(concept[0], var);
 		}
-		//csvr.categoryValues
-		//metadata.put("participant_set", "");
-		//metadata.put("date_created", "");
-		//metadata.put("description", "");
-		//variables = new TreeMap<>();
-		/*
-		doc.getElementsByTag("variable").stream().forEach(variable -> {
-			TopmedVariable tVar;
-			try {
-				tVar = new TopmedVariable(this, variable);
-				variables.put(variable.attr("id"), tVar);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		});*/
+
 	}
 
 	public void generateTagMap() {

@@ -48,6 +48,8 @@ public class RawDataImporter {
     private TreeMap<String, TopmedDataTable> jsonMetaDictionary;
     private TreeMap<String, String> harmonizedMetaDictionary;
 
+    private Set<String> stigmatizedPaths = new HashSet<>();
+    
     public RawDataImporter(String inputDirectory) {
 
     	this.inputDirectory = inputDirectory;
@@ -164,8 +166,7 @@ public class RawDataImporter {
         		
         		ColumnMetaCSVRecord csvr = new ColumnMetaCSVRecord(columnMetaCSVRecord);
         		String[] concept = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
-        		//System.out.println(arr[3]);
-        		String dt = null; // = csvr.name.split("\\\\").length > 0 ? csvr.name.split("\\\\")[2] : null;
+        		String dt = null; 
         		int studyDepth = concept.length;
         		
         		if(studyDepth == 4) {
@@ -220,6 +221,8 @@ public class RawDataImporter {
         }
         // merge xml dictionaries to column metadata
         mergeDictionaries();
+        
+        stigmatizedVariables();
         
         buildVarTags();
         
@@ -305,6 +308,53 @@ public class RawDataImporter {
         System.out.println(dictKS.size());
         System.out.println(cmdKS.size());
     }
+
+	private void stigmatizedVariables() {
+		readStigmatizedVariables();
+		columnMetaDictionary.forEach((phs,variables) -> {
+			variables.variables.forEach((key,variable) -> {
+				String HPDS_PATH = variable.getMetadata().containsKey("HPDS_PATH") ?
+						variable.getMetadata().get("HPDS_PATH"): "";
+				
+				if(HPDS_PATH.isBlank()) {
+					System.err.println("HPDS_PATH MISSING FOR - " + phs + ":" + key);
+				} else {
+					
+					if(stigmatizedPaths.contains("HPDS_PATH")) {
+						variable.getMetadata().put("columnmeta_is_stigmatized", "true");
+					} else {
+						variable.getMetadata().put("columnmeta_is_stigmatized", "false");
+
+					}
+					
+				}
+				
+			});
+		});
+	}
+
+	private void readStigmatizedVariables() {
+		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(inputDirectory + "conceptsToRemove.csv"))) {
+			
+RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
+        	
+        	CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(buffer)
+        			.withCSVParser(rfc4180Parser);
+        	
+        	CSVReader csvreader = csvReaderBuilder.build();	
+        	
+        	csvreader.forEach(line ->{
+        		if(line[0] != null && !line[0].isBlank()) {
+        			stigmatizedPaths.add(line[0]);
+        		}
+        		
+        	});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
 	private void buildHarmonizedMetaDictionary() {
 		for(File studyFolder : new File(inputDirectory).listFiles()) {
