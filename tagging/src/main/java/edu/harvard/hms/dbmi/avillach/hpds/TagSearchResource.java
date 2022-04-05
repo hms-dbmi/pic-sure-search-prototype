@@ -107,7 +107,7 @@ public class TagSearchResource implements IResourceRS {
         // flatten the results for each score into a list of search results
         List<SearchResult> searchResults = results.entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream().map(topmedVariable -> new SearchResult(topmedVariable, entry.getKey())))
-                .sorted(Comparator.comparing(SearchResult::getScore).reversed().thenComparing(result -> result.getResult().getMetadata().get("description")))
+                .sorted(Comparator.comparing(SearchResult::getScore).reversed().thenComparing(result -> result.getResult().getMetadata().get("columnmeta_description")))
                 .collect(Collectors.toList());
 
         int searchResultsSize = searchResults.size();
