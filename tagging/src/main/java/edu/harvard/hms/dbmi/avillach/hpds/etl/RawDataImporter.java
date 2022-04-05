@@ -313,8 +313,8 @@ public class RawDataImporter {
 		readStigmatizedVariables();
 		columnMetaDictionary.forEach((phs,variables) -> {
 			variables.variables.forEach((key,variable) -> {
-				String HPDS_PATH = variable.getMetadata().containsKey("HPDS_PATH") ?
-						variable.getMetadata().get("HPDS_PATH"): "";
+				String HPDS_PATH = variable.getMetadata().containsKey("columnmeta_HPDS_PATH") ?
+						variable.getMetadata().get("columnmeta_HPDS_PATH"): "";
 				
 				if(HPDS_PATH.isBlank()) {
 					System.err.println("HPDS_PATH MISSING FOR - " + phs + ":" + key);
