@@ -38,7 +38,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.metadata.model.DefaultJsonDataDictionaryBuilder;
 
 public class RawDataImporter {
-    private static String outputDirectory = "/usr/local/docker-config/search/";
+    private static String outputDirectory = "./data/";//"/usr/local/docker-config/search/";
 
     private static final String JAVABIN = outputDirectory + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
@@ -236,7 +236,6 @@ public class RawDataImporter {
         
         TreeMap<String, TopmedDataTable> dictionary = readDictionary();
         
-        Set<String> invalidDict = new HashSet<String>();
         AtomicInteger dictionaryTotalVars = new AtomicInteger();
         
         Set<String> dictKS = new HashSet<String>();
@@ -295,8 +294,9 @@ public class RawDataImporter {
 	        	System.out.println(buildVariableConceptPath(value));
             });*/
             
-        });        
+        });  
         System.out.println("ColumnMetadata records = " + columnMetaRecCount);
+        System.out.println("ColumnMetadata records = " + columnMetaDictionary.size());
         // dictionary size can be smaller as _studies_consents holds nested variables in it's concept path.
         System.out.println("Dictionary data table records = " + dictionary.size());
         System.out.println("Dictionary variable records = " + dictionaryTotalVars);
