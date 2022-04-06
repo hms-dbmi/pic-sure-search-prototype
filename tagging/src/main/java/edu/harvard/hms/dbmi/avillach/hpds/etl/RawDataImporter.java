@@ -40,6 +40,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.metadata.model.DefaultJsonDataDict
 public class RawDataImporter {
     private static String outputDirectory = "/usr/local/docker-config/search/";
 
+    
     private static final String JAVABIN = outputDirectory + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
     private String inputDirectory;
