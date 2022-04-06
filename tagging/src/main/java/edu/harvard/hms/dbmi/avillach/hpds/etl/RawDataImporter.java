@@ -254,6 +254,7 @@ public class RawDataImporter {
 
         	});        
         });
+        
         Set<String> allHpdsPaths = new HashSet<String>(); 
         dictionary.keySet().forEach(key -> { 
         	if(dictionary.get(key).variables.values().isEmpty()) {
