@@ -182,7 +182,7 @@ public class RawDataImporter {
         		}
         		if(concept[0].equals("_studies_consents")) {
         			if(studyDepth == 3) {
-            			dt = concept[0] + "_" + concept[2];
+            			dt = concept[0] + "_" + concept[1] + "_" + concept[2];
             		}
             		if(studyDepth == 2) {
             			dt = concept[0] + "_" + concept[1];
@@ -280,13 +280,7 @@ public class RawDataImporter {
         			System.err.println("Dictionary variable name equals description - " + value.getStudyId() + ":" + value.getVarId());
         		}
         	});
-        	dictionary.get(key).variables.forEach((k,v ) -> {
-				String colDesc = v.getMetadata().get("columnmeta_description");
-				String colName = v.getMetadata().get("columnmeta_name");
-				if(colDesc.equals(colName)) {
-					
-				}
-			});
+        	
         	/* this method call is no longer valid as non dbgap studies are not 4 level of concept depth
         	 * each dictionary variable has an hpds_path saved in it's metadata will display that instead
         	 * 
