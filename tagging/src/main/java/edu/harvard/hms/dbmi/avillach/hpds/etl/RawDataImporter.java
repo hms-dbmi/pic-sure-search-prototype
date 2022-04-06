@@ -197,7 +197,7 @@ public class RawDataImporter {
         				TopmedVariable var =  new TopmedVariable(columnMetaDictionary.get(dt), csvr);
         				
         				if(columnMetaDictionary.get(dt).variables.containsKey(var.getVarId())) {
-        				
+        					System.out.println("variable already added - " + var.getStudyId() + ":" + dt + ":" + var.getVarId());
         					nonIngestedMetaRecords.add(var.getStudyId() + ":" + dt + ":" + var.getVarId());
         					
         				} else {
@@ -207,8 +207,7 @@ public class RawDataImporter {
         				columnMetaDictionary.put(dt, new TopmedDataTable(csvr));
         			}
         		} else {
-        			nonIngestedMetaRecords.add(csvr.name);
-        			System.err.println("Dictionary not created for=" + csvr.name);
+        			nonIngestedMetaRecords.add("Dictionary not created for=" + csvr.name);
         		}
         	});
         	
@@ -338,8 +337,7 @@ public class RawDataImporter {
         nonIngestedMetaRecords.forEach(str -> {
         	System.err.println(str);
         });
-        System.out.println(dictKS.size());
-        System.out.println(cmdKS.size());
+
     }
 
 	private void stigmatizedVariables() {
