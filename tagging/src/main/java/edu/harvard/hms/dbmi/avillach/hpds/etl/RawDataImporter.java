@@ -38,7 +38,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.metadata.model.DefaultJsonDataDictionaryBuilder;
 
 public class RawDataImporter {
-    private static String outputDirectory = "/usr/local/docker-config/search/";
+    private static String outputDirectory = "./data"; //"/usr/local/docker-config/search/";
 
     private static final String JAVABIN = outputDirectory + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
@@ -175,7 +175,7 @@ public class RawDataImporter {
         			dt = concept[0] + "_" + concept[1];
         		}
         		if(studyDepth == 2) {
-        			dt = concept[0];
+        			dt = concept[0] + "_" + concept[1];
         		}
         		if(studyDepth == 1) {
         			dt = concept[0];
