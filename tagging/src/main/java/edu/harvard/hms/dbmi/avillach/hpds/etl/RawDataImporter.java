@@ -27,7 +27,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -461,7 +460,7 @@ RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
 					} else if(key.startsWith("age_at_")) {
 						String subKey = key.replace("age_at_", "");
 						if(harmonizedMetaDictionary.containsKey(subKey)) {
-							var.getMetadata().put("columnmeta_description", "Age at - " + harmonizedMetaDictionary.get(key));
+							var.getMetadata().put("columnmeta_description", "Age at - " + harmonizedMetaDictionary.get(subKey));
 						}
 						
 					} else if(key.startsWith("unit_")) {
