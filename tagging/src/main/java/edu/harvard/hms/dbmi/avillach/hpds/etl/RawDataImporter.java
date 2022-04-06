@@ -194,7 +194,14 @@ public class RawDataImporter {
         		if(dt != null) {
         			if(columnMetaDictionary.containsKey(dt)) {
         				TopmedVariable var =  new TopmedVariable(columnMetaDictionary.get(dt), csvr);
-        				columnMetaDictionary.get(dt).variables.put(var.getVarId(), var);
+        				
+        				if(columnMetaDictionary.get(dt).variables.containsKey(var.getVarId())) {
+        				
+        					nonIngestedMetaRecords.add(var.getStudyId() + ":" + dt + ":" + var.getVarId());
+        					
+        				} else {
+        					columnMetaDictionary.get(dt).variables.put(var.getVarId(), var);
+        				}
         			} else {
         				columnMetaDictionary.put(dt, new TopmedDataTable(csvr));
         			}
