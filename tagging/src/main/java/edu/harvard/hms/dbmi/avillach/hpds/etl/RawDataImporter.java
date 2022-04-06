@@ -38,7 +38,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.metadata.model.DefaultJsonDataDictionaryBuilder;
 
 public class RawDataImporter {
-    private static String outputDirectory = "./data/";//"/usr/local/docker-config/search/";
+    private static String outputDirectory = "/usr/local/docker-config/search/";
 
     private static final String JAVABIN = outputDirectory + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
     private TreeMap<String, TopmedDataTable> fhsDictionary;
@@ -253,7 +253,7 @@ public class RawDataImporter {
 
         	});        
         });
-
+        Set<String> allHpdsPaths = new HashSet<String>(); 
         dictionary.keySet().forEach(key -> { 
         	if(dictionary.get(key).variables.values().isEmpty()) {
         		nonIngestedMetaRecords.add(dictionary.get(key).metadata.get("id") + " - " + dictionary.get(key).metadata.get("study_id"));
@@ -268,7 +268,7 @@ public class RawDataImporter {
         		nonIngestedMetaRecords.add(dictionary.get(key) + " - Data Table blank Description");
         	}
         	dictionary.get(key).variables.values().forEach((TopmedVariable value) -> {
-        
+        		
         		dictionaryTotalVars.getAndIncrement();
         		
         		if(!value.getMetadata().containsKey("columnmeta_description")) {
@@ -281,7 +281,13 @@ public class RawDataImporter {
         		}
         		if(!value.getMetadata().containsKey("columnmeta_HPDS_PATH")) {
         			System.err.println("Dictionary variable missing columnmeta_HPDS_PATH=" + value.getStudyId() + " - " + value.getVarId());
-        		} 
+        		} else {
+        			if(allHpdsPaths.contains(value.getMetadata().get("columnmeta_HPDS_PATH"))) {
+        				System.err.println("HPDS_PATH exists in multiple locations: " + value.getMetadata().get("columnmeta_HPDS_PATH"));
+        			} else {
+            			allHpdsPaths.add(value.getMetadata().get("columnmeta_HPDS_PATH"));
+        			}
+        		}
         	    if (value.getMetadata().get("columnmeta_description").equals(value.getMetadata().get("columnmeta_name"))) {
         			System.err.println("Dictionary variable name equals description - " + value.getStudyId() + ":" + value.getVarId());
         		}
