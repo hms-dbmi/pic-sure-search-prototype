@@ -302,7 +302,7 @@ public class RawDataImporter {
             });*/
             
         });  
-        
+        HashSet<String> pathsFound = new HashSet<>();
         try(BufferedReader buffer = Files.newBufferedReader(Paths.get(inputDirectory + "/columnMeta.csv"))) {
         	
         	RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
@@ -317,9 +317,15 @@ public class RawDataImporter {
         		String concept = csvr.name;
         		if(!allHpdsPaths.contains(csvr.name)) {
         			nonIngestedMetaRecords.add("columnMeta not ingested: " + csvr.name);
+        		} 
+        		if(!pathsFound.contains(csvr.name)) {
+        			pathsFound.add("csvr.name");
+        		} else {
+        			nonIngestedMetaRecords.add("columnMeta path has multiple records: " + csvr.name);
+
         		}
-        		
         	});
+        	
         }
         System.out.println("ColumnMetadata records = " + columnMetaRecCount);
         System.out.println("ColumnMetadata records = " + columnMetaDictionary.size());
