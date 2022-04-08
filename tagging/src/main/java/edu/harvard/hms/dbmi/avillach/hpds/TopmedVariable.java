@@ -205,7 +205,7 @@ public class TopmedVariable implements Serializable  {
 		if(patharr.length == 4) {
 			this.varId = patharr[2];
 			metadata.put("columnmeta_var_id", patharr[3]);
-			metadata.put("columnmeta_name", patharr[3]);
+			metadata.put("columnmeta_name", patharr[2]);
 			metadata.put("columnmeta_description", patharr[3]);
 			//metadata.put("description", patharr[3]);
 
