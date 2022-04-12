@@ -97,6 +97,7 @@ public class TagSearchResource implements IResourceRS {
             if(tagStats.size()>10) {
                 tagResults = tagResults.filter(result -> 
                 result.getScore() > 1 && (
+                result.getTag().matches("DCC Harmonized data set") ||
         		result.getTag().matches("PHS\\d{6}+.*") || 
         		result.getTag().toUpperCase().matches("PHT\\d{6}+.*") || 
                 	(result.getScore() > numVars * .05 && result.getScore() < numVars * .95)
