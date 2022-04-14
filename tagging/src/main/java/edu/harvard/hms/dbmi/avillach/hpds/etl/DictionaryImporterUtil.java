@@ -38,8 +38,8 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.HPDSDictionarySerialize
  */
 public class DictionaryImporterUtil {
 	// directory and file structure
-	private static String DATA_INPUT_DIR = "./data/";//"/local/source/";
-	private static String OUTPUT_DIR = "./output/";//"/usr/local/docker-config/search/";
+	private static String DATA_INPUT_DIR = "/local/source/";
+	private static String OUTPUT_DIR = "/usr/local/docker-config/search/";
     private static final String JAVABIN = OUTPUT_DIR + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
 
 	private static Map<String,DictionaryModel> dictionaries = new TreeMap<>();
