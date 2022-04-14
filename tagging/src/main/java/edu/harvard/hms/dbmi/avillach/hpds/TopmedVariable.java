@@ -158,7 +158,7 @@ public class TopmedVariable implements Serializable  {
 					this.metadata.put(element.tagName(), element.ownText());
 				}
 			}
-		});#
+		});
 		this.dtId = topmedDataTable.metadata.get("id");
 		this.studyId = topmedDataTable.metadata.get("study_id");
 		this.varId = e.id();
