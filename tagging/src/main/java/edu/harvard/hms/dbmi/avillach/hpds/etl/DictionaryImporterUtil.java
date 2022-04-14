@@ -150,14 +150,14 @@ public class DictionaryImporterUtil {
 
     private static void writeDictionary() {
         try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(JAVABIN)))){
-            oos.writeObject(dictionaries);
+            oos.writeObject(hpdsDictionaries);
             oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
         ObjectMapper mapper = new ObjectMapper();
         try {
-			String jsonOut = mapper.writeValueAsString(dictionaries);
+			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
 			
 			Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut.getBytes());
 		} catch (JsonProcessingException e) {
@@ -200,8 +200,8 @@ public class DictionaryImporterUtil {
 		readStigmatizedVariables();
 		hpdsDictionaries.forEach((phs,variables) -> {
 			variables.variables.forEach((key,variable) -> {
-				String HPDS_PATH = variable.getMetadata().containsKey("columnmeta_HPDS_PATH") ?
-						variable.getMetadata().get("columnmeta_HPDS_PATH"): "";
+				String HPDS_PATH = variable.getMetadata().containsKey("columnmeta_hpds_path") ?
+						variable.getMetadata().get("columnmeta_hpds_path"): "";
 				
 				if(HPDS_PATH.isBlank()) {
 					System.err.println("HPDS_PATH MISSING FOR - " + phs + ":" + key);
