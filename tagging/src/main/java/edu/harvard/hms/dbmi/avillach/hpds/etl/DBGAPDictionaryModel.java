@@ -11,6 +11,8 @@ import java.util.Set;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.ui.Model;
+
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
@@ -83,7 +85,6 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 
 			doc.getElementsByTag("variable").stream().forEach(variableElement -> {
 				
-				DBGapVariable dbgvar;
 				try {
 					addVarReportData(dict, variableElement);
 										//variables.put(variable.attr("id").replaceAll("\\.v.*", ""), dbgvar);
@@ -115,6 +116,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 							
 							if(dbGapVariable.variable_id.startsWith(elementVarId)) {
 								dbGapVariable.variable_description = element.getElementsByTag("description").first().text();
+								dbGapVariable.study_description = dict.description;
 							}
 						}
 						
@@ -145,6 +147,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			id = doc.getElementsByTag("data_table").first().attr("id");
 			name = dataDictFile.getName().split("\\.")[4];
 			study_id = doc.getElementsByTag("data_table").first().attr("study_id");
+			
 			participant_set = doc.getElementsByTag("data_table").first().attr("participant_set");
 
 			date_created = doc.getElementsByTag("data_table").first().attr("date_created");
@@ -177,10 +180,12 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	public class DBGapVariable {
 		public String study_id;
 		public String variable_id;
+		public String variable_encoded_name;
 		public String variable_description;
 		public String data_table_id;
 		public String data_table_description;
 		public String data_table_name;
+		public String study_description;
 		
 		public DBGapVariable(DBGAPDictionaryModel dbgapDictionaryModel, Element variable) {
 			study_id = dbgapDictionaryModel.study_id;
@@ -188,6 +193,8 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			data_table_description = dbgapDictionaryModel.description;
 			data_table_name = dbgapDictionaryModel.name;
 			variable_id = variable.id();
+			variable_encoded_name = variable.getElementsByTag("name").first().text();
+			variable_description = variable.getElementsByTag("description").first().text();
 		}
 	}
 
@@ -198,6 +205,21 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	}
 
 	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DBGAPDictionaryModel dict) {
+		dict.variables.forEach(var -> {
+			String keyLookup = "\\" + var.study_id.split("\\.")[0] + "\\" + var.data_table_id.split("\\.")[0] + "\\" + var.variable_id.split("\\.")[0] + "\\" + var.variable_encoded_name + "\\";
+			if(baseDictionary.containsKey(keyLookup)) {
+				DictionaryModel baseModel = baseDictionary.get(keyLookup);
+				
+				baseModel.derived_group_description = var.data_table_description.isBlank() ? baseModel.derived_group_description: var.data_table_description;
+				baseModel.derived_group_name = var.data_table_name.isBlank() ? baseModel.derived_group_name: var.data_table_name;
+				baseModel.derived_group_id = var.data_table_id.isBlank() ? baseModel.derived_group_id : var.data_table_id;
+				baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
+				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
+				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
+				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
+			};
+		});
+		/* bad looping
 		baseDictionary.entrySet().forEach(entry -> {
 									
 			for(DBGapVariable var: dict.variables) {
@@ -213,10 +235,11 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 					baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
 					baseModel.derived_study_id = dict.study_id.isBlank() ? baseModel.derived_study_id : dict.study_id;
 					baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
+					
 				}
 				
 			}
-		}); 
+		}); */
 		
 		
 	}

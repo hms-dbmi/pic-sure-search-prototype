@@ -30,7 +30,7 @@ public abstract class DictionaryModel {
 	public String columnmeta_observation_count = "";
 	public String columnmeta_patient_count = "";
 	public String columnmeta_hpds_path = "";
-	
+	public String hashed_var_id = "";
 	
 	protected List<String> values;
 	

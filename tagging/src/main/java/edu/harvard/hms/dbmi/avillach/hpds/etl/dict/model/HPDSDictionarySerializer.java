@@ -61,8 +61,12 @@ public class HPDSDictionarySerializer {
 		Field[] fields = dm.getClass().getSuperclass().getDeclaredFields();
 		try {
 			for(Field field: fields) {
-				
+				if(field.get(dm) != null && !String.valueOf(field.get(dm)).equalsIgnoreCase("null")){
 					var.getMetadata().put(field.getName(), String.valueOf(field.get(dm)));
+				} else {
+					var.getMetadata().put(field.getName(), "");
+
+				}; 
 					
 				
 			}

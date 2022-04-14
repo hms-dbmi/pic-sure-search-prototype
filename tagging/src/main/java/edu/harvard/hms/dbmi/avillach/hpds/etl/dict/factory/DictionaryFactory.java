@@ -36,7 +36,7 @@ public class DictionaryFactory {
 	// columnmeta data file.  required to generate any dictionaries
 	private static String DATA_INPUT_DIR = "/local/source/";
 
-	public static String COLUMN_META_FILE = DATA_INPUT_DIR + "columnMeta.csv";
+	public static String COLUMN_META_FILE = CONFIG_DIR + "columnMeta.csv";
 
 	/**
 	 * get Directory model to use to build base dictionaries

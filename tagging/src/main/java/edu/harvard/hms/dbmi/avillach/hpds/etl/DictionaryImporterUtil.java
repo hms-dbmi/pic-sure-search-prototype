@@ -170,7 +170,7 @@ public class DictionaryImporterUtil {
     }
     
 	private static void readStigmatizedVariables() {
-		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.DICTIONARY_CONTROL_FILE + "conceptsToRemove.csv"))) {
+		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.CONFIG_DIR + "conceptsToRemove.csv"))) {
 			
 			RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
         	

@@ -59,12 +59,14 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		ColumnMetaCSVRecord cmr = new ColumnMetaCSVRecord(columnMetaRecord);
 		
 		String[] hpdsNodes =  cmr.name.substring(1, cmr.name.length() - 1).split("\\\\");
-		
-		this.derived_var_id = DictionaryFactory.hashVarId(cmr.name);
+				
+		this.hashed_var_id = DictionaryFactory.hashVarId(cmr.name);
 		
 		// encoded variable is always last node of hpds_path
 		this.derived_var_name = hpdsNodes[hpdsNodes.length - 1];
-	
+		
+		this.derived_var_id = hpdsNodes.length > 3 ? hpdsNodes[hpdsNodes.length - 2]: this.derived_var_name; // if it is four nodes expected it to phv? Potentially bad
+
 		this.derived_var_description = ""; 
 		
 		// Can look for pht here at least 
