@@ -36,9 +36,12 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		String inputDirectory = controlFileRow[2];
 		
 		File studyFolder = new File(inputDirectory);
+		
 		System.out.println(inputDirectory);  //debug
-		if(!studyFolder.isFile()) {
-			for(File study : new File(inputDirectory).listFiles()) {
+		
+		if(studyFolder != null && !studyFolder.isFile()) {
+			
+			for(File study : studyFolder.listFiles()) {
 	        	String[] fileNameArr = study.getName().split("\\.");
 	        	if(fileNameArr.length < 7 ) continue; 
 	        	String fileVarName = fileNameArr[fileNameArr.length - 3];
