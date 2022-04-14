@@ -2,9 +2,7 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
-import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryModel.FormGroup;
 
 public class DBGAPDictionaryModel extends DictionaryModel {
 
