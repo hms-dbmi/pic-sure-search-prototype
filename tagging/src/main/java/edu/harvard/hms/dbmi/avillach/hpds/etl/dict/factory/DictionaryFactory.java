@@ -34,8 +34,10 @@ public class DictionaryFactory {
 	// Config file to control study and its dictionary builder to use
 	public static String DICTIONARY_CONTROL_FILE = CONFIG_DIR + "dictionary_control_file.csv";
 	// columnmeta data file.  required to generate any dictionaries
-	public static String COLUMN_META_FILE = CONFIG_DIR + "columnMeta.csv";
-	
+	private static String DATA_INPUT_DIR = "/local/source/";
+
+	public static String COLUMN_META_FILE = DATA_INPUT_DIR + "columnMeta.csv";
+
 	/**
 	 * get Directory model to use to build base dictionaries
 	 */
