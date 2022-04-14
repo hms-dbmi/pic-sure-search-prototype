@@ -55,7 +55,6 @@ public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 					//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
 			}	
 		}
-		List<DCCHarmonizedDictionaryModel> models = allModels;
 		
 		for(DCCHarmonizedDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);

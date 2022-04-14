@@ -48,7 +48,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	
 				DBGAPDictionaryModel dict = new DBGAPDictionaryModel("data_dict", study.getAbsolutePath());
 				
-				// add var data 
+				
 				if(!studyFolder.isFile()) {
 					for(File varReport : studyFolder.listFiles()) {
 						if(!varReport.getName().contains(fileVarName)) continue;
@@ -57,11 +57,12 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 						buildVarReport(dict, varReport.getAbsolutePath());
 					}
 				}
+				
 				allModels.add(dict);
 			}	
 		}
-		List<DBGAPDictionaryModel> models = allModels;
-		
+
+		System.out.println("updating base dictionaries");
 		for(DBGAPDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
 		}

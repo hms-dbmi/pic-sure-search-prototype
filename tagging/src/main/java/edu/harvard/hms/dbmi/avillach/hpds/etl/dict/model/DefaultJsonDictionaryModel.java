@@ -220,7 +220,6 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 					//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
 			}	
 		}
-		List<DefaultJsonDictionaryModel> models = allModels;
 		
 		for(DefaultJsonDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
