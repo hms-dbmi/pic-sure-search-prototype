@@ -130,11 +130,11 @@ public class TopmedVariable implements Serializable  {
 			"YOU",
 			"YOUR"
 			);
-	private HashMap<String, String> metadata;
-	private HashMap<String, String> values;
+	private HashMap<String, String> metadata = new HashMap<String, String>();
+	private HashMap<String, String> values = new HashMap<String, String>();
 	private HashSet<String> metadata_tags = new HashSet<>();
 	private HashSet<String> value_tags = new HashSet<>();
-	private HashSet<String> allTagsLowercase = new HashSet<>();
+	public HashSet<String> allTagsLowercase = new HashSet<>();
 
 	private String studyId;
 	private String dtId;
@@ -158,7 +158,7 @@ public class TopmedVariable implements Serializable  {
 					this.metadata.put(element.tagName(), element.ownText());
 				}
 			}
-		});
+		});#
 		this.dtId = topmedDataTable.metadata.get("id");
 		this.studyId = topmedDataTable.metadata.get("study_id");
 		this.varId = e.id();
@@ -313,7 +313,7 @@ public class TopmedVariable implements Serializable  {
 		}).collect(Collectors.toSet()));
 	}
 
-	private List<String> filterTags(String value) {
+	public List<String> filterTags(String value) {
 		return Arrays.asList(value.split("[\\s\\p{Punct}]"))
 				.stream().filter((val2)->{
 					return val2.length() > 1 

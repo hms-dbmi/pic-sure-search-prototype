@@ -1,0 +1,2 @@
+study_abv_name,root_node,input_dir,directory_model
+FHS,phs000007,./data/fhs/rawdata/,DBGAPDictionaryModel

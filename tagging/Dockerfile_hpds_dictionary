@@ -1,5 +1,9 @@
 FROM openjdk:11-jre-slim as loader
 ADD  ./target/RawDataImporter-jar-with-dependencies.jar .
 
-ENTRYPOINT ["java", "-Xmx8192m", "-jar", "RawDataImporter-jar-with-dependencies.jar"]
-CMD [ "/local/source/" ]"
+## old importer
+#ENTRYPOINT ["java", "-Xmx8192m", "-jar", "RawDataImporter-jar-with-dependencies.jar"]
+#CMD [ "/local/source/" ]"
+
+#
+ENTRYPOINT ["java", "-Xmx8192m", "-jar", "DictionaryImporterUtil-jar-with-dependencies.jar"]

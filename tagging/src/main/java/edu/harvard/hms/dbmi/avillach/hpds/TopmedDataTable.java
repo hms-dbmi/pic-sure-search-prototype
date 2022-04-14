@@ -22,7 +22,9 @@ public class TopmedDataTable implements Serializable {
 	private HashMap<String, Set<TopmedVariable>> tagMap;
 
 	public TopmedDataTable(){
-
+		variables = new TreeMap<String, TopmedVariable>();
+		metadata = new TreeMap<String, String>();
+		tagMap = new HashMap<String, Set<TopmedVariable>>();
 	}
 
 	public TopmedDataTable(Document doc, String data_dict_file){
