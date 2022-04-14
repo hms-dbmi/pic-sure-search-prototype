@@ -8,4 +8,5 @@ ADD  ./configs/dictionary_control_file.csv ./configs/
 #CMD [ "/local/source/" ]"
 
 #
-ENTRYPOINT ["java", "-Xmx8192m", "-jar", "DictionaryImporterUtil-jar-with-dependencies.jar"]
+#ENTRYPOINT ["java", "-Xmx8192m", "-jar", "DictionaryImporterUtil-jar-with-dependencies.jar"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
