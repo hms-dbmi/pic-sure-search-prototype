@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -103,7 +104,8 @@ public class DictionaryImporterUtil {
 				// variables must exist in columnmeta.
 				// Build current studies dictionary models and update the base dictionary object.				
 				try {
-					
+					Arrays.toString(controlFileRow);
+
 					String dictionaryModel = controlFileRow[3];
 					
 					DictionaryModel controlFileModel = DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel(dictionaryModel);
@@ -111,7 +113,6 @@ public class DictionaryImporterUtil {
 					if(controlFileModel == null) {
 						System.err.println(dictionaryModel + " is an invalid model");
 					}
-					
 					// columnmeta is the base dictionaries no need to build it again.
 					else if(!(controlFileModel instanceof ColumnMetaDictionaryModel)) {
 						controlFileModel.build(controlFileRow, dictionaries);
@@ -170,7 +171,7 @@ public class DictionaryImporterUtil {
     }
     
 	private static void readStigmatizedVariables() {
-		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.CONFIG_DIR + "conceptsToRemove.csv"))) {
+		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DATA_INPUT_DIR + "conceptsToRemove.csv"))) {
 			
 			RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
         	
