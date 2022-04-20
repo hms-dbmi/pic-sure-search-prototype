@@ -3,6 +3,7 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,8 @@ public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 			for(File study : new File(inputDirectory).listFiles()) {
 	        	if(!study.getName().endsWith(".json")) continue;
 	        	DCCHarmonizedDictionaryModel dict = new DCCHarmonizedDictionaryModel(study.getAbsolutePath());
+	        	
+	        	allModels.add(dict);
 					//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
 			}	
 		}
@@ -63,8 +66,34 @@ public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 	}
 
 	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DCCHarmonizedDictionaryModel model) {
-		// TODO Auto-generated method stub
+		String varId = model.derived_var_id;
 		
+		Map<String,String> pathLookup = harmonizedPathLookup(baseDictionary);
+		
+		if(pathLookup.containsKey(varId)) {
+			String hpdsPath = pathLookup.get(varId);
+			DictionaryModel dm = baseDictionary.get(hpdsPath);
+			
+			dm.derived_var_description = model.derived_var_description;
+			
+		}
+	}
+
+	private Map<String, String> harmonizedPathLookup(Map<String, DictionaryModel> baseDictionary) {
+		Map<String,String> lookup = new HashMap<>();
+		
+		baseDictionary.entrySet().stream().forEach(baseD -> {
+			String root = baseD.getKey().split("\\\\")[1];
+			
+			if(root.contains("DCC Harmonized data set")) {
+				
+				DictionaryModel dm = baseD.getValue();
+				
+				lookup.put(dm.derived_var_id,dm.columnmeta_hpds_path);
+			}
+			
+		});
+		return lookup;
 	}
 
 }
