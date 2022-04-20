@@ -3,6 +3,8 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +13,7 @@ import java.util.Set;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.ui.Model;
-
+import org.jsoup.select.Elements;
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
@@ -28,6 +29,15 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	private String description;
 	private Set<DBGapVariable> variables = new HashSet<>();
 	
+	// add a list of element filters for the dynamic metadata to ignore
+	private static final List<String> ALL_ELEMENTS_FILTERS_LIST = Arrays.asList( 
+	); 
+	// map of element filters for the dynamic metadata to ignore ( either as a white list or black list not sure yet )
+	// map is associated to the phs level this will give more granularity if elements in the list is breaking studies 
+	// example black list: if ignoring "total" element breaks all other studies it should be added to this list where for the phs where we want to omit
+	private static final Map<String,String>  ALL_ELEMENTS_FILTERS_MAP = new HashMap<>() {
+		
+	};
 	
 	@Override
 	public Map<String, DictionaryModel> build(String[] controlFileRow, Map<String, DictionaryModel> baseDictionary) {
@@ -75,24 +85,59 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	private void buildVarReport(DBGAPDictionaryModel dict, String absolutePath) {
         File dataDictFile = new File(absolutePath);
 
-		Document doc;	
-		
+		Document doc;
+				
 		try {
 
 			doc = Jsoup.parse(dataDictFile, "UTF-8");
 			
-			dict.description = doc.getElementsByTag("data_table").first().attr("study_name");
+			Element dataTable = doc.getElementsByTag("data_table").first();
+			
+			if(dataTable != null) {
+				
+				dict.description = doc.getElementsByTag("data_table").first().attr("study_name");
+				
+				dict.variables.forEach(dbGapVariable ->{
+					
+					String[] elementVarIdArr = dataTable.attr("id").split("\\.");
+					
+					if(elementVarIdArr.length > 0) {
+						
+						if(elementVarIdArr[0].startsWith("phv")) {
+							
+							String elementVarId = elementVarIdArr[0];
+							
+							// Ingest the var report into the var_report_metadata data map
+							if(dbGapVariable.variable_id.startsWith(elementVarId)) {
+								
+								
 
-			doc.getElementsByTag("variable").stream().forEach(variableElement -> {
+								//dbGapVariable.all_metadata.put(varReportPrefix + "description", element.getElementsByTag("description").first().text());
+								
+								//dbGapVariable.all_metadata.put(varReportPrefix + "study_description", dict.description);
+								
+								//dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
+
+							}
+						}
+						
+					}
+					
+				});
 				
-				try {
-					addVarReportData(dict, variableElement);
-										//variables.put(variable.attr("id").replaceAll("\\.v.*", ""), dbgvar);
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-				
-			});
+				doc.getElementsByTag("variable").stream().forEach(variableElement -> {
+					
+					try {
+						addVarReportData(dict, variableElement);
+											//variables.put(variable.attr("id").replaceAll("\\.v.*", ""), dbgvar);
+					}catch(Exception e) {
+						e.printStackTrace();
+					}
+					
+				});
+			} else {
+				System.err.println(new File(absolutePath).getName() + " dictionary does not contain a data table");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,11 +146,17 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	}
 
 	private void addVarReportData(DBGAPDictionaryModel dict, Element variableElement) {
+		// Create a new 
+		//TopmedVariable variableObject = new TopmedVariable();
+	
+		//variableObject.addVarReportMeta(variableElement);
 		
+		//Instead of using this lets use the method that already exists in the TopmedVariable class
+		String varReportPrefix = "var_report_";
 		variableElement.getAllElements().stream().forEach(element -> {
 			
-			Element varDescriptionElement = element.getElementsByTag("description").first();
-			if(varDescriptionElement!=null) {
+			String varId = element.attr("id");
+			if(varId != null || !varId.isBlank()) {
 				dict.variables.forEach(dbGapVariable ->{
 					
 					String[] elementVarIdArr = element.attr("id").split("\\.");
@@ -113,10 +164,15 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 						
 						if(elementVarIdArr[0].startsWith("phv")) {
 							String elementVarId = elementVarIdArr[0];
-							
+							// Ingest the var report into the var_report_metadata data map
 							if(dbGapVariable.variable_id.startsWith(elementVarId)) {
-								dbGapVariable.variable_description = element.getElementsByTag("description").first().text();
-								dbGapVariable.study_description = dict.description;
+
+								dbGapVariable.all_metadata.put(varReportPrefix + "description", element.getElementsByTag("description").first().text());
+								
+								dbGapVariable.all_metadata.put(varReportPrefix + "study_description", dict.description);
+								
+								dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
+
 							}
 						}
 						
@@ -126,6 +182,62 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			}
 		});
 		
+	}
+	/**
+	 * method to gather all of a variables elements textvals and element attributes 
+	 * should work with  both data_dictionaries and var report. 
+	 * 
+	 * @param metaDataPrefix - prefix for the metadata key that is being generated
+	 * @param element - the variable element that is being ingested
+	 */
+	private Map<String,String> collectAllMetadataForElement(String metaDataPrefix, Element e) {
+		
+		Map<String,String> metadata = new HashMap<>();
+		
+		e.getAllElements().stream().forEach((Element element)->{
+			
+			
+			String elementText = element.ownText();
+			
+			String elementParentTexts = element.parents().text();
+			
+			if(!ALL_ELEMENTS_FILTERS_LIST.contains(elementText)) {
+				// does current element have a text val?
+				// if so add to metadata
+				// if multiple element tags exist create an enumerated key association
+				if(!elementText.isBlank()) {
+					if(metadata.containsKey(metaDataPrefix + element.tagName())) {
+						int enumeratedKey = determineMetaKeyIteration(metadata.keySet(),metaDataPrefix + element.tagName());
+						metadata.put(metaDataPrefix + element.tagName() + "_" + enumeratedKey, elementText);
+					} else {
+						metadata.put(metaDataPrefix + element.tagName(), elementText);
+					}
+				}
+				// does current element have attributes 
+				
+				element.attributes().forEach((attr)->{
+					if(metadata.containsKey(metaDataPrefix + attr.getKey())) {
+						int enumeratedKey = determineMetaKeyIteration(metadata.keySet(),metaDataPrefix + attr.getKey());
+						metadata.put(metaDataPrefix + attr.getKey() + "_" + enumeratedKey, attr.getValue());
+
+					} else {
+						metadata.put(metaDataPrefix + attr.getKey(), attr.getValue());
+
+					}
+				});
+			}
+		});
+		
+		return metadata;
+	}
+
+	private int determineMetaKeyIteration(Set<String> set, String string) {
+		Set<String> matchKeys = new HashSet<>();
+		set.parallelStream().forEach(key ->{
+			if(key.contains(string)) matchKeys.add(key);
+		});
+		
+		return matchKeys.size() - 1;
 	}
 
 	public DBGAPDictionaryModel(String xmlType, String absolutePath) {
@@ -158,8 +270,9 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				
 				DBGapVariable dbgvar;
 				try {
-					dbgvar = new DBGapVariable(this, variable);
 					
+					dbgvar = new DBGapVariable(this, variable);
+					dbgvar.all_metadata.putAll(collectAllMetadataForElement("data_dictionary_", variable));
 					variables.add(dbgvar);
 					//variables.put(variable.attr("id").replaceAll("\\.v.*", ""), dbgvar);
 				}catch(Exception e) {
@@ -186,6 +299,9 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		public String data_table_description;
 		public String data_table_name;
 		public String study_description;
+		// hash map that will collect all non derived metadata
+		// keys will be prefixed with the source of where the metadata was extracted from ( data_dictionary_ or var_report_ )
+		public Map<String,String> all_metadata = new HashMap<String,String>();
 		
 		public DBGapVariable(DBGAPDictionaryModel dbgapDictionaryModel, Element variable) {
 			study_id = dbgapDictionaryModel.study_id;
@@ -217,6 +333,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
 				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
+				baseModel.metadata.putAll(dict.metadata);
 			};
 		});
 		/* bad looping

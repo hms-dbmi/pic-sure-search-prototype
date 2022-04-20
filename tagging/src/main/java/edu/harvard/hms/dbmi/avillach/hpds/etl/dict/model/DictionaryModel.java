@@ -1,5 +1,6 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ public abstract class DictionaryModel {
 	public String hashed_var_id = "";
 	
 	protected List<String> values;
+	public Map<String,String> metadata = new HashMap<String,String>();
 	
 	public DictionaryModel() {
 		super();
