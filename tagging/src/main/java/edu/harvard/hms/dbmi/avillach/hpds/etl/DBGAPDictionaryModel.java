@@ -9,11 +9,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
@@ -27,7 +27,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	private String participant_set;
 	private String date_created;
 	private String description;
-	private Set<DBGapVariable> variables = new HashSet<>();
+	private List<DBGapVariable> variables = new ArrayList<>();
 	
 	// add a list of element filters for the dynamic metadata to ignore
 	private static final List<String> ALL_ELEMENTS_FILTERS_LIST = Arrays.asList( 
@@ -153,10 +153,28 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		
 		//Instead of using this lets use the method that already exists in the TopmedVariable class
 		String varReportPrefix = "var_report_";
+		
+		Map<String,Integer> dictIndex = dict.buildVariableIndex();
 		variableElement.getAllElements().stream().forEach(element -> {
 			
 			String varId = element.attr("id");
 			if(varId != null || !varId.isBlank()) {
+				varId = varId.split("\\.")[0];
+				int indexLookup = dictIndex.containsKey(varId) ? dictIndex.get(varId) : -1;
+				
+				DBGapVariable dbGapVariable = indexLookup != -1 ? dict.variables.get(indexLookup) : null;
+				
+				if(indexLookup != -1) {
+					dict.variables.get(indexLookup);
+				}
+				if(dbGapVariable != null) {
+					dbGapVariable.all_metadata.put(varReportPrefix + "description", element.getElementsByTag("description").first().text());
+					
+					dbGapVariable.all_metadata.put(varReportPrefix + "study_description", dict.description);
+					
+					dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
+				}
+				/*
 				dict.variables.forEach(dbGapVariable ->{
 					
 					String[] elementVarIdArr = element.attr("id").split("\\.");
@@ -178,11 +196,21 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 						
 					}
 					
-				});
+				});*/
 			}
 		});
 		
 	}
+	private Map<String, Integer> buildVariableIndex() {
+		Map<String,Integer> index = new HashMap<>();
+		AtomicInteger x = new AtomicInteger();  // index 
+		this.variables.forEach(variable -> {
+			index.put( variable.variable_id.split("\\.")[0],x.get());
+			x.incrementAndGet();
+		});
+		return index;
+	}
+
 	/**
 	 * method to gather all of a variables elements textvals and element attributes 
 	 * should work with  both data_dictionaries and var report. 
