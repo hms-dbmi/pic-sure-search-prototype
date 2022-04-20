@@ -46,7 +46,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		
 		File studyFolder = new File(inputDirectory);
 		
-		System.out.println(inputDirectory);  //debug
+		System.out.println("data directory = " + inputDirectory);  
 		
 		if(studyFolder != null && !studyFolder.isFile()) {
 			
@@ -75,6 +75,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		}
 
 		System.out.println("updating base dictionaries");
+		
 		for(DBGAPDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
 		}
@@ -96,7 +97,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			if(dataTable != null) {
 				
 				dict.description = doc.getElementsByTag("data_table").first().attr("study_name");
-				
+				/*
 				dict.variables.forEach(dbGapVariable ->{
 					
 					String[] elementVarIdArr = dataTable.attr("id").split("\\.");
@@ -124,7 +125,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 					}
 					
 				});
-				
+				*/
 				doc.getElementsByTag("variable").stream().forEach(variableElement -> {
 					
 					try {
@@ -172,7 +173,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 					
 					dbGapVariable.all_metadata.put(varReportPrefix + "study_description", dict.description);
 					
-					dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
+					//dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
 				}
 				/*
 				dict.variables.forEach(dbGapVariable ->{
@@ -261,7 +262,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 
 	private int determineMetaKeyIteration(Set<String> set, String string) {
 		Set<String> matchKeys = new HashSet<>();
-		set.parallelStream().forEach(key ->{
+		set.stream().forEach(key ->{
 			if(key.contains(string)) matchKeys.add(key);
 		});
 		
@@ -300,7 +301,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				try {
 					
 					dbgvar = new DBGapVariable(this, variable);
-					dbgvar.all_metadata.putAll(collectAllMetadataForElement("data_dictionary_", variable));
+					//dbgvar.all_metadata.putAll(collectAllMetadataForElement("data_dictionary_", variable));
 					variables.add(dbgvar);
 					//variables.put(variable.attr("id").replaceAll("\\.v.*", ""), dbgvar);
 				}catch(Exception e) {
