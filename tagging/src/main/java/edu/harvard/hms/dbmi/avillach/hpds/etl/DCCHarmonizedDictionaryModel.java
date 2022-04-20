@@ -73,9 +73,11 @@ public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 		if(pathLookup.containsKey(varId)) {
 			String hpdsPath = pathLookup.get(varId);
 			DictionaryModel dm = baseDictionary.get(hpdsPath);
+			String groupId = hpdsPath.split("\\\\")[2];
 			
+			dm.derived_group_id = groupId;
 			dm.derived_var_description = model.derived_var_description;
-			
+
 		}
 	}
 
