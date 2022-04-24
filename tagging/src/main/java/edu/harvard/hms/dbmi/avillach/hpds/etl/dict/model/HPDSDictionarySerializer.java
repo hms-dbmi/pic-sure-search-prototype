@@ -75,7 +75,7 @@ public class HPDSDictionarySerializer {
 			e.printStackTrace();
 		}
 		
-		var.getMetadata().putAll(dm.metadata);
+		//var.getMetadata().putAll(dm.metadata);
 		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
 		

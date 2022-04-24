@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -68,9 +69,9 @@ public class DictionaryImporterUtil {
 		
 		hpdsDictionaries = HPDSDictionarySerializer.serialize(dictionaries);
 			
-		readStigmatizedVariables();
+		//readStigmatizedVariables();
 		
-		doStigmatizeVariables();
+		//doStigmatizeVariables();
 		
 		writeDictionary();
 
@@ -79,13 +80,27 @@ public class DictionaryImporterUtil {
 
 	private static Map<String, DictionaryModel> buildColumnMetaDictionaries() {
 		try {
-			DictionaryModel columnmetaModel = DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel("columnmetadata");
+			ColumnMetaDictionaryModel columnmetaModel = (ColumnMetaDictionaryModel) DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel("columnmetadata");
 			
-			return columnmetaModel.build();
+			BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.DICTIONARY_CONTROL_FILE));
+			
+			CSVReader csvReader = new CSVReader(buffer);
+			
+			List<String[]> controlFile = csvReader.readAll();
+			
+			csvReader.close();
+			
+			return columnmetaModel.build(controlFile, dictionaries);
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			System.err.println("Error generating dictionary model.");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CsvException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

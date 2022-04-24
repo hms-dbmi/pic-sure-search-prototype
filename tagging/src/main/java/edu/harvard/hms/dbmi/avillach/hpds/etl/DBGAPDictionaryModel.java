@@ -362,7 +362,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
 				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
-				baseModel.metadata.putAll(dict.metadata);
+				//baseModel.metadata.putAll(dict.metadata);
 			};
 		});
 		/* bad looping

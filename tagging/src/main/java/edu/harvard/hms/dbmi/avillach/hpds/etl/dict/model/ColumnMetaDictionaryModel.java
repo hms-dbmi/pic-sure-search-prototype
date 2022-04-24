@@ -51,7 +51,7 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
     	
     }
 	
-	private ColumnMetaDictionaryModel(String[] columnMetaRecord) {
+	private ColumnMetaDictionaryModel(List<String[]> controlFile, String[] columnMetaRecord) {
 		super();
 		// hashing hpds path for unique front end indentifiers without backslashes
 		// hpds path is the unique key for each variable hashing this will give unique id
@@ -80,6 +80,8 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		
 		this.derived_study_description = "";
 		
+		this.derived_study_abv_name = findStudAbvName(controlFile,this.derived_study_id);
+		
 		this.columnmeta_data_type = cmr.isCategorical ? "categorical": "continous";
 		
 		this.is_stigmatized = "false";  // needs to be updated by a stigmatizing methodology
@@ -96,6 +98,12 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		
 		this.values = cmr.categoryValues;
 		
+	}
+	private String findStudAbvName(List<String[]> controlFile, String derived_study_id) {
+		for(String[] controlFileRec: controlFile) {
+			if(controlFileRec[1].equals(derived_study_id)) return controlFileRec[0];
+		}
+		return "";
 	}
 	private String findDerivedGroupId(String[] hpdsNodes) {
 		for(String node: hpdsNodes) {
@@ -128,7 +136,7 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 	    		
 	    		String hpdsPath = columnMetaCSVRecord[0];
 	    		
-	    		dictionaries.put(hpdsPath,new ColumnMetaDictionaryModel(columnMetaCSVRecord));
+	    		dictionaries.put(hpdsPath,new ColumnMetaDictionaryModel(null, columnMetaCSVRecord));
 	    		
 	    	});
 		
@@ -158,6 +166,38 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 	public Map<String, DictionaryModel> build(String[] controlFileRow, Map<String, DictionaryModel> baseDictionary) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public Map<String, DictionaryModel> build(List<String[]> controlFile,
+			Map<String, DictionaryModel> dictionaries) {
+	
+        BufferedReader buffer;
+        
+		try {
+			buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.COLUMN_META_FILE));
+		
+	    	
+	    	RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
+	    	
+	    	CSVReaderBuilder csvReaderBuilder = new CSVReaderBuilder(buffer)
+	    			.withCSVParser(rfc4180Parser)
+	    			.withSkipLines(DictionaryFactory.COLUMN_META_FILE_HAS_HEADER ? 1:0);  // header implied
+	    	
+	    	CSVReader csvreader = csvReaderBuilder.build();
+	    	
+	    	csvreader.forEach(columnMetaCSVRecord -> {
+	    		
+	    		String hpdsPath = columnMetaCSVRecord[0];
+	    		
+	    		dictionaries.put(hpdsPath,new ColumnMetaDictionaryModel(controlFile, columnMetaCSVRecord));
+	    		
+	    	});
+		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return dictionaries;
 	}
 
 }

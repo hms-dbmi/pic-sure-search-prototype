@@ -24,6 +24,7 @@ public abstract class DictionaryModel {
 	public String derived_group_description = "";
 	public String derived_study_id = "";
 	public String derived_study_description = "";
+	public String derived_study_abv_name = "";
 	public String columnmeta_data_type = "";
 	public String is_stigmatized = "";
 	public String columnmeta_min = "";
@@ -34,7 +35,8 @@ public abstract class DictionaryModel {
 	public String hashed_var_id = "";
 	
 	protected List<String> values;
-	public Map<String,String> metadata = new HashMap<String,String>();
+	// removing this for now as dynamic metadata will be built out after release
+	//public Map<String,String> metadata = new HashMap<String,String>();
 	
 	public DictionaryModel() {
 		super();
