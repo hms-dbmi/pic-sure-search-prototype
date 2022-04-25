@@ -74,7 +74,11 @@ public class HPDSDictionarySerializer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		var.setVarId(dm.derived_var_id);
+		var.setDtId(dm.derived_group_id);
+		var.setIs_categorical(dm.columnmeta_data_type.equals("categorical"));
+		var.setIs_continuous(dm.columnmeta_data_type.equals("continous"));
+		var.setStudyId(dm.derived_study_id);
 		//var.getMetadata().putAll(dm.metadata);
 		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
