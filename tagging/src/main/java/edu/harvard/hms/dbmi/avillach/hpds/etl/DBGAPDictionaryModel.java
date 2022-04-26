@@ -358,6 +358,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_group_description = var.data_table_description.isBlank() ? baseModel.derived_group_description: var.data_table_description;
 				baseModel.derived_group_name = var.data_table_name.isBlank() ? baseModel.derived_group_name: var.data_table_name;
 				baseModel.derived_group_id = var.data_table_id.isBlank() ? baseModel.derived_group_id : var.data_table_id;
+				baseModel.derived_var_name = var.variable_encoded_name;
 				baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
 				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
 				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
