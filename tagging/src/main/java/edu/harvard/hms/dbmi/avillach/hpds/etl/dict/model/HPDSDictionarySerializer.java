@@ -75,11 +75,11 @@ public class HPDSDictionarySerializer {
 			e.printStackTrace();
 		}
 		// Backwards compatibility variables
-		var.setVarId(dm.derived_var_id);
-		var.setDtId(dm.derived_group_id);
+		var.setVarId(dm.derived_var_id.split("\\.")[0]);
+		var.setDtId(dm.derived_group_id.split("\\.")[0]);
 		var.setIs_categorical(dm.columnmeta_data_type.equals("categorical"));
 		var.setIs_continuous(dm.columnmeta_data_type.equals("continous"));
-		var.setStudyId(dm.derived_study_id);
+		var.setStudyId(dm.derived_study_id.split("\\.")[0]);
 		if(dm.columnmeta_data_type.equals("continous")) {
 			var.getMetadata().put("min", dm.getColumnmeta_min());
 			var.getMetadata().put("max", dm.getColumnmeta_max());
