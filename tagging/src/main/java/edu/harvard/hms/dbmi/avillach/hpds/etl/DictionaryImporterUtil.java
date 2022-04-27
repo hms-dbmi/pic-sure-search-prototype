@@ -54,7 +54,7 @@ public class DictionaryImporterUtil {
 	public static void main(String[] args) {
 		parameterOverrides(args);
 		
-		preRunValidations();
+		//preRunValidations();
 		// Build base dictionary entries 
 		
 		run();
@@ -69,9 +69,9 @@ public class DictionaryImporterUtil {
 		
 		hpdsDictionaries = HPDSDictionarySerializer.serialize(dictionaries);
 			
-		//readStigmatizedVariables();
+		readStigmatizedVariables();
 		
-		//doStigmatizeVariables();
+		doStigmatizeVariables();
 		
 		writeDictionary();
 
@@ -224,9 +224,9 @@ public class DictionaryImporterUtil {
 				} else {
 					
 					if(stigmatizedPaths.contains("HPDS_PATH")) {
-						variable.getMetadata().put("is_stigmatized", "true");
+						variable.getMetadata().put("columnmeta_is_stigmatized", "true");
 					} else {
-						variable.getMetadata().put("is_stigmatized", "false");
+						variable.getMetadata().put("columnmeta_is_stigmatized", "false");
 
 					}
 					
