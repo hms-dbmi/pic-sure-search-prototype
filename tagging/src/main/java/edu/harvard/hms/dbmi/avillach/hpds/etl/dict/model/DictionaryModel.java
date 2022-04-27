@@ -26,7 +26,7 @@ public abstract class DictionaryModel {
 	public String derived_study_description = "";
 	public String derived_study_abv_name = "";
 	public String columnmeta_data_type = "";
-	public String is_stigmatized = "";
+	public String columnmeta_is_stigmatized = "";
 	public String columnmeta_min = "";
 	public String columnmeta_max = "";
 	public String columnmeta_observation_count = "";
@@ -58,7 +58,7 @@ public abstract class DictionaryModel {
 		this.derived_study_id = derived_study_id;
 		this.derived_study_description = derived_study_description;
 		this.columnmeta_data_type = columnmeta_data_type;
-		this.is_stigmatized = is_stigmatized;
+		this.columnmeta_is_stigmatized = is_stigmatized;
 		this.columnmeta_min = columnmeta_min;
 		this.columnmeta_max = columnmeta_max;
 		this.columnmeta_observation_count = columnmeta_observation_count;
@@ -79,7 +79,7 @@ public abstract class DictionaryModel {
 		this.derived_study_id = defaultJsonDictionaryModel.derived_study_id;
 		this.derived_study_description = defaultJsonDictionaryModel.derived_study_description;
 		this.columnmeta_data_type = defaultJsonDictionaryModel.columnmeta_data_type;
-		this.is_stigmatized = defaultJsonDictionaryModel.is_stigmatized;
+		this.columnmeta_is_stigmatized = defaultJsonDictionaryModel.columnmeta_is_stigmatized;
 		this.columnmeta_min = defaultJsonDictionaryModel.columnmeta_min;
 		this.columnmeta_max = defaultJsonDictionaryModel.columnmeta_max;
 		this.columnmeta_observation_count = defaultJsonDictionaryModel.columnmeta_observation_count;
@@ -164,11 +164,11 @@ public abstract class DictionaryModel {
 	}
 
 	public String getIs_stigmatized() {
-		return is_stigmatized;
+		return columnmeta_is_stigmatized;
 	}
 
 	public void setIs_stigmatized(String is_stigmatized) {
-		this.is_stigmatized = is_stigmatized;
+		this.columnmeta_is_stigmatized = is_stigmatized;
 	}
 
 	public String getColumnmeta_min() {
