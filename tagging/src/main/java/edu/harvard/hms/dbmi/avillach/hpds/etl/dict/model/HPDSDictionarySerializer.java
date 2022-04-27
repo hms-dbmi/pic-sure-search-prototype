@@ -74,6 +74,7 @@ public class HPDSDictionarySerializer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Backwards compatibility variables
 		var.setVarId(dm.derived_var_id);
 		var.setDtId(dm.derived_group_id);
 		var.setIs_categorical(dm.columnmeta_data_type.equals("categorical"));
@@ -83,6 +84,13 @@ public class HPDSDictionarySerializer {
 			var.getMetadata().put("min", dm.getColumnmeta_min());
 			var.getMetadata().put("max", dm.getColumnmeta_max());
 		}
+	
+		var.getMetadata().put("columnmeta_study_id", "derived_study_id".split("\\.")[0]);
+		var.getMetadata().put("columnmeta_var_group_id", "derived_group_id".split("\\.")[0]);
+		var.getMetadata().put("columnmeta_name", "derived_var_name");
+		var.getMetadata().put("columnmeta_var_group_description", "derived_group_description");
+		var.getMetadata().put("columnmeta_description", "derived_var_description");
+		
 		//var.getMetadata().putAll(dm.metadata);
 		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
