@@ -95,7 +95,7 @@ public class HPDSDictionarySerializer {
 		dt.metadata.put("study_description", dm.derived_study_description);
 		dt.metadata.put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
 
-		
+		String varKey = dm.derived_var_id.split("\\.")[0];
 		// end of compatibility
 		
 		// add misc metadata
@@ -112,7 +112,7 @@ public class HPDSDictionarySerializer {
 		if(dictKeyArr.length == 1) dictKey = dictKeyArr[0].split("\\.")[0];
 
 		String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
-		
+		/* replacing this varkey for compatibility
 		String varKey = null;
 		
 		if(varKeyArr.length >= 3) varKey = varKeyArr[0].split("\\.")[0] + "_" + varKeyArr[1].split("\\.")[0] + "_" + varKeyArr[2].split("\\.")[0];
@@ -129,7 +129,7 @@ public class HPDSDictionarySerializer {
 			
 			}
 		
-		}
+		}*/
 		
 		if(hpdsDictionary.containsKey(dictKey)) {
 			
