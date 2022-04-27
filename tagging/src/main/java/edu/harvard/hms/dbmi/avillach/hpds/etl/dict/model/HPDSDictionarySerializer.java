@@ -79,6 +79,10 @@ public class HPDSDictionarySerializer {
 		var.setIs_categorical(dm.columnmeta_data_type.equals("categorical"));
 		var.setIs_continuous(dm.columnmeta_data_type.equals("continous"));
 		var.setStudyId(dm.derived_study_id);
+		if(dm.columnmeta_data_type.equals("continous")) {
+			var.getMetadata().put("min", dm.getColumnmeta_min());
+			var.getMetadata().put("max", dm.getColumnmeta_max());
+		}
 		//var.getMetadata().putAll(dm.metadata);
 		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
