@@ -91,7 +91,17 @@ public class HPDSDictionarySerializer {
 		var.getMetadata().put("columnmeta_var_group_description", dm.derived_group_description);
 		var.getMetadata().put("columnmeta_description", dm.derived_var_description);
 		var.getMetadata().put("description", dm.derived_var_description.isBlank() ? dm.derived_var_name: dm.derived_var_description);
+		
+		dt.metadata.put("study_description", dm.derived_study_description);
+		dt.metadata.put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
+
+		
+		// end of compatibility
+		
+		// add misc metadata
 		//var.getMetadata().putAll(dm.metadata);
+		
+		
 		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
 		
