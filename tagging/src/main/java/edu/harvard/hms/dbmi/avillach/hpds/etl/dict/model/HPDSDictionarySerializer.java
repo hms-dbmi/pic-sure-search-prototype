@@ -97,19 +97,19 @@ public class HPDSDictionarySerializer {
 		
 		String dictKey = null;
 		
-		if(dictKeyArr.length >= 2) dictKey = dictKeyArr[0] + "_" + dictKeyArr[1];
+		if(dictKeyArr.length >= 2) dictKey = dictKeyArr[0].split("\\.")[0] + "_" + dictKeyArr[1].split("\\.")[0];
 		
-		if(dictKeyArr.length == 1) dictKey = dictKeyArr[0];
+		if(dictKeyArr.length == 1) dictKey = dictKeyArr[0].split("\\.")[0];
 
 		String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
 		
 		String varKey = null;
 		
-		if(varKeyArr.length >= 3) varKey = varKeyArr[0] + "_" + varKeyArr[1] + "_" + varKeyArr[2];
+		if(varKeyArr.length >= 3) varKey = varKeyArr[0].split("\\.")[0] + "_" + varKeyArr[1].split("\\.")[0] + "_" + varKeyArr[2].split("\\.")[0];
 		
-		if(varKeyArr.length == 2) varKey = varKeyArr[0] + "_" + varKeyArr[1];
+		if(varKeyArr.length == 2) varKey = varKeyArr[0].split("\\.")[0] + "_" + varKeyArr[1].split("\\.")[0];
 		
-		if(varKeyArr.length == 1) varKey = varKeyArr[0];
+		if(varKeyArr.length == 1) varKey = varKeyArr[0].split("\\.")[0];
 		
 		if(entry.getValue().columnmeta_data_type.equals("categorical")) {
 		
