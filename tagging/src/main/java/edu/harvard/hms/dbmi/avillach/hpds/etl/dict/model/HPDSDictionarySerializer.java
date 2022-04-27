@@ -2,6 +2,9 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -13,6 +16,10 @@ public class HPDSDictionarySerializer {
 	
 	private static TreeMap<String, TopmedDataTable> hpdsDictionary = new  TreeMap<String, TopmedDataTable>();
 	
+	private static List<String> IGNORE_META_KEYS = List.of(
+			"hashed_var_id"
+			);
+	
 	public static TreeMap<String, TopmedDataTable> serialize(Map<String, DictionaryModel> dictionaries) {
 		for(Entry<String,DictionaryModel> entry: dictionaries.entrySet()) {
 
@@ -20,6 +27,7 @@ public class HPDSDictionarySerializer {
 		}
 		// build tags
 		buildTags();
+		TreeMap<String, TopmedDataTable> test = hpdsDictionary;
 		return hpdsDictionary;
 	}
 
@@ -29,13 +37,11 @@ public class HPDSDictionarySerializer {
 			hpdsDictEntry.getValue().variables.forEach((varid, var) -> {
 				var.getMetadata().forEach((k,v) -> {
 					try {
-					
+						if(IGNORE_META_KEYS.contains(k)) return;
+						
 						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
 					
-						for(String value: var.getValues().values()) {
-							var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value));
-				
-						}
+
 						for(String valuesTolower: var.getValue_tags()) {
 							var.allTagsLowercase.add(valuesTolower.toLowerCase());
 						}
@@ -48,8 +54,19 @@ public class HPDSDictionarySerializer {
 						e.printStackTrace();
 					}
 				});
+				for(String value: var.getValues().values()) {
+					try {
+						var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value));
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		
+				}
 			});
 			hpdsDictEntry.getValue().generateTagMap();
+			System.out.println();
 		}		
 	}
 

@@ -19,7 +19,7 @@ public class TopmedDataTable implements Serializable {
 	private static final long serialVersionUID = -2138670854234447527L;
 	public TreeMap<String, String> metadata;
 	public TreeMap<String, TopmedVariable> variables;
-	private HashMap<String, Set<TopmedVariable>> tagMap;
+	public HashMap<String, Set<TopmedVariable>> tagMap;
 
 	public TopmedDataTable(){
 		variables = new TreeMap<String, TopmedVariable>();
