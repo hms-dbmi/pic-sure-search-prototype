@@ -112,6 +112,7 @@ public class HPDSDictionarySerializer {
 		if(dictKeyArr.length == 1) dictKey = dictKeyArr[0].split("\\.")[0];
 
 		String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
+		
 		/* replacing this varkey for compatibility
 		String varKey = null;
 		
@@ -120,7 +121,7 @@ public class HPDSDictionarySerializer {
 		if(varKeyArr.length == 2) varKey = varKeyArr[0].split("\\.")[0] + "_" + varKeyArr[1].split("\\.")[0];
 		
 		if(varKeyArr.length == 1) varKey = varKeyArr[0].split("\\.")[0];
-		
+		*/
 		if(entry.getValue().columnmeta_data_type.equals("categorical")) {
 		
 			for(String value: entry.getValue().values) {
@@ -129,7 +130,7 @@ public class HPDSDictionarySerializer {
 			
 			}
 		
-		}*/
+		}
 		
 		if(hpdsDictionary.containsKey(dictKey)) {
 			
