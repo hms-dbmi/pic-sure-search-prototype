@@ -84,7 +84,7 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		
 		this.columnmeta_data_type = cmr.isCategorical ? "categorical": "continous";
 		
-		this.is_stigmatized = "false";  // needs to be updated by a stigmatizing methodology
+		this.columnmeta_is_stigmatized = "false";  // needs to be updated by a stigmatizing methodology
 		
 		this.columnmeta_min = String.valueOf(cmr.min);
 		
