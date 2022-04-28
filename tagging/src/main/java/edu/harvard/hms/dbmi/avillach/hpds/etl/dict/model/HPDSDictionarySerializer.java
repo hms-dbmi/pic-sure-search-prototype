@@ -66,7 +66,6 @@ public class HPDSDictionarySerializer {
 				}
 			});
 			hpdsDictEntry.getValue().generateTagMap();
-			System.out.println();
 		}		
 	}
 
