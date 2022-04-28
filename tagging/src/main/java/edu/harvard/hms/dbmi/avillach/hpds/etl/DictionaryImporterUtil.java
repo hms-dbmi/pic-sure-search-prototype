@@ -170,7 +170,7 @@ public class DictionaryImporterUtil {
             oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }/*
         ObjectMapper mapper = new ObjectMapper();
         try {
 			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
@@ -182,7 +182,7 @@ public class DictionaryImporterUtil {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
     }
     
 	private static void readStigmatizedVariables() {
