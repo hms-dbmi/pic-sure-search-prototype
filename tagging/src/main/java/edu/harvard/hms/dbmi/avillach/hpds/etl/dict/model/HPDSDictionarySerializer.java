@@ -40,8 +40,11 @@ public class HPDSDictionarySerializer {
 						if(IGNORE_META_KEYS.contains(k)) return;
 						
 						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
-					
-
+						var.getMetadata_tags().add(var.getDtId());
+						var.getMetadata_tags().add(var.getStudyId());
+						var.getMetadata_tags().add(var.getStudyId().split("\\.")[0].toUpperCase());
+						var.getMetadata_tags().add(var.getVarId());
+						
 						for(String valuesTolower: var.getValue_tags()) {
 							var.allTagsLowercase.add(valuesTolower.toLowerCase());
 						}
@@ -110,6 +113,8 @@ public class HPDSDictionarySerializer {
 		var.getMetadata().put("description", dm.derived_var_description.isBlank() ? dm.derived_var_name: dm.derived_var_description);
 		var.getMetadata().put("columnmeta_HPDS_PATH", dm.columnmeta_hpds_path);
 		var.getMetadata().put("HPDS_PATH", dm.columnmeta_hpds_path);
+		
+		
 		dt.metadata.put("study_description", dm.derived_study_description);
 		dt.metadata.put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
 
