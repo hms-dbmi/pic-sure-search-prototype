@@ -41,11 +41,14 @@ public class HPDSDictionarySerializer {
 						
 						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
 						var.getMetadata_tags().add(var.getDtId());
+						var.getMetadata_tags().add(var.getDtId().split("\\.")[0]);
+						var.getMetadata_tags().add(var.getDtId().split("\\.")[0].toUpperCase());
 						var.getMetadata_tags().add(var.getStudyId());
+						var.getMetadata_tags().add(var.getStudyId().split("\\.")[0]);
 						var.getMetadata_tags().add(var.getStudyId().split("\\.")[0].toUpperCase());
-						var.getMetadata_tags().add(var.getVarId().split("\\.")[0].toUpperCase());
+						var.getMetadata_tags().add(var.getVarId());
 						var.getMetadata_tags().add(var.getVarId().split("\\.")[0]);
-
+						var.getMetadata_tags().add(var.getVarId().split("\\.")[0].toUpperCase());
 						for(String valuesTolower: var.getValue_tags()) {
 							var.allTagsLowercase.add(valuesTolower.toLowerCase());
 						}
@@ -119,7 +122,6 @@ public class HPDSDictionarySerializer {
 		dt.metadata.put("study_description", dm.derived_study_description);
 		dt.metadata.put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
 
-		String varKey = dm.derived_var_id.split("\\.")[0];
 		// end of compatibility
 		
 		// add misc metadata
@@ -129,14 +131,15 @@ public class HPDSDictionarySerializer {
 		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
 		
-		String dictKey = null;
+		String dictKey = var.getStudyId() + "_" + var.getDtId();
 		
-		if(dictKeyArr.length >= 2) dictKey = dictKeyArr[0].split("\\.")[0] + "_" + dictKeyArr[1].split("\\.")[0];
+		//if(dictKeyArr.length >= 2) dictKey = dictKeyArr[0].split("\\.")[0] + "_" + dictKeyArr[1].split("\\.")[0];
 		
-		if(dictKeyArr.length == 1) dictKey = dictKeyArr[0].split("\\.")[0];
+		//if(dictKeyArr.length == 1) dictKey = dictKeyArr[0].split("\\.")[0] + "_";
 
-		String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
-		
+		//String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
+		String varKey = dm.derived_var_id.split("\\.")[0];
+
 		/* replacing this varkey for compatibility
 		String varKey = null;
 		
