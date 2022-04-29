@@ -43,8 +43,9 @@ public class HPDSDictionarySerializer {
 						var.getMetadata_tags().add(var.getDtId());
 						var.getMetadata_tags().add(var.getStudyId());
 						var.getMetadata_tags().add(var.getStudyId().split("\\.")[0].toUpperCase());
-						var.getMetadata_tags().add(var.getVarId());
-						
+						var.getMetadata_tags().add(var.getVarId().split("\\.")[0].toUpperCase());
+						var.getMetadata_tags().add(var.getVarId().split("\\.")[0]);
+
 						for(String valuesTolower: var.getValue_tags()) {
 							var.allTagsLowercase.add(valuesTolower.toLowerCase());
 						}
