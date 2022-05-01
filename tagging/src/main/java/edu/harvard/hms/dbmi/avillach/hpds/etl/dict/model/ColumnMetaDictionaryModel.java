@@ -82,7 +82,7 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		
 		this.derived_study_abv_name = findStudAbvName(controlFile,this.derived_study_id);
 		
-		this.columnmeta_data_type = cmr.isCategorical ? "categorical": "continous";
+		this.columnmeta_data_type = cmr.isCategorical ? "categorical": "continuous";
 		
 		this.columnmeta_is_stigmatized = "false";  // needs to be updated by a stigmatizing methodology
 		
