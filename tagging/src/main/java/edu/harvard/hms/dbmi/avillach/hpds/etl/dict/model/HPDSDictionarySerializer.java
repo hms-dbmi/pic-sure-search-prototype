@@ -38,8 +38,29 @@ public class HPDSDictionarySerializer {
 				var.getMetadata().forEach((k,v) -> {
 					try {
 						if(IGNORE_META_KEYS.contains(k)) return;
+						TopmedVariable tvMethods = TopmedVariable.class.getDeclaredConstructor().newInstance();
+						// * in order to get the app working I am hard setting the metadata_tags that created.
+						// micing the metadata_tags in live integration
+						// phs to upper and lower
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toLowerCase()));
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
 						
-						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
+						// pht to upper and lower
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toLowerCase()));
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
+						
+						// phv to upper only!
+						//var.getMetadata_tags().addAll(tvMethods.filterTags(var.getVarId().toLowerCase()));
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getVarId().toUpperCase()));
+												
+						// data type
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("columnmeta_data_type").toUpperCase()));
+						
+						// variable encoded name
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("columnmeta_name").toUpperCase()));
+						
+						//var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
+						/*
 						var.getMetadata_tags().add(var.getDtId());
 						var.getMetadata_tags().add(var.getDtId().split("\\.")[0]);
 						var.getMetadata_tags().add(var.getDtId().split("\\.")[0].toUpperCase());
@@ -49,6 +70,7 @@ public class HPDSDictionarySerializer {
 						var.getMetadata_tags().add(var.getVarId());
 						var.getMetadata_tags().add(var.getVarId().split("\\.")[0]);
 						var.getMetadata_tags().add(var.getVarId().split("\\.")[0].toUpperCase());
+						*/
 						for(String valuesTolower: var.getValue_tags()) {
 							var.allTagsLowercase.add(valuesTolower.toLowerCase());
 						}
