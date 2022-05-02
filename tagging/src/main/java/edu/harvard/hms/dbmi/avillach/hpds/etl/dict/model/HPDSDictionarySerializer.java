@@ -110,8 +110,11 @@ public class HPDSDictionarySerializer {
 	
 		var.getMetadata().put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
 		var.getMetadata().put("columnmeta_var_group_id", dm.derived_group_id.split("\\.")[0]);
-		var.getMetadata().put("columnmeta_var_id", dm.derived_var_id.split("\\.")[0]);
-		var.getMetadata().put("columnmeta_name", dm.derived_var_name);
+		var.getMetadata().put("columnmeta_var_id", dm.derived_var_name);
+		//var.getMetadata().put("columnmeta_var_id", dm.derived_var_id.split("\\.")[0]);
+
+		//var.getMetadata().put("columnmeta_name", dm.derived_var_name);
+		var.getMetadata().put("columnmeta_name", dm.derived_var_id.split("\\.")[0]);
 		var.getMetadata().put("columnmeta_var_group_description", dm.derived_group_description);
 		var.getMetadata().put("columnmeta_description", dm.derived_var_description);
 		var.getMetadata().put("description", dm.derived_var_description.isBlank() ? dm.derived_var_name: dm.derived_var_description);
