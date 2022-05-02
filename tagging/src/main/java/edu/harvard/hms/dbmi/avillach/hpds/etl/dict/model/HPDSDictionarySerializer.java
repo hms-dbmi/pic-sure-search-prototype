@@ -42,11 +42,11 @@ public class HPDSDictionarySerializer {
 						// * in order to get the app working I am hard setting the metadata_tags that created.
 						// micing the metadata_tags in live integration
 						// phs to upper and lower
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toLowerCase()));
+						var.getMetadata_tags().add(var.getStudyId().toLowerCase());
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
 						
 						// pht to upper and lower
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toLowerCase()));
+						var.getMetadata_tags().add(var.getDtId().toLowerCase());
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
 						
 						// phv to upper only!
