@@ -14,24 +14,26 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 
 public class HPDSDictionarySerializer {
 	
-	private static TreeMap<String, TopmedDataTable> hpdsDictionary = new  TreeMap<String, TopmedDataTable>();
+	private TreeMap<String, TopmedDataTable> hpdsDictionary = new  TreeMap<String, TopmedDataTable>();
 	
 	private static List<String> IGNORE_META_KEYS = List.of(
 			"hashed_var_id"
 			);
 	
-	public static TreeMap<String, TopmedDataTable> serialize(Map<String, DictionaryModel> dictionaries) {
+	public TreeMap<String, TopmedDataTable> serialize(Map<String, DictionaryModel> dictionaries) {
+		//TODO can stream dictionaries out here instead building the entire dictionary then writing it
+		// dictionary object will be very large as the tag map grows.
+
 		for(Entry<String,DictionaryModel> entry: dictionaries.entrySet()) {
 
 			buildDataTable(entry);
 		}
 		// build tags
 		buildTags();
-		TreeMap<String, TopmedDataTable> test = hpdsDictionary;
 		return hpdsDictionary;
 	}
 
-	private static void buildTags() {
+	private void buildTags() {
 		for(Entry<String, TopmedDataTable> hpdsDictEntry: hpdsDictionary.entrySet()) {
 			
 			hpdsDictEntry.getValue().variables.forEach((varid, var) -> {
@@ -39,14 +41,14 @@ public class HPDSDictionarySerializer {
 					try {
 						if(IGNORE_META_KEYS.contains(k)) return;
 						TopmedVariable tvMethods = TopmedVariable.class.getDeclaredConstructor().newInstance();
-						// * in order to get the app working I am hard setting the metadata_tags that created.
-						// micing the metadata_tags in live integration
+						// * adding back meta tags
+						
 						// phs to upper and lower
 						var.getMetadata_tags().add(var.getStudyId().toLowerCase());
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
 						
 						// pht to upper and lower
-						var.getMetadata_tags().add(var.getDtId().toLowerCase());
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toLowerCase()));
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
 						
 						// phv to upper only!
@@ -59,6 +61,11 @@ public class HPDSDictionarySerializer {
 						// variable encoded name
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("columnmeta_name").toUpperCase()));
 						
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("derived_var_description").toUpperCase()));
+						
+						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("derived_study_abv_name").toUpperCase()));
+
+						// 
 						//var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
 						/*
 						var.getMetadata_tags().add(var.getDtId());
@@ -71,12 +78,7 @@ public class HPDSDictionarySerializer {
 						var.getMetadata_tags().add(var.getVarId().split("\\.")[0]);
 						var.getMetadata_tags().add(var.getVarId().split("\\.")[0].toUpperCase());
 						*/
-						for(String valuesTolower: var.getValue_tags()) {
-							var.allTagsLowercase.add(valuesTolower.toLowerCase());
-						}
-						for(String metatagsTolower: var.getMetadata_tags()) {
-							var.allTagsLowercase.add(metatagsTolower.toLowerCase());
-						}
+						
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 						// TODO Auto-generated catch block
@@ -85,7 +87,9 @@ public class HPDSDictionarySerializer {
 				});
 				for(String value: var.getValues().values()) {
 					try {
-						var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value));
+						String valueNoQuotes = value.replace("\\\"", "");
+						var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
+						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 						// TODO Auto-generated catch block
@@ -93,12 +97,18 @@ public class HPDSDictionarySerializer {
 					}
 		
 				}
+				for(String valuesTolower: var.getValue_tags()) {
+					var.allTagsLowercase.add(valuesTolower.toLowerCase());
+				}
+				for(String metatagsTolower: var.getMetadata_tags()) {
+					var.allTagsLowercase.add(metatagsTolower.toLowerCase());
+				}
 			});
 			hpdsDictEntry.getValue().generateTagMap();
 		}		
 	}
 
-	private static void buildDataTable(Entry<String, DictionaryModel> entry) {
+	private void buildDataTable(Entry<String, DictionaryModel> entry) {
 		TopmedDataTable dt = new TopmedDataTable();
 		TopmedVariable var = new TopmedVariable();
 		DictionaryModel dm = entry.getValue();
@@ -140,7 +150,6 @@ public class HPDSDictionarySerializer {
 		var.getMetadata().put("columnmeta_HPDS_PATH", dm.columnmeta_hpds_path);
 		var.getMetadata().put("HPDS_PATH", dm.columnmeta_hpds_path);
 		
-		
 		dt.metadata.put("study_description", dm.derived_study_description);
 		dt.metadata.put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
 
@@ -152,12 +161,19 @@ public class HPDSDictionarySerializer {
 		
 		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
-		
-		String dictKey = var.getStudyId() + "_" + var.getDtId();
-		
-		//if(dictKeyArr.length >= 2) dictKey = dictKeyArr[0].split("\\.")[0] + "_" + dictKeyArr[1].split("\\.")[0];
-		
-		//if(dictKeyArr.length == 1) dictKey = dictKeyArr[0].split("\\.")[0] + "_";
+		String dictKey;
+		if(var.getStudyId().equals("_studies_consents")) {
+			if(dictKeyArr.length == 3) {
+				dictKey = dictKeyArr[0] + "_" + dictKeyArr[1] + "_" + dictKeyArr[2];
+			} else if(dictKeyArr.length == 2) {
+				dictKey = dictKeyArr[0] + "_" + dictKeyArr[1];
+			} else {
+				dictKey = dictKeyArr[0];
+			}
+		} else {
+			 dictKey = var.getStudyId() + "_" + var.getDtId();
+		}
+
 
 		//String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
 		String varKey = dm.derived_var_id.split("\\.")[0];
@@ -174,8 +190,8 @@ public class HPDSDictionarySerializer {
 		if(entry.getValue().columnmeta_data_type.equals("categorical")) {
 		
 			for(String value: entry.getValue().values) {
-			
-				var.getValues().put(value.trim(), value.trim());
+				
+				var.getValues().put(value.trim().replace("\\\"", ""), value.trim().replace("\\\"", ""));
 			
 			}
 		

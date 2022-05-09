@@ -44,12 +44,10 @@ public class DictionaryImporterUtil {
 	private static String OUTPUT_DIR = "/usr/local/docker-config/search/";
     private static final String JAVABIN = OUTPUT_DIR + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
 
-	private static Map<String,DictionaryModel> dictionaries = new TreeMap<>();
-	private static TreeMap<String, TopmedDataTable> hpdsDictionaries = new TreeMap<String, TopmedDataTable>();
+	private Map<String,DictionaryModel> dictionaries = new TreeMap<>();
+	private TreeMap<String, TopmedDataTable> hpdsDictionaries = new TreeMap<String, TopmedDataTable>();
 	
-	private static Set<String> stigmatizedPaths = new HashSet<>();
-
-    
+	private Set<String> stigmatizedPaths = new HashSet<>();
     
 	public static void main(String[] args) {
 		parameterOverrides(args);
@@ -57,28 +55,54 @@ public class DictionaryImporterUtil {
 		//preRunValidations();
 		// Build base dictionary entries 
 		
-		run();
+		try {
+			
+			DictionaryImporterUtil.class.getDeclaredConstructor().newInstance().run();
+			
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			System.err.println("Dictionary Importer unable to complete successfully!");
+			e.printStackTrace();
+		}
 		
 	}
 
 
-	private static void run() {
+	private void run() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		dictionaries = buildColumnMetaDictionaries();
 
 		buildDictionariesFromControlFile();		
 		
-		hpdsDictionaries = HPDSDictionarySerializer.serialize(dictionaries);
+		hpdsDictionaries = HPDSDictionarySerializer.class.getDeclaredConstructor().newInstance().serialize(dictionaries);
 			
 		readStigmatizedVariables();
 		
 		doStigmatizeVariables();
 		
+		//validateDictionary();
+		
 		writeDictionary();
 
 	}
 
+	/**
+	 * Validations need to be done to ensure the following:
+	 * - Required fields contain their expected values 
+	 * - Required metadata contain their expected values
+	 * - Check that each record in the columnMeta.csv has had a dictionary generated for it.
+	 * 
+	 */
+	private void validateDictionary() {
+		
+		DictionaryValidator validator = new DictionaryValidator();
+		
+		validator.validateDictionary(hpdsDictionaries);
+		
+		
+	}
 
-	private static Map<String, DictionaryModel> buildColumnMetaDictionaries() {
+
+	private Map<String, DictionaryModel> buildColumnMetaDictionaries() {
 		try {
 			ColumnMetaDictionaryModel columnmetaModel = (ColumnMetaDictionaryModel) DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel("columnmetadata");
 			
@@ -107,7 +131,7 @@ public class DictionaryImporterUtil {
 	}
 
 
-	private static void buildDictionariesFromControlFile() {
+	private void buildDictionariesFromControlFile() {
 		
 		try {
 			// iterate over dict control file
@@ -164,28 +188,35 @@ public class DictionaryImporterUtil {
 
 	}
 
-    private static void writeDictionary() {
+    private void writeDictionary() {
+    	
         try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(JAVABIN)))){
+        	
             oos.writeObject(hpdsDictionaries);
             oos.flush();
+            
         } catch (IOException e) {
             e.printStackTrace();
-        }/*
+        }
+        
         ObjectMapper mapper = new ObjectMapper();
+        
         try {
 			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
 			
 			Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut.getBytes());
+			
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
+        
     }
     
-	private static void readStigmatizedVariables() {
+	private void readStigmatizedVariables() {
 		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DATA_INPUT_DIR + "conceptsToRemove.csv"))) {
 			
 			RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().build();
@@ -212,7 +243,7 @@ public class DictionaryImporterUtil {
 		
 	}
 
-	private static void doStigmatizeVariables() {
+	private void doStigmatizeVariables() {
 		readStigmatizedVariables();
 		hpdsDictionaries.forEach((phs,variables) -> {
 			variables.variables.forEach((key,variable) -> {
@@ -223,11 +254,12 @@ public class DictionaryImporterUtil {
 					System.err.println("HPDS_PATH MISSING FOR - " + phs + ":" + key);
 				} else {
 					
-					if(stigmatizedPaths.contains("HPDS_PATH")) {
+					if(stigmatizedPaths.contains(HPDS_PATH)) {
 						variable.getMetadata().put("columnmeta_is_stigmatized", "true");
+						variable.getMetadata().put("is_stigmatized", "true");
 					} else {
 						variable.getMetadata().put("columnmeta_is_stigmatized", "false");
-
+						variable.getMetadata().put("is_stigmatized", "false");
 					}
 					
 				}

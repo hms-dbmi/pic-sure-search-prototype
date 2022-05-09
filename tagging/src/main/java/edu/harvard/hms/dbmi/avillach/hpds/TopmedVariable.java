@@ -400,6 +400,7 @@ public class TopmedVariable implements Serializable  {
 		return Arrays.asList(value.split("[\\s\\p{Punct}]"))
 				.stream().filter((val2)->{
 					return val2.length() > 1 
+							&& !val2.isBlank()
 							&& !val2.matches("^\\d+$") 
 							&& !EXCLUDED_WORDS_LIST.contains(val2.toUpperCase()) 
 							&& !val2.toUpperCase().matches("^V\\d+$");}).map((String var)->{
