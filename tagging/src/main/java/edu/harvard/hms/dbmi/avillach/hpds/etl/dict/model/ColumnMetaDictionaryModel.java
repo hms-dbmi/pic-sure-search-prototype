@@ -31,14 +31,17 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
     	public long allObservationsLength;
     	public int observationCount;
     	public int patientCount;
+    	public Map<String, String> valuesMap;
+    	public List<String> values;
     	
-		public ColumnMetaCSVRecord(String[] metaRecord) {
+    	
+    	public ColumnMetaCSVRecord(String[] metaRecord) {
 			System.out.println(Arrays.toString(metaRecord));
 			this.name = metaRecord[0];
 			this.widthInBytes = NumberUtils.isCreatable(metaRecord[1]) ? Integer.valueOf(metaRecord[1]): null;
 			this.columnOffset = NumberUtils.isCreatable(metaRecord[2]) ? Integer.valueOf(metaRecord[2]): null;
 			this.isCategorical = Boolean.parseBoolean(metaRecord[3]);
-			this.categoryValues = isCategorical ? Arrays.asList(metaRecord[4].substring(1,metaRecord[4].length()-1).split(",")) : null;
+			this.categoryValues = isCategorical ? Arrays.asList(metaRecord[4].split("µ")) : null;
 			this.min =  NumberUtils.isCreatable(metaRecord[5]) ? Double.valueOf(metaRecord[5]): null;
 			this.max = NumberUtils.isCreatable(metaRecord[6]) ? Double.valueOf(metaRecord[6]): null;
 			this.allObservationsOffset = NumberUtils.isCreatable(metaRecord[7]) ? Long.valueOf(metaRecord[7]): null;
@@ -46,7 +49,8 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 			this.observationCount = NumberUtils.isCreatable(metaRecord[9]) ? Integer.valueOf(metaRecord[9]): null;
 			this.patientCount = NumberUtils.isCreatable(metaRecord[10]) ? Integer.valueOf(metaRecord[10]): null;
 
-		
+			this.values = Arrays.asList(metaRecord[4].split("µ"));
+			
 		}	
     	
     }
@@ -96,7 +100,8 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		
 		this.columnmeta_hpds_path = cmr.name;
 		
-		this.values = cmr.categoryValues;
+		this.values = cmr.values;
+				
 		
 	}
 	private String findStudAbvName(List<String[]> controlFile, String derived_study_id) {
