@@ -34,7 +34,8 @@ public abstract class DictionaryModel {
 	public String columnmeta_hpds_path = "";
 	public String hashed_var_id = "";
 	
-	protected List<String> values;
+	//public Map<String, String> valuesMap;
+	public List<String> values;
 	// removing this for now as dynamic metadata will be built out after release
 	//public Map<String,String> metadata = new HashMap<String,String>();
 	
@@ -201,6 +202,15 @@ public abstract class DictionaryModel {
 
 	public void setColumnmeta_patient_count(String columnmeta_patient_count) {
 		this.columnmeta_patient_count = columnmeta_patient_count;
+	}
+
+	public List<String> getValues() {
+		return values;
+	}
+
+
+	public void setValues(List<String> values) {
+		this.values = values;
 	}
 
 

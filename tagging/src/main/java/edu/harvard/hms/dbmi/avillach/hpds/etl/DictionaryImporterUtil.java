@@ -82,7 +82,11 @@ public class DictionaryImporterUtil {
 		//validateDictionary();
 		
 		writeDictionary();
-
+		System.out.println("test");
+		System.out.println("test");
+		System.out.println("test");
+		System.out.println("test");
+		System.out.println("test");
 	}
 
 	/**
@@ -198,7 +202,7 @@ public class DictionaryImporterUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        /*
+        
         ObjectMapper mapper = new ObjectMapper();
         
         try {
@@ -212,7 +216,7 @@ public class DictionaryImporterUtil {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
         
     }
     
