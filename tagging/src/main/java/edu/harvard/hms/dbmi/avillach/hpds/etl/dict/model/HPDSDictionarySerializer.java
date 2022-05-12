@@ -131,19 +131,20 @@ public class HPDSDictionarySerializer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		dm.derived_group_id = dm.derived_group_id == null ? "":dm.derived_group_id;
 		// Backwards compatibility variables
-		var.setVarId(dm.derived_var_id.split("\\.")[0]);
-		var.setDtId(dm.derived_group_id.split("\\.")[0]);
+		var.setVarId(dm.derived_var_id.isBlank() ? "": dm.derived_var_id.split("\\.")[0]);
+		var.setDtId(dm.derived_group_id.isBlank() ? "": dm.derived_group_id.split("\\.")[0]);
 		var.setIs_categorical(dm.columnmeta_data_type.equals("categorical"));
 		var.setIs_continuous(dm.columnmeta_data_type.equals("continuous"));
-		var.setStudyId(dm.derived_study_id.split("\\.")[0]);
+		var.setStudyId(dm.derived_study_id.isBlank() ? "": dm.derived_study_id.split("\\.")[0]);
 		if(dm.columnmeta_data_type.equals("continuous")) {
 			var.getMetadata().put("min", dm.getColumnmeta_min());
 			var.getMetadata().put("max", dm.getColumnmeta_max());
 		}
 	
-		var.getMetadata().put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
-		var.getMetadata().put("columnmeta_var_group_id", dm.derived_group_id.split("\\.")[0]);
+		var.getMetadata().put("columnmeta_study_id", dm.derived_study_id.isBlank() ? "": dm.derived_study_id.split("\\.")[0]);
+		var.getMetadata().put("columnmeta_var_group_id", dm.derived_group_id.isBlank() ? "": dm.derived_group_id.split("\\.")[0]);
 		var.getMetadata().put("columnmeta_var_id", dm.derived_var_id.split("\\.")[0]);
 		var.getMetadata().put("columnmeta_name", dm.derived_var_name);
 		var.getMetadata().put("columnmeta_var_group_description", dm.derived_group_description);

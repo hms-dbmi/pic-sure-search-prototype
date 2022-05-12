@@ -80,6 +80,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public Set<Variable> variables = new HashSet<>();
 		public String variableGroupDesc;
 		public String variableGroupName;
+		public String variableGroupId;
 		
 		public VariableGroup(JsonNode variableGroupNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
 			this.variableGroupName = variableGroupNode.has("variable_group_name") ? variableGroupNode.get("variable_group_name").asText() : "";
@@ -220,7 +221,8 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 					//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
 			}	
 		}
-		
+		System.out.println("Updating base dictionary.");
+
 		for(DefaultJsonDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
 		}
@@ -229,48 +231,51 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 	}
 	
 	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DefaultJsonDictionaryModel dict) {
-		baseDictionary.entrySet().forEach(entry -> {
+		
+		//baseDictionary.entrySet().forEach(entry -> {
 			
-			String dictphs = dict.derived_study_id;
-			
-			String dictVarId = dict.derived_var_name;
-			
-			if(entry.getKey().equals("\\" + dictphs + "\\" + dictVarId + "\\")) {
-				DictionaryModel baseModel = entry.getValue();
+		String dictphs = dict.derived_study_id;
+		
+		String dictVarId = dict.derived_var_name;
+		
+		//if(entry.getKey().equals("\\" + dictphs + "\\" + dictVarId + "\\")) {
+		String key = "\\" + dictphs + "\\" + dictVarId + "\\";
+		DictionaryModel baseModel = baseDictionary.get(key);
+		if(baseModel != null) { 
+		for(Field f: dict.getClass().getSuperclass().getDeclaredFields()) {
+			try {
 				
-				for(Field f: dict.getClass().getSuperclass().getDeclaredFields()) {
-					try {
+				f.setAccessible(true);
+				
+				String fieldName = f.getName();
+				
+				Object fieldVal = f.get(dict);
+				
+				if(fieldVal != null && !fieldVal.toString().isBlank()) {
+					if(Arrays.asList(baseModel.getClass().getFields()).contains(f)) {
+						Field fieldToSet = baseModel.getClass().getSuperclass().getDeclaredField(fieldName);
 						
-						f.setAccessible(true);
+						fieldToSet.setAccessible(true);
 						
-						String fieldName = f.getName();
-						
-						Object fieldVal = f.get(dict);
-						
-						if(fieldVal != null && !fieldVal.toString().isBlank()) {
-							if(Arrays.asList(baseModel.getClass().getFields()).contains(f)) {
-								Field fieldToSet = baseModel.getClass().getSuperclass().getDeclaredField(fieldName);
-								
-								fieldToSet.setAccessible(true);
-								
-								fieldToSet.set(baseModel, fieldVal);
-							}
-						}
-						
-					} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						fieldToSet.set(baseModel, fieldVal);
 					}
 				}
 				
-				entry.getValue().derived_study_description = dict.derived_study_description.isBlank() ? entry.getValue().derived_study_description: dict.derived_study_description;
-				entry.getValue().derived_group_id = dict.studyFullName;
-				
-				for(FormGroup fg: dict.formGroups) {
-					//for()
-				}
+			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		}); 
+		}
+		
+		baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_study_description = dict.derived_study_description.isBlank() ? baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_study_description: dict.derived_study_description;
+		baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_group_id = dict.studyFullName;
+		
+		//for(FormGroup fg: dict.formGroups) {
+			//for()
+		//}
+		}
+		//}
+		//}); 
 	}
 
 	/**
@@ -292,7 +297,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 				this.setStudyShortName(node2.get("study").asText());
 				
 				this.setStudyUrl(node2.get("study_url").asText());
-				
+				this.derived_group_id = "";
 				JsonNode formGroups = node2.has("form_group") ? node2.get("form_group"): null;
 				// if no formgroups not given start with form element
 				if(formGroups != null) {
