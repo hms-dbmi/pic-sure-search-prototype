@@ -115,9 +115,14 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		
 		public Variable(JsonNode variableNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
+			
 			defaultJsonDictionaryModel.derived_var_name = this.variableId;
 			
-			this.variableName = variableNode.has("variable_name") && !variableNode.get("variable_name").textValue().trim().isBlank() ? variableNode.get("variable_name").asText() : variableNode.get("variable_id").asText();
+			if(variableNode.has("variable_name") && variableNode.has("variable_id") && !variableNode.get("variable_name").textValue().trim().isBlank()) {
+				this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : variableNode.get("variable_id").asText();
+			} else {
+				
+			}
 			defaultJsonDictionaryModel.derived_var_description = this.variableName;
 			
 			this.variableType = variableNode.has("variable_type") ? variableNode.get("variable_type").asText() : "";
