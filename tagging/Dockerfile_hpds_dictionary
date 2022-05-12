@@ -9,7 +9,7 @@ ADD  ./configs/dictionary_control_file.csv ./configs/
 
 
 #
-ENTRYPOINT ["java", "-Xmx204800m", "-jar", "DictionaryImporterUtil-jar-with-dependencies.jar"]
+ENTRYPOINT ["java", "-Xmx393216m", "-jar", "DictionaryImporterUtil-jar-with-dependencies.jar"]
 
 # uncomment this is container needs to run continously to debug
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
