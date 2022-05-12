@@ -202,7 +202,7 @@ public class DictionaryImporterUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+        /*
         ObjectMapper mapper = new ObjectMapper();
         
         try {
@@ -218,6 +218,7 @@ public class DictionaryImporterUtil {
 			e.printStackTrace();
 		}
         
+        */
     }
     
 	private void readStigmatizedVariables() {
