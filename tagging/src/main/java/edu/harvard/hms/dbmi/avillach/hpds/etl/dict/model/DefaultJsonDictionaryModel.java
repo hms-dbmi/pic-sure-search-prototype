@@ -127,9 +127,6 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			
 			this.variableType = variableNode.has("variable_type") ? variableNode.get("variable_type").asText() : "";
 			
-			if(defaultJsonDictionaryModel.derived_var_name.equals("AE_TYPE")) {
-				System.out.println();
-			};
 			if(variableNode.has("variable_metadata")) {
 				for(JsonNode variableMetadataNode: variableNode.get("variable_metadata")) {
 					this.variableMetadata.add(new VariableMetadata(variableMetadataNode, defaultJsonDictionaryModel));
@@ -256,9 +253,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		//if(entry.getKey().equals("\\" + dictphs + "\\" + dictVarId + "\\")) {
 		String key = "\\" + dictphs + "\\" + dictVarId + "\\";
 		DictionaryModel baseModel = baseDictionary.get(key);
-		if(dict.derived_var_name.equals("AE_TYPE")) {
-			System.out.println();
-		}
+
 		if(baseModel != null) { 
 		for(Field f: dict.getClass().getSuperclass().getDeclaredFields()) {
 			try {
