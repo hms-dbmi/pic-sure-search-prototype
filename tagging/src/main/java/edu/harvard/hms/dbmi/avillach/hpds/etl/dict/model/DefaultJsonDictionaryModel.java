@@ -129,9 +129,11 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			
 			
 			allModels.add(new DefaultJsonDictionaryModel(defaultJsonDictionaryModel));
-			//for(JsonNode variableMetadataNode: variableNode.get("variable_metadata")) {
-			//	this.variableMetadata.add(new VariableMetadata(variableMetadataNode));
-			//}
+			if(variableNode.has("variable_metadata")) {
+				for(JsonNode variableMetadataNode: variableNode.get("variable_metadata")) {
+					this.variableMetadata.add(new VariableMetadata(variableMetadataNode, defaultJsonDictionaryModel));
+				}
+			}
 		}
 	}
 	
@@ -140,9 +142,10 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public String variableDescription;
 		public String variableLabelFromDataDictionary;
 		
-		public VariableMetadata(JsonNode variableMetadataNode) {
-			this.variableDescription = variableMetadataNode.get("variable_description").asText();
-			this.variableLabelFromDataDictionary = variableMetadataNode.get("variable_label_from_data_dictionary").asText();
+		public VariableMetadata(JsonNode variableMetadataNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+			this.variableDescription = variableMetadataNode.has(variableDescription) ? variableMetadataNode.get("variable_description").asText(): "";
+			this.variableLabelFromDataDictionary =  variableMetadataNode.has("variable_label_from_data_dictionary") ? variableMetadataNode.get("variable_label_from_data_dictionary").asText() : "";
+			defaultJsonDictionaryModel.derived_var_description = this.variableLabelFromDataDictionary.isBlank() ? defaultJsonDictionaryModel.derived_var_description: this.variableLabelFromDataDictionary;
 		}
 	}
 	
