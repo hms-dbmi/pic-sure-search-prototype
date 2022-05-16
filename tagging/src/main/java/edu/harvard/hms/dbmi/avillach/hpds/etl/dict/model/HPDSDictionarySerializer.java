@@ -48,11 +48,11 @@ public class HPDSDictionarySerializer {
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
 						
 						// pht to upper and lower
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toLowerCase()));
+						var.getMetadata_tags().add(var.getDtId().toLowerCase());
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
 						
 						// phv to upper only!
-						//var.getMetadata_tags().addAll(tvMethods.filterTags(var.getVarId().toLowerCase()));
+						var.getMetadata_tags().add(var.getVarId().toLowerCase());
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getVarId().toUpperCase()));
 												
 						// data type
