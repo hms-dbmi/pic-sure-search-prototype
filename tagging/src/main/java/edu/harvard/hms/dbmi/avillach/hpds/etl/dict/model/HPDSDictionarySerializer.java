@@ -45,13 +45,13 @@ public class HPDSDictionarySerializer {
 						
 						// phs to upper and lower
 						if(!var.getStudyId().isBlank()) {
-							var.getMetadata_tags().add(var.getStudyId().toLowerCase());
+							var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toLowerCase()));
 						}
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
 						
 						// pht to upper and lower
 						if(!var.getDtId().isBlank()) {
-							var.getMetadata_tags().add(var.getDtId().toLowerCase());
+							var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toLowerCase()));
 						}
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
 						
