@@ -71,7 +71,6 @@ public class HPDSDictionarySerializer {
 						
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("derived_study_description").toUpperCase()));
 						
-						
 						// 
 						//var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
 						/*
