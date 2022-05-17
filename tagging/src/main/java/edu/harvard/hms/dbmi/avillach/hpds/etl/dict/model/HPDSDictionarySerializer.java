@@ -134,10 +134,12 @@ public class HPDSDictionarySerializer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		dm.derived_group_id = dm.derived_group_id == null ? "":dm.derived_group_id;
+		dm.derived_group_id = dm.derived_group_id == null ? "All Variables":dm.derived_group_id;
+		dm.derived_group_id = dm.derived_group_id.isBlank() ? "All Variables":dm.derived_group_id;
+
 		// Backwards compatibility variables
 		var.setVarId(dm.derived_var_id.isBlank() ? "": dm.derived_var_id.split("\\.")[0]);
-		var.setDtId(dm.derived_group_id.isBlank() ? "": dm.derived_group_id.split("\\.")[0]);
+		var.setDtId(dm.derived_group_id.isBlank() ? "All Variables": dm.derived_group_id.split("\\.")[0]);
 		var.setIs_categorical(dm.columnmeta_data_type.equals("categorical"));
 		var.setIs_continuous(dm.columnmeta_data_type.equals("continuous"));
 		var.setStudyId(dm.derived_study_id.isBlank() ? "": dm.derived_study_id.split("\\.")[0]);
@@ -193,14 +195,19 @@ public class HPDSDictionarySerializer {
 		
 		if(varKeyArr.length == 1) varKey = varKeyArr[0].split("\\.")[0];
 		*/
+		
+		
 		if(entry.getValue().columnmeta_data_type.equals("categorical")) {
 		
-			for(String value: entry.getValue().values) {
+			if(entry.getValue().values.isEmpty()) {
+				System.err.println("CATEGORICAL VARIABLE HAS NO VALUES! = " + entry.getKey());
+			} else {
+				for(String value: entry.getValue().values) {
+					
+					var.getValues().put(value,value);
 				
-				var.getValues().put(value.trim().replace("\\\"", ""), value.trim().replace("\\\"", ""));
-			
+				}
 			}
-		
 		}
 		
 		if(hpdsDictionary.containsKey(dictKey)) {
