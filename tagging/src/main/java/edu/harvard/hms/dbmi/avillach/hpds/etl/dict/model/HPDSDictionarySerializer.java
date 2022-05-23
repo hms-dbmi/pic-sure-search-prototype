@@ -161,18 +161,15 @@ public class HPDSDictionarySerializer {
 		var.getMetadata().put("HPDS_PATH", dm.columnmeta_hpds_path);
 		
 		dt.metadata.put("study_description", dm.derived_study_description);
+
 		dt.metadata.put("columnmeta_study_id", dm.derived_study_id.split("\\.")[0]);
 
-		// end of compatibility
-		
-		// add misc metadata
-		//var.getMetadata().putAll(dm.metadata);
-		
-		
-		
 		String[] dictKeyArr = entry.getKey().substring(1).split("\\\\");
+		
 		String dictKey;
+		
 		if(var.getStudyId().equals("_studies_consents")) {
+		
 			if(dictKeyArr.length == 3) {
 				dictKey = dictKeyArr[0] + "_" + dictKeyArr[1] + "_" + dictKeyArr[2];
 			} else if(dictKeyArr.length == 2) {
@@ -180,10 +177,10 @@ public class HPDSDictionarySerializer {
 			} else {
 				dictKey = dictKeyArr[0];
 			}
+			
 		} else {
 			 dictKey = var.getStudyId() + "_" + var.getDtId();
 		}
-
 
 		//String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
 		String varKey = dm.derived_var_id.split("\\.")[0];
@@ -211,6 +208,11 @@ public class HPDSDictionarySerializer {
 				}
 			}
 		}
+		
+		// removing counts 
+		var.getMetadata().remove("columnmeta_observation_count");
+		var.getMetadata().remove("columnmeta_patient_count");
+		
 		
 		if(hpdsDictionary.containsKey(dictKey)) {
 			
