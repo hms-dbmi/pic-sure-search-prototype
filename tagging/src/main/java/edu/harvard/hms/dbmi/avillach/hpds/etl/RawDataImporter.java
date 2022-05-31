@@ -36,7 +36,14 @@ import com.opencsv.RFC4180ParserBuilder;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.metadata.model.DefaultJsonDataDictionaryBuilder;
-
+/**
+ * This is the original raw data importer
+ * This was deprecated as it was becoming a gigantic class with no
+ * structure.  Better to refactor a better solution.
+ * @author Tom
+ *
+ */
+@Deprecated
 public class RawDataImporter {
     
 	private static String outputDirectory = "/usr/local/docker-config/search/";
