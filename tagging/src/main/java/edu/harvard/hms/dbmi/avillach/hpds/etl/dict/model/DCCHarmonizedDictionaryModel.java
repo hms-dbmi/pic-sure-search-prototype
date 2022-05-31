@@ -1,4 +1,4 @@
-package edu.harvard.hms.dbmi.avillach.hpds.etl;
+package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
-
+/**
+ * Pretty simple model the dbgap dictionaries do not contain much information
+ * 
+ * Would be great to generate our own dictionaries using the DefaultJsonDictionaryModel which is our internal
+ * dictionaries that we generate.
+ * 
+ * This can then be deprecated.
+ * @author Tom
+ *
+ */
 public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 
 	public static List<DCCHarmonizedDictionaryModel> allModels = new ArrayList<>();

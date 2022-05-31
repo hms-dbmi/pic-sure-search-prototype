@@ -8,8 +8,8 @@ import java.util.Map;
  * Abstract model that will hold all required fields that need to be set for 
  * pic-sure-search to function.
  * 
- * All models need to set values for these fields.  They will be converted to the requried metadata
- * that needs to exist in the TopmedDataTable object that is stored in the dictionary.javabin
+ * All models need to set values for these fields.  They will be converted to the required metadata
+ * that needs to exist in the TopmedDataTable object and it's children objects that is stored in the dictionary.javabin
  * @author Tom
  *
  */
@@ -217,6 +217,8 @@ public abstract class DictionaryModel {
 	/** 
 	 * Columnmeta is the base dictionary generated which this method is meant to do
 	 * could be used if another base dictionary is used instead.
+	 * 
+	 * This could probably just be abstract at this layer currently
 	 */
 	public Map<String, DictionaryModel> build(Map<String, DictionaryModel> baseDictionary) {
 		// TODO Auto-generated method stub

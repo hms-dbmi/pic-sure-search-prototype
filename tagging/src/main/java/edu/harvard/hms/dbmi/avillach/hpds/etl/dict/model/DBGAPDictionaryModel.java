@@ -1,4 +1,4 @@
-package edu.harvard.hms.dbmi.avillach.hpds.etl;
+package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
-import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
 public class DBGAPDictionaryModel extends DictionaryModel {
 

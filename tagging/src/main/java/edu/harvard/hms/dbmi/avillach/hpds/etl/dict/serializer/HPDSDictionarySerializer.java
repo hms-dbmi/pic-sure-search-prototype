@@ -1,4 +1,4 @@
-package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
+package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.serializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -11,15 +11,30 @@ import java.util.TreeMap;
 
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
+/**
+ * 
+ * 
+ *
+ */
 public class HPDSDictionarySerializer {
 	
+	// Dictionary object that will be serialized and written
 	private TreeMap<String, TopmedDataTable> hpdsDictionary = new  TreeMap<String, TopmedDataTable>();
 	
+	// use this object to explicitly ignore any metadata tags that you do not want generated.
 	private static List<String> IGNORE_META_KEYS = List.of(
 			"hashed_var_id"
 			);
 	
+	/**
+	 * This is the public method that can be called to serialize DictionaryModel Objects into 
+	 * a useable javabin for search 
+	 * 
+	 * @param dictionaries
+	 * @return
+	 */
 	public TreeMap<String, TopmedDataTable> serialize(Map<String, DictionaryModel> dictionaries) {
 		//TODO can stream dictionaries out here instead building the entire dictionary then writing it
 		// dictionary object will be very large as the tag map grows.
@@ -32,7 +47,14 @@ public class HPDSDictionarySerializer {
 		buildTags();
 		return hpdsDictionary;
 	}
-
+	
+	/**
+	 * 
+	 * This method will build the metadata tags for new search.
+	 * 
+	 * 
+	 * 
+	 */
 	private void buildTags() {
 		for(Entry<String, TopmedDataTable> hpdsDictEntry: hpdsDictionary.entrySet()) {
 			
@@ -41,23 +63,23 @@ public class HPDSDictionarySerializer {
 					try {
 						if(IGNORE_META_KEYS.contains(k)) return;
 						TopmedVariable tvMethods = TopmedVariable.class.getDeclaredConstructor().newInstance();
-						// * adding back meta tags
 						
 						// phs to upper and lower
 						if(!var.getStudyId().isBlank()) {
-							
+							// cannot filter lowercase objects as filter tags always returns an uppercases value
+							// which is fine as we do not want to filter any study ids.
 							var.getMetadata_tags().add(var.getStudyId().toLowerCase());
-							//var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toLowerCase()));
+							var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
 						}
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
 						
 						// pht to upper and lower
 						if(!var.getDtId().isBlank()) {
 							var.getMetadata_tags().add(var.getDtId().toLowerCase());
+							var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
 						}
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
 						
-						// phv to upper only!
+						
+						// phv to upper and lower
 						var.getMetadata_tags().add(var.getVarId().toLowerCase());
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getVarId().toUpperCase()));
 												
@@ -73,33 +95,20 @@ public class HPDSDictionarySerializer {
 						
 						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("derived_study_description").toUpperCase()));
 						
-						// 
-						//var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(v));
-						/*
-						var.getMetadata_tags().add(var.getDtId());
-						var.getMetadata_tags().add(var.getDtId().split("\\.")[0]);
-						var.getMetadata_tags().add(var.getDtId().split("\\.")[0].toUpperCase());
-						var.getMetadata_tags().add(var.getStudyId());
-						var.getMetadata_tags().add(var.getStudyId().split("\\.")[0]);
-						var.getMetadata_tags().add(var.getStudyId().split("\\.")[0].toUpperCase());
-						var.getMetadata_tags().add(var.getVarId());
-						var.getMetadata_tags().add(var.getVarId().split("\\.")[0]);
-						var.getMetadata_tags().add(var.getVarId().split("\\.")[0].toUpperCase());
-						*/
 						
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-						// TODO Auto-generated catch block
+						// TODO exception handling
 						e.printStackTrace();
 					}
 				});
+				// add values to metadata tags and value tags
 				for(String value: var.getValues().values()) {
 					try {
 						var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
 						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 		
@@ -115,6 +124,14 @@ public class HPDSDictionarySerializer {
 		}		
 	}
 
+	/**
+	 * This will build the dictionary data table and it's associated variables.
+	 * 
+	 * The code block for backward compatibility can be deprecated as the data model 
+	 * matures.
+	 * 
+	 * @param entry
+	 */
 	private void buildDataTable(Entry<String, DictionaryModel> entry) {
 		TopmedDataTable dt = new TopmedDataTable();
 		TopmedVariable var = new TopmedVariable();
@@ -136,28 +153,43 @@ public class HPDSDictionarySerializer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		// Backwards compatibility variables
+		// could move this to a method that is more easily deprecated.
 		dm.derived_group_id = dm.derived_group_id == null ? "All Variables":dm.derived_group_id;
 		dm.derived_group_id = dm.derived_group_id.isBlank() ? "All Variables":dm.derived_group_id;
 
-		// Backwards compatibility variables
 		var.setVarId(dm.derived_var_id.isBlank() ? "": dm.derived_var_id.split("\\.")[0]);
+		
 		var.setDtId(dm.derived_group_id.isBlank() ? "All Variables": dm.derived_group_id.split("\\.")[0]);
+		
 		var.setIs_categorical(dm.columnmeta_data_type.equals("categorical"));
+		
 		var.setIs_continuous(dm.columnmeta_data_type.equals("continuous"));
+		
 		var.setStudyId(dm.derived_study_id.isBlank() ? "": dm.derived_study_id.split("\\.")[0]);
+		
 		if(dm.columnmeta_data_type.equals("continuous")) {
 			var.getMetadata().put("min", dm.getColumnmeta_min());
 			var.getMetadata().put("max", dm.getColumnmeta_max());
 		}
 	
 		var.getMetadata().put("columnmeta_study_id", dm.derived_study_id.isBlank() ? "": dm.derived_study_id.split("\\.")[0]);
+		
 		var.getMetadata().put("columnmeta_var_group_id", dm.derived_group_id.isBlank() ? "": dm.derived_group_id.split("\\.")[0]);
+		
 		var.getMetadata().put("columnmeta_var_id", dm.derived_var_id.split("\\.")[0]);
+		
 		var.getMetadata().put("columnmeta_name", dm.derived_var_name);
+		
 		var.getMetadata().put("columnmeta_var_group_description", dm.derived_group_description);
+		
 		var.getMetadata().put("columnmeta_description", dm.derived_var_description);
+		
 		var.getMetadata().put("description", dm.derived_var_description.isBlank() ? dm.derived_var_name: dm.derived_var_description);
+		
 		var.getMetadata().put("columnmeta_HPDS_PATH", dm.columnmeta_hpds_path);
+		
 		var.getMetadata().put("HPDS_PATH", dm.columnmeta_hpds_path);
 		
 		dt.metadata.put("study_description", dm.derived_study_description);
@@ -182,19 +214,7 @@ public class HPDSDictionarySerializer {
 			 dictKey = var.getStudyId() + "_" + var.getDtId();
 		}
 
-		//String[] varKeyArr = entry.getKey().substring(1).split("\\\\");
 		String varKey = dm.derived_var_id.split("\\.")[0];
-
-		/* replacing this varkey for compatibility
-		String varKey = null;
-		
-		if(varKeyArr.length >= 3) varKey = varKeyArr[0].split("\\.")[0] + "_" + varKeyArr[1].split("\\.")[0] + "_" + varKeyArr[2].split("\\.")[0];
-		
-		if(varKeyArr.length == 2) varKey = varKeyArr[0].split("\\.")[0] + "_" + varKeyArr[1].split("\\.")[0];
-		
-		if(varKeyArr.length == 1) varKey = varKeyArr[0].split("\\.")[0];
-		*/
-		
 		
 		if(entry.getValue().columnmeta_data_type.equals("categorical")) {
 		

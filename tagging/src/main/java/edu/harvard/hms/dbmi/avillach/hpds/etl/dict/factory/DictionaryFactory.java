@@ -6,9 +6,9 @@ import java.nio.file.Paths;
 
 import com.google.common.hash.Hashing;
 
-import edu.harvard.hms.dbmi.avillach.hpds.etl.DBGAPDictionaryModel;
-import edu.harvard.hms.dbmi.avillach.hpds.etl.DCCHarmonizedDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.ColumnMetaDictionaryModel;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DBGAPDictionaryModel;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DCCHarmonizedDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
@@ -36,7 +36,7 @@ public class DictionaryFactory {
 	// columnmeta data file.  required to generate any dictionaries
 	private static String DATA_INPUT_DIR = "/local/source/";
 
-	public static String COLUMN_META_FILE = DATA_INPUT_DIR + "columnMeta.csv";
+	public static String COLUMN_META_FILE = CONFIG_DIR + "columnMeta.csv";
 
 	/**
 	 * get Directory model to use to build base dictionaries
@@ -67,7 +67,12 @@ public class DictionaryFactory {
 
 		return true;
 	}
-
+	/**
+	 * used to hash the var id to be stored in the metadata
+	 * 
+	 * Does this belong in the factory?
+	 * Probably not.
+	 */
 	public static String hashVarId(String hpdsPath) {
 		
 		return Hashing.sha256().hashString(hpdsPath, StandardCharsets.UTF_8)

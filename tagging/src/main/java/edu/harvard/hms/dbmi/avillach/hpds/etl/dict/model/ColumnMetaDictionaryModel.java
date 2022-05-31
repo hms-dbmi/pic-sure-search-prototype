@@ -18,8 +18,17 @@ import com.opencsv.RFC4180ParserBuilder;
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory.DictionaryFactory;
 
+/**
+ * Model for the columnMeta.csv
+ * This is the backbone of the dictionary integration as it is responsible for storing the 
+ * HPDS_PATH metadata that is used to link the data dictionary data store to the hpds data store.
+ * 
+ * All variables that are accessible in authorized hpds columnMeta.javabin should have a model generated for them.
+ * 
+ */
 public class ColumnMetaDictionaryModel extends DictionaryModel {
-
+	
+	// object to store each record in the columnmeta.csv file.
     public class ColumnMetaCSVRecord {
     	public String name;
     	public int widthInBytes;
@@ -34,7 +43,10 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
     	public Map<String, String> valuesMap;
     	public List<String> values;
     	
-    	
+    	/**
+    	 * Constructor to build a object from a the csv buffer.
+    	 * @param metaRecord
+    	 */
     	public ColumnMetaCSVRecord(String[] metaRecord) {
 			System.out.println(Arrays.toString(metaRecord));
 			this.name = metaRecord[0];
@@ -55,6 +67,20 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
     	
     }
 	
+    /**
+     * This constructor will build a dictionary model for each record.
+     * 
+     * We can use the control file to pull abbreviations or use the metadata.json file from the 
+     * hpds data ingestion.  Currently the control file is required for each study to have an entry so
+     * is safe to use.
+     * 
+     * All required fields need to be set by the columnMeta.csv as it is the only source of
+     * truth that we know has to exist for each variable.  This constructor in tandem with the build method is responsible 
+     * for setting these values.
+     * 
+     * @param controlFile
+     * @param columnMetaRecord
+     */
 	private ColumnMetaDictionaryModel(List<String[]> controlFile, String[] columnMetaRecord) {
 		super();
 		// hashing hpds path for unique front end indentifiers without backslashes
@@ -104,12 +130,32 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 				
 		
 	}
+	
+	/**
+	 * find the study abv name and return it's value from the control file
+	 * @param controlFile
+	 * @param derived_study_id
+	 * @return
+	 */
 	private String findStudAbvName(List<String[]> controlFile, String derived_study_id) {
 		for(String[] controlFileRec: controlFile) {
 			if(controlFileRec[1].equals(derived_study_id)) return controlFileRec[0];
 		}
 		return "";
 	}
+	
+	/**
+	 * This will attempt to find the data table id ( aka group id ) from the concept path.
+	 * This is currently safe to do as the pht for compliant dbgap studies exists in the concept path
+	 * 
+	 * If this information is removed from the concept path then this methodology will need to change.
+	 * 
+	 * Non-Compliant dbgap studies are handled in the DefaultJsonDictionaryModel as they do not store 
+	 * data table id's in concept paths.
+	 * 
+	 * @param hpdsNodes
+	 * @return
+	 */
 	private String findDerivedGroupId(String[] hpdsNodes) {
 		for(String node: hpdsNodes) {
 			if(node.matches("pht[0-9]{6}")) {
@@ -119,6 +165,10 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		// no group id found 
 		return "";
 	}
+	
+	/**
+	 * 
+	 */
 	@Override
 	public Map<String, DictionaryModel> build() {
 		// read columnmeta csv 

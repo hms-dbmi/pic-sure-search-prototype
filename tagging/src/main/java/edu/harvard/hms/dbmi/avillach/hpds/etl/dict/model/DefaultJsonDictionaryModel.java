@@ -14,6 +14,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * This the model for 
+ * 
+ *
+ */
 public class DefaultJsonDictionaryModel extends DictionaryModel {
 
 	public static List<DefaultJsonDictionaryModel> allModels = new ArrayList<>();

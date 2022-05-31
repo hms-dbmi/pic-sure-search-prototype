@@ -27,7 +27,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory.DictionaryFactory;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.ColumnMetaDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
-import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.HPDSDictionarySerializer;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.serializer.HPDSDictionarySerializer;
 
 /**
  * This util will ingest dictionary from data sources into readable dictionary.javabin.
@@ -67,45 +67,36 @@ public class DictionaryImporterUtil {
 		
 	}
 
-
+	/**
+	 * wrapper method to execute necessary steps to build dictionary.javabin
+	 * 
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 */
 	private void run() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		// initialize base dictionaries from the columnMeta.csv and control file 
 		dictionaries = buildColumnMetaDictionaries();
 
 		buildDictionariesFromControlFile();		
-		
+		// Serialize dictionary models into the dictionary Data Table and Variable dictionary Objects.
 		hpdsDictionaries = HPDSDictionarySerializer.class.getDeclaredConstructor().newInstance().serialize(dictionaries);
-			
-		readStigmatizedVariables();
-		
+		// Stigmatizing variables			
 		doStigmatizeVariables();
 		
 		//validateDictionary();
 		
 		writeDictionary();
-		System.out.println("test");
-		System.out.println("test");
-		System.out.println("test");
-		System.out.println("test");
-		System.out.println("test");
+		
 	}
 
 	/**
-	 * Validations need to be done to ensure the following:
-	 * - Required fields contain their expected values 
-	 * - Required metadata contain their expected values
-	 * - Check that each record in the columnMeta.csv has had a dictionary generated for it.
-	 * 
+	 * Build method for columnMeta.csv
+	 * @return
 	 */
-	private void validateDictionary() {
-		
-		DictionaryValidator validator = new DictionaryValidator();
-		
-		validator.validateDictionary(hpdsDictionaries);
-		
-		
-	}
-
-
 	private Map<String, DictionaryModel> buildColumnMetaDictionaries() {
 		try {
 			ColumnMetaDictionaryModel columnmetaModel = (ColumnMetaDictionaryModel) DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel("columnmetadata");
@@ -135,6 +126,9 @@ public class DictionaryImporterUtil {
 	}
 
 
+	/**
+	 * Build method for control file.
+	 */
 	private void buildDictionariesFromControlFile() {
 		
 		try {
@@ -148,7 +142,7 @@ public class DictionaryImporterUtil {
 				// Build current studies dictionary models and update the base dictionary object.				
 				try {
 					System.out.println(Arrays.toString(controlFileRow));
-
+	
 					String dictionaryModel = controlFileRow[3];
 					
 					DictionaryModel controlFileModel = DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel(dictionaryModel);
@@ -159,7 +153,7 @@ public class DictionaryImporterUtil {
 					// columnmeta is the base dictionaries no need to build it again.
 					else if(!(controlFileModel instanceof ColumnMetaDictionaryModel)) {
 						controlFileModel.build(controlFileRow, dictionaries);
- 					}
+					}
 					
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -178,6 +172,30 @@ public class DictionaryImporterUtil {
 	}
 
 
+	/**
+	 * Validations need to be done to ensure the following:
+	 * - Required fields contain their expected values 
+	 * - Required metadata contain their expected values
+	 * - Check that each record in the columnMeta.csv has had a dictionary generated for it.
+	 * 
+	 * These validations are currently not compliant with requirements
+	 * deprecated to use validations done in ALS-3252 once it is tested.
+	 */
+	@Deprecated
+	private void validateDictionary() {
+		
+		DictionaryValidator validator = new DictionaryValidator();
+		
+		validator.validateDictionary(hpdsDictionaries);
+		
+		
+	}
+
+	/**
+	 * prerun validations to ensure prerequisites exists
+	 * currently commented out but can developed and implemented now that 
+	 * ingestion process is stabilizing.
+	 */
 	private static void preRunValidations() {
 		// validate required files and directory structure exist
 		if(!DictionaryFactory.validate()) throw new RuntimeException("Dictionary config invalid"); 
@@ -191,36 +209,10 @@ public class DictionaryImporterUtil {
 		//if(!Paths.get(DICTIONARY_OUTPUT_NAME).toFile().isDirectory()) throw new RuntimeException(DICTIONARY_OUTPUT_NAME + " is not a directory");
 
 	}
-
-    private void writeDictionary() {
-    	
-        try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(JAVABIN)))){
-        	
-            oos.writeObject(hpdsDictionaries);
-            oos.flush();
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        /*
-        ObjectMapper mapper = new ObjectMapper();
-        
-        try {
-			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
-			
-			Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut.getBytes());
-			
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-        */
-    }
-    
+	
+	/**
+     * reads in the conceptsToRemove.csv to be used for variable stigmatization.
+     */
 	private void readStigmatizedVariables() {
 		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DATA_INPUT_DIR + "conceptsToRemove.csv"))) {
 			
@@ -242,12 +234,10 @@ public class DictionaryImporterUtil {
 			e.printStackTrace();
 		}
 	}
-	
-	private static void parameterOverrides(String[] args) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	/**
+	 * This methods will stigmatize variables by setting the metadata for columnmeta_is_stigmatized and is_stigmatized
+	 * 
+	 */
 	private void doStigmatizeVariables() {
 		readStigmatizedVariables();
 		hpdsDictionaries.forEach((phs,variables) -> {
@@ -271,5 +261,55 @@ public class DictionaryImporterUtil {
 				
 			});
 		});
+	}
+
+
+	/**
+	 * This method will write dictionary.javabin
+	 * 
+	 * This method needs to be migrated to the serializer 
+	 * 
+	 * Currently this is a concern of mine as we are required to build a large object to store the
+	 * hpdsDictionaries which is going to cause a scaling issue with the etl. - tdesain
+	 * 
+	 * Not sure if possible to stream the ObjectOutputStream with the current data model.
+	 */
+	private void writeDictionary() {
+		
+	    try(ObjectOutputStream oos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(JAVABIN)))){
+	    	
+	        oos.writeObject(hpdsDictionaries);
+	        oos.flush();
+	        
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	    // code block to output dictionary in a json format
+	    // very useful for development. so leaving it in.  could add a arg flag to pass that will build the json if needed.
+	    // DO NOT TRY AND OUTPUT THE JSON FILE FOR THE ENTIRE DICTIONARY.  It will be a GIGANTIC file and not very useful.
+	    /*  
+	    ObjectMapper mapper = new ObjectMapper();
+	    
+	    try {
+			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
+			
+			Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut.getBytes());
+			
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+	    */
+	}
+
+
+	// use this for passing args and setting variables if needed.
+	private static void parameterOverrides(String[] args) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -26,6 +26,9 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.ColumnMetaDictionaryMod
  * Dictionary validations 
  * Any validations done against the dictionary should be done here.
  * 
+ * Holding off on this until business rules are defined.  Or else this will be
+ * changing constantly and not very useful
+ * 
  * @author TDeSain
  *
  */
