@@ -96,7 +96,7 @@ public class TagSearchResource implements IResourceRS {
                     }).sorted(Comparator.comparing(TagResult::getScore).reversed());
             if(tagStats.size()>10) {
                 tagResults = tagResults.filter(result -> 
-                result.getScore() > 1 && (
+                result.getScore() > 0 && (
                 result.getTag().toLowerCase().matches("dcc harmonized data set") ||
         		result.getTag().matches("PHS\\d{6}+.*") || 
         		result.getTag().toUpperCase().matches("PHT\\d{6}+.*") || 
