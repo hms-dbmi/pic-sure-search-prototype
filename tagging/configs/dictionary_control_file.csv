@@ -1,4 +1,6 @@
 study_abv_name,root_node,input_dir,directory_model
+ACTIV4a,/local/source/phs002694/raw/Data/DefaultJsonDictionaryModel
+ACTIV4b,/local/source/phs002710/raw/Data/DefaultJsonDictionaryModel
 AMISH,phs000956,/local/source/phs000956/rawData/,DBGAPDictionaryModel
 ARIC,phs000280,/local/source/phs000280/rawData/,DBGAPDictionaryModel
 ARIC,phs001211,/local/source/phs001211/rawData/,DBGAPDictionaryModel
