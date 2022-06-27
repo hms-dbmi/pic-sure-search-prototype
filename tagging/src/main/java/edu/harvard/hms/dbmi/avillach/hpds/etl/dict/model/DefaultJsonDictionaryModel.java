@@ -119,17 +119,13 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public Set<VariableMetadata> variableMetadata = new HashSet<>();
 		
 		public Variable(JsonNode variableNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+			
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
-			
-			defaultJsonDictionaryModel.derived_var_name = this.variableId;
-			
-			if(variableNode.has("variable_name") && variableNode.has("variable_id") && !variableNode.get("variable_name").textValue().trim().isBlank()) {
-				this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : variableNode.get("variable_id").asText();
-			} else {
-				
-			}
-			defaultJsonDictionaryModel.derived_var_description = this.variableName;
-			
+			defaultJsonDictionaryModel.derived_var_id = this.variableId;
+
+			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : variableNode.get("variable_id").asText();
+			defaultJsonDictionaryModel.derived_var_name = this.variableName;
+			// var type is derived from columnmeta data		
 			this.variableType = variableNode.has("variable_type") ? variableNode.get("variable_type").asText() : "";
 			
 			if(variableNode.has("variable_metadata")) {
@@ -150,9 +146,9 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public String variableLabelFromDataDictionary;
 		
 		public VariableMetadata(JsonNode variableMetadataNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
-			this.variableDescription = variableMetadataNode.has(variableDescription) ? variableMetadataNode.get("variable_description").asText(): "";
+			this.variableDescription = variableMetadataNode.has("variable_description") ? variableMetadataNode.get("variable_description").asText(): "";
 			this.variableLabelFromDataDictionary =  variableMetadataNode.has("variable_label_from_data_dictionary") ? variableMetadataNode.get("variable_label_from_data_dictionary").asText() : "";
-			defaultJsonDictionaryModel.derived_var_description = this.variableLabelFromDataDictionary.isBlank() ? defaultJsonDictionaryModel.derived_var_description: this.variableLabelFromDataDictionary;
+		    defaultJsonDictionaryModel.derived_var_description = this.variableDescription;
 			allModels.add(new DefaultJsonDictionaryModel(defaultJsonDictionaryModel));
 
 		}
@@ -253,7 +249,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			
 		String dictphs = dict.derived_study_id;
 		
-		String dictVarId = dict.derived_var_name;
+		String dictVarId = dict.derived_var_id;
 		
 		//if(entry.getKey().equals("\\" + dictphs + "\\" + dictVarId + "\\")) {
 		String key = "\\" + dictphs + "\\" + dictVarId + "\\";
