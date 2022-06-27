@@ -122,8 +122,8 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
 			defaultJsonDictionaryModel.derived_var_id = this.variableId;
-
-			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : variableNode.get("variable_id").asText();
+			System.out.println(this.variableId);
+			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : this.variableId;
 			defaultJsonDictionaryModel.derived_var_name = this.variableName;
 			// var type is derived from columnmeta data		
 			this.variableType = variableNode.has("variable_type") ? variableNode.get("variable_type").asText() : "";
