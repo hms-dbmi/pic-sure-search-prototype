@@ -1,11 +1,12 @@
 study_abv_name,root_node,input_dir,directory_model
-ACTIV4a,phs002694,/local/source/phs002694/rawData/,DefaultJsonDictionaryModel
-ACTIV4b,phs002710,/local/source/phs002710/rawData/,DefaultJsonDictionaryModel
+ACTIV4a,/local/source/phs002694/raw/Data/DefaultJsonDictionaryModel
+ACTIV4b,/local/source/phs002710/raw/Data/DefaultJsonDictionaryModel
 AMISH,phs000956,/local/source/phs000956/rawData/,DBGAPDictionaryModel
 ARIC,phs000280,/local/source/phs000280/rawData/,DBGAPDictionaryModel
 ARIC,phs001211,/local/source/phs001211/rawData/,DBGAPDictionaryModel
 BABYHUG,phs002415,/local/source/phs002415/rawData/,DefaultJsonDictionaryModel
 BAGS,phs001143,/local/source/phs001143/rawData/,DBGAPDictionaryModel
+C3PO,phs002415,/local/source/phs002752/rawData/,DefaultJsonDictionaryModel
 CARDIA,phs000285,/local/source/phs000285/rawData/,DBGAPDictionaryModel
 CATHGEN,phs000703,/local/source/phs000703/rawData/,DBGAPDictionaryModel
 CCAF,phs000820,/local/source/phs000820/rawData/,DBGAPDictionaryModel
@@ -34,7 +35,7 @@ GENSALT,phs001217,/local/source/phs001217/rawData/,DBGAPDictionaryModel
 GOLDN,phs001359,/local/source/phs001359/rawData/,DBGAPDictionaryModel
 HCHSSOL,phs000810,/local/source/phs000810/rawData/,DBGAPDictionaryModel
 HCT_for_SCD,phs002385,/local/source/phs002385/rawData/,DefaultJsonDictionaryModel
-HRMN,DCC Harmonized data set,/local/source/hrmn/rawData/,DCCHarmonizedDictionaryModel
+HRMN,DCC Harmonized data set,/local/source/hrmn/rawData/,DCCHarmonizedDictionaryModel2
 HVH,phs000993,/local/source/phs000993/rawData/,DBGAPDictionaryModel
 HVH,phs001013,/local/source/phs001013/rawData/,DBGAPDictionaryModel
 HYPERGEN,phs001293,/local/source/phs001293/rawData/,DBGAPDictionaryModel
