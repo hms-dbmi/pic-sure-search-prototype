@@ -78,6 +78,8 @@ public class DCCHarmonizedDictionaryModel2 extends DictionaryModel {
 	    					
 	    					base.derived_group_id = groupId;
 	    					base.derived_var_id = varId;
+	    					base.derived_var_name = varName;
+
 	    					base.derived_var_description = meta.get("var_description").asText();
 		    					
 		    				

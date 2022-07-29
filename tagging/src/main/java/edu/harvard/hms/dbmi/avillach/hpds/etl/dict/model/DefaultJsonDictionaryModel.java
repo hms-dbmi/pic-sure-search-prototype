@@ -122,7 +122,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
 			defaultJsonDictionaryModel.derived_var_id = this.variableId;
-			System.out.println(this.variableId);
+
 			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : this.variableId;
 			defaultJsonDictionaryModel.derived_var_name = this.variableName;
 			// var type is derived from columnmeta data		
@@ -253,8 +253,26 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		
 		//if(entry.getKey().equals("\\" + dictphs + "\\" + dictVarId + "\\")) {
 		String key = "\\" + dictphs + "\\" + dictVarId + "\\";
-		DictionaryModel baseModel = baseDictionary.get(key);
-
+		
+		DictionaryModel baseModel = null;
+		
+		if(baseDictionary.containsKey(key)) {
+			baseModel = baseDictionary.get(key);
+		} else {
+			key = "\\" + dictphs + "\\" + dictVarId.toUpperCase() + "\\";
+			
+			if(baseDictionary.containsKey(key)) {
+				baseModel = baseDictionary.get(key);
+			} else {
+				key = "\\" + dictphs + "\\" + dictVarId.toLowerCase() + "\\";
+				
+				if(baseDictionary.containsKey(key)) {
+					baseModel = baseDictionary.get(key);
+				} else {
+					System.out.println(dict.derived_var_id + " not found in columnMeta.csv - ensure the variable ids in metadata and columnmeta match");
+				}
+			}
+		}
 		if(baseModel != null) { 
 		for(Field f: dict.getClass().getSuperclass().getDeclaredFields()) {
 			try {
@@ -281,8 +299,8 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			}
 		}
 		
-		baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_study_description = dict.derived_study_description.isBlank() ? baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_study_description: dict.derived_study_description;
-		baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_group_id = dict.studyFullName;
+		baseDictionary.get(key).derived_study_description = dict.derived_study_description.isBlank() ? baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_study_description: dict.derived_study_description;
+		baseDictionary.get(key).derived_group_id = dict.studyFullName;
 		
 		//for(FormGroup fg: dict.formGroups) {
 			//for()
