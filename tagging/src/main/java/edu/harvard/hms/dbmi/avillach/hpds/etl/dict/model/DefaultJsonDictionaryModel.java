@@ -122,9 +122,14 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
 			defaultJsonDictionaryModel.derived_var_id = this.variableId;
+			defaultJsonDictionaryModel.derived_var_name = this.variableId;
 
+			// currently variable_name is the encoded variable_id
+			// and variable name is the decoded variable_id stored in variable_name
+			
 			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : this.variableId;
-			defaultJsonDictionaryModel.derived_var_name = this.variableName;
+			defaultJsonDictionaryModel.derived_var_description = this.variableName;
+			
 			// var type is derived from columnmeta data		
 			this.variableType = variableNode.has("variable_type") ? variableNode.get("variable_type").asText() : "";
 			
@@ -148,7 +153,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public VariableMetadata(JsonNode variableMetadataNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
 			this.variableDescription = variableMetadataNode.has("variable_description") ? variableMetadataNode.get("variable_description").asText(): "";
 			this.variableLabelFromDataDictionary =  variableMetadataNode.has("variable_label_from_data_dictionary") ? variableMetadataNode.get("variable_label_from_data_dictionary").asText() : "";
-		    defaultJsonDictionaryModel.derived_var_description = this.variableDescription;
+		    //defaultJsonDictionaryModel.derived_var_description = this.variableDescription;
 			allModels.add(new DefaultJsonDictionaryModel(defaultJsonDictionaryModel));
 
 		}
