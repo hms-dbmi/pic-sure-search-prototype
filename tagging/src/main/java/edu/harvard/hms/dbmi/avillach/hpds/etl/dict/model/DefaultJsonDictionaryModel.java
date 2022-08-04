@@ -1,18 +1,24 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVWriter;
 
 /**
  * This the model for 
@@ -239,8 +245,12 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 					//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
 			}	
 		}
-		System.out.println("Updating base dictionary.");
+		System.out.println("Looking for missing dictionaries");
 
+		reportMissingDictionaries(baseDictionary);
+
+		System.out.println("Updating base dictionary.");
+		
 		for(DefaultJsonDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
 		}
@@ -248,8 +258,50 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		return baseDictionary;
 	}
 	
-	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DefaultJsonDictionaryModel dict) {
+	private void reportMissingDictionaries(Map<String, DictionaryModel> baseDictionary) {
 		
+		Set<String> allVariableNamesInDictionary = collectVariableNames();
+		
+		String phs = "";
+		
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("./output/" + "Missing_Dictionary_Entries.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+			
+			CSVWriter csvwriter = new CSVWriter(writer);
+			
+			for(Entry<String,DictionaryModel> baseEntry: baseDictionary.entrySet()) {
+				phs = baseEntry.getValue().derived_study_id;
+				if(!allVariableNamesInDictionary.contains(baseEntry.getValue().derived_var_name)) {
+					csvwriter.writeNext(new String[]{ baseEntry.getValue().derived_study_abv_name, baseEntry.getValue().derived_study_id, baseEntry.getValue().derived_var_name });
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("./output/" + phs + "_Dictionary_Variable_Names.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+			CSVWriter csvwriter = new CSVWriter(writer);
+			for(String varName: allVariableNamesInDictionary) {
+				csvwriter.writeNext(new String[] { varName });
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private Set<String> collectVariableNames() {
+		Set<String> set = new HashSet<String>();
+		
+		for(DefaultJsonDictionaryModel model: allModels) {
+			set.add(model.derived_var_name);
+		}
+		
+		return set;
+	}
+
+	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DefaultJsonDictionaryModel dict) {
+
 		//baseDictionary.entrySet().forEach(entry -> {
 			
 		String dictphs = dict.derived_study_id;
