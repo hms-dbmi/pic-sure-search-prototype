@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
 
+import edu.harvard.hms.dbmi.avillach.hpds.etl.DictionaryImporterUtil;
+
 /**
  * This the model for 
  * 
@@ -264,7 +266,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		
 		String phs = "";
 		
-		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("./output/" + "Missing_Dictionary_Entries.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + "Missing_Dictionary_Entries.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
 			
 			CSVWriter csvwriter = new CSVWriter(writer);
 			
@@ -274,15 +276,22 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 					csvwriter.writeNext(new String[]{ baseEntry.getValue().derived_study_abv_name, baseEntry.getValue().derived_study_id, baseEntry.getValue().derived_var_name });
 				}
 			}
+			csvwriter.flush();
+
+			csvwriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("./output/" + phs + "_Dictionary_Variable_Names.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + phs + "_Dictionary_Variable_Names.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
 			CSVWriter csvwriter = new CSVWriter(writer);
 			for(String varName: allVariableNamesInDictionary) {
 				csvwriter.writeNext(new String[] { varName });
 			}
+			csvwriter.flush();
+
+			csvwriter.close();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
