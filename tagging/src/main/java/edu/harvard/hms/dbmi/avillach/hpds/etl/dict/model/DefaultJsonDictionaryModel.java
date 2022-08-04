@@ -249,7 +249,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		}
 		System.out.println("Looking for missing dictionaries");
 
-		reportMissingDictionaries(baseDictionary);
+		reportMissingDictionaries(baseDictionary,controlFileRow);
 
 		System.out.println("Updating base dictionary.");
 		
@@ -260,18 +260,18 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		return baseDictionary;
 	}
 	
-	private void reportMissingDictionaries(Map<String, DictionaryModel> baseDictionary) {
+	private void reportMissingDictionaries(Map<String, DictionaryModel> baseDictionary, String[] controlFileRow) {
 		
 		Set<String> allVariableNamesInDictionary = collectVariableNames();
 		
-		String phs = "";
+		String phs = controlFileRow[1];
 		
 		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + "Missing_Dictionary_Entries.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
 			
 			CSVWriter csvwriter = new CSVWriter(writer);
 			
 			for(Entry<String,DictionaryModel> baseEntry: baseDictionary.entrySet()) {
-				phs = baseEntry.getValue().derived_study_id;
+				if(!phs.equals(baseEntry.getValue().derived_study_id)) continue;
 				if(!allVariableNamesInDictionary.contains(baseEntry.getValue().derived_var_name)) {
 					csvwriter.writeNext(new String[]{ baseEntry.getValue().derived_study_abv_name, baseEntry.getValue().derived_study_id, baseEntry.getValue().derived_var_name });
 				}
