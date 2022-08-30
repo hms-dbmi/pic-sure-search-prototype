@@ -257,9 +257,29 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			updateBaseDictionary(baseDictionary, model);
 		}
 		
+		reportMissingColumnmeta();
+		
 		return baseDictionary;
 	}
 	
+	private void reportMissingColumnmeta() {
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + "Missing_Columnmeta.csv"), StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+			
+			CSVWriter csvwriter = new CSVWriter(writer);
+	
+			for(String[] line: DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA) {
+				csvwriter.writeNext(line);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
+			
 	private void reportMissingDictionaries(Map<String, DictionaryModel> baseDictionary, String[] controlFileRow) {
 		
 		Set<String> allVariableNamesInDictionary = collectVariableNames();
@@ -335,6 +355,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 				if(baseDictionary.containsKey(key)) {
 					baseModel = baseDictionary.get(key);
 				} else {
+					DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(new String[] {dict.derived_study_abv_name, dict.derived_study_id, dict.derived_var_id});
 					System.out.println(dict.derived_var_id + " not found in columnMeta.csv - ensure the variable ids in metadata and columnmeta match");
 				}
 			}

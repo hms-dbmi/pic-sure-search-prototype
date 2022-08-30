@@ -73,12 +73,17 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		}
 
 		System.out.println("updating base dictionaries");
-		
+		reportMissingColumnmeta();
 		for(DBGAPDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
 		}
 		
 		return baseDictionary;
+	}
+
+	private void reportMissingColumnmeta() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void buildVarReport(DBGAPDictionaryModel dict, String absolutePath) {
@@ -95,35 +100,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			if(dataTable != null) {
 				
 				dict.description = doc.getElementsByTag("data_table").first().attr("study_name");
-				/*
-				dict.variables.forEach(dbGapVariable ->{
-					
-					String[] elementVarIdArr = dataTable.attr("id").split("\\.");
-					
-					if(elementVarIdArr.length > 0) {
-						
-						if(elementVarIdArr[0].startsWith("phv")) {
-							
-							String elementVarId = elementVarIdArr[0];
-							
-							// Ingest the var report into the var_report_metadata data map
-							if(dbGapVariable.variable_id.startsWith(elementVarId)) {
-								
-								
-
-								//dbGapVariable.all_metadata.put(varReportPrefix + "description", element.getElementsByTag("description").first().text());
-								
-								//dbGapVariable.all_metadata.put(varReportPrefix + "study_description", dict.description);
-								
-								//dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
-
-							}
-						}
-						
-					}
-					
-				});
-				*/
+				
 				doc.getElementsByTag("variable").stream().forEach(variableElement -> {
 					
 					try {
@@ -346,10 +323,16 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
 
+	public static List<String[]> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new ArrayList<String[]>();
+	
 	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DBGAPDictionaryModel dict) {
 		dict.variables.forEach(var -> {
+			
 			String keyLookup = "\\" + var.study_id.split("\\.")[0] + "\\" + var.data_table_id.split("\\.")[0] + "\\" + var.variable_id.split("\\.")[0] + "\\" + var.variable_encoded_name + "\\";
+			
 			if(baseDictionary.containsKey(keyLookup)) {
 				DictionaryModel baseModel = baseDictionary.get(keyLookup);
 				
@@ -361,7 +344,13 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
 				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
+				
+				if(baseModel.derived_var_description.isBlank()) {
+					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(new String[] { baseModel.derived_study_id,  });
+				}
 				//baseModel.metadata.putAll(dict.metadata);
+			} else {
+				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(new String[] { keyLookup });
 			};
 		});
 		/* bad looping
