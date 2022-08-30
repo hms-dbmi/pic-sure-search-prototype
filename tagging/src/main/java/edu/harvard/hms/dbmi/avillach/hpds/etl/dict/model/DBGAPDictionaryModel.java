@@ -113,6 +113,58 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		return baseDictionary;
 	}
 
+	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DBGAPDictionaryModel dict) {
+		dict.variables.forEach(var -> {
+			
+			String keyLookup = "\\" + var.study_id.split("\\.")[0] + "\\" + var.data_table_id.split("\\.")[0] + "\\" + var.variable_id.split("\\.")[0] + "\\" + var.variable_encoded_name + "\\";
+			
+			if(baseDictionary.containsKey(keyLookup)) {
+				DictionaryModel baseModel = baseDictionary.get(keyLookup);
+				
+				baseModel.derived_group_description = var.data_table_description.isBlank() ? baseModel.derived_group_description: var.data_table_description;
+				baseModel.derived_group_name = var.data_table_name.isBlank() ? baseModel.derived_group_name: var.data_table_name;
+				baseModel.derived_group_id = var.data_table_id.isBlank() ? baseModel.derived_group_id : var.data_table_id;
+				baseModel.derived_var_name = var.variable_encoded_name;
+				baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
+				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
+				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
+				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
+				
+				if(baseModel.derived_var_description.isBlank()) {
+					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(keyLookup.split("\\"));
+				}
+				//baseModel.metadata.putAll(dict.metadata);
+			} else {
+				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(keyLookup.split("\\"));
+			};
+		});
+		
+	
+		/* bad looping
+		baseDictionary.entrySet().forEach(entry -> {
+									
+			for(DBGapVariable var: dict.variables) {
+				if(entry.getValue().columnmeta_hpds_path.contains(var.study_id.split("\\.")[0]) && 
+					entry.getValue().columnmeta_hpds_path.contains(var.data_table_id.split("\\.")[0]) &&
+					entry.getValue().columnmeta_hpds_path.contains(var.variable_id.split("\\.")[0])) {
+					
+					DictionaryModel baseModel = entry.getValue();
+					
+					baseModel.derived_group_description = var.data_table_description.isBlank() ? baseModel.derived_group_description: var.data_table_description;
+					baseModel.derived_group_name = var.data_table_name.isBlank() ? baseModel.derived_group_name: var.data_table_name;
+					baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
+					baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
+					baseModel.derived_study_id = dict.study_id.isBlank() ? baseModel.derived_study_id : dict.study_id;
+					baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
+					
+				}
+				
+			}
+		}); */
+		
+		
+	}
+
 	private void reportMissingColumnmeta() {
 		// TODO Auto-generated method stub
 		
@@ -359,57 +411,5 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
 
 	public static List<String[]> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new ArrayList<String[]>();
-	
-	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DBGAPDictionaryModel dict) {
-		dict.variables.forEach(var -> {
-			
-			String keyLookup = "\\" + var.study_id.split("\\.")[0] + "\\" + var.data_table_id.split("\\.")[0] + "\\" + var.variable_id.split("\\.")[0] + "\\" + var.variable_encoded_name + "\\";
-			
-			if(baseDictionary.containsKey(keyLookup)) {
-				DictionaryModel baseModel = baseDictionary.get(keyLookup);
-				
-				baseModel.derived_group_description = var.data_table_description.isBlank() ? baseModel.derived_group_description: var.data_table_description;
-				baseModel.derived_group_name = var.data_table_name.isBlank() ? baseModel.derived_group_name: var.data_table_name;
-				baseModel.derived_group_id = var.data_table_id.isBlank() ? baseModel.derived_group_id : var.data_table_id;
-				baseModel.derived_var_name = var.variable_encoded_name;
-				baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
-				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
-				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
-				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
-				
-				if(baseModel.derived_var_description.isBlank()) {
-					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(keyLookup.split("\\"));
-				}
-				//baseModel.metadata.putAll(dict.metadata);
-			} else {
-				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(keyLookup.split("\\"));
-			};
-		});
-		
-
-		/* bad looping
-		baseDictionary.entrySet().forEach(entry -> {
-									
-			for(DBGapVariable var: dict.variables) {
-				if(entry.getValue().columnmeta_hpds_path.contains(var.study_id.split("\\.")[0]) && 
-					entry.getValue().columnmeta_hpds_path.contains(var.data_table_id.split("\\.")[0]) &&
-					entry.getValue().columnmeta_hpds_path.contains(var.variable_id.split("\\.")[0])) {
-					
-					DictionaryModel baseModel = entry.getValue();
-					
-					baseModel.derived_group_description = var.data_table_description.isBlank() ? baseModel.derived_group_description: var.data_table_description;
-					baseModel.derived_group_name = var.data_table_name.isBlank() ? baseModel.derived_group_name: var.data_table_name;
-					baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
-					baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
-					baseModel.derived_study_id = dict.study_id.isBlank() ? baseModel.derived_study_id : dict.study_id;
-					baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
-					
-				}
-				
-			}
-		}); */
-		
-		
-	}
 
 }
