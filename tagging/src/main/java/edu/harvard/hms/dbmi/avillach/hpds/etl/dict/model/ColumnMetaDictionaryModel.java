@@ -48,7 +48,7 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
     	 * @param metaRecord
     	 */
     	public ColumnMetaCSVRecord(String[] metaRecord) {
-			System.out.println(Arrays.toString(metaRecord));
+			//System.out.println(Arrays.toString(metaRecord));
 			this.name = metaRecord[0];
 			this.widthInBytes = NumberUtils.isCreatable(metaRecord[1]) ? Integer.valueOf(metaRecord[1]): null;
 			this.columnOffset = NumberUtils.isCreatable(metaRecord[2]) ? Integer.valueOf(metaRecord[2]): null;

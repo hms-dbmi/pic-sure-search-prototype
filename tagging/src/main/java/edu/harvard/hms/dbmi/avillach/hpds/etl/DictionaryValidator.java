@@ -251,5 +251,21 @@ public class DictionaryValidator {
 		
 	}
 
+
+	public void validateNoEmptyValues(TreeMap<String, TopmedDataTable> hpdsDictionaries) {
+		hpdsDictionaries.entrySet().parallelStream().forEach(entry -> {
+			
+			entry.getValue().variables.forEach((k, var) ->{
+				
+				if(!var.getMetadata().containsKey("COLUMN_META_HPDS_PATH_KEY")) System.err.println("columnmeta_HPDS_PATH MISSING! - " + var.getStudyId() + "." + var.getVarId());
+				
+				else DICTIONARY_ALL_HPDS_PATHS.add(var.getMetadata().get(COLUMN_META_HPDS_PATH_KEY));
+				
+			});
+			
+		});
+		
+	}
+
 	
 }

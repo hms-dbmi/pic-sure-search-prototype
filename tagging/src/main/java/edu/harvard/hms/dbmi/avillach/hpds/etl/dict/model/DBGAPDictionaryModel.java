@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jsoup.Jsoup;
@@ -26,9 +26,9 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 
 	public static List<DBGAPDictionaryModel> allModels = new ArrayList<>();
 	
-	public static List<String[]> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new ArrayList<String[]>();
+	public static Set<String[]> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new TreeSet<String[]>();
 
-	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
+	public static Set<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new TreeSet<String[]>();
 
 	private String id;
 	private String name;
