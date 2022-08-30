@@ -3,6 +3,8 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -26,9 +28,9 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 
 	public static List<DBGAPDictionaryModel> allModels = new ArrayList<>();
 	
-	public static Set<String[]> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new TreeSet<String[]>();
+	public static Set<String> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new TreeSet<String>();
 
-	public static Set<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new TreeSet<String[]>();
+	public static Set<String> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new TreeSet<String>();
 
 	private String id;
 	private String name;
@@ -90,12 +92,15 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		}
 		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + "DBGap_Compliant_Dictionaries_Missing_From_HPDS_Data_Store.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
 			
-			CSVWriter csvwriter = new CSVWriter(writer);
+			PrintWriter pWriter = new PrintWriter(writer);
 			
-			csvwriter.writeAll(DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA);
-			csvwriter.flush();
+			for(String str: DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA) {
+				pWriter.write(str);
+			}
+	
+			pWriter.flush();
 
-			csvwriter.close();
+			pWriter.close();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -103,12 +108,14 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		}
 		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + "DBGap_Compliant_Dictionaries_Missing_Variable_Description.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
 			
-			CSVWriter csvwriter = new CSVWriter(writer);
+			PrintWriter pWriter = new PrintWriter(writer);
 			
-			csvwriter.writeAll(VARIABLES_MISSING_VARIABLE_DESCRIPTION);
-			csvwriter.flush();
+			for(String str: VARIABLES_MISSING_VARIABLE_DESCRIPTION) {
+				pWriter.write(str);
+			}
+			pWriter.flush();
 
-			csvwriter.close();
+			pWriter.close();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -135,11 +142,11 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
 				
 				if(baseModel.derived_var_description.isBlank()) {
-					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(new String[] { keyLookup });
+					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(keyLookup);
 				}
 				//baseModel.metadata.putAll(dict.metadata);
 			} else {
-				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(new String[] { keyLookup });
+				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(keyLookup);
 			};
 		});
 		
