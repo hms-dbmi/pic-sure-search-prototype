@@ -95,7 +95,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			PrintWriter pWriter = new PrintWriter(writer);
 			
 			for(String str: DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA) {
-				pWriter.write(str + "\n");
+				pWriter.println(str);
 			}
 	
 			pWriter.flush();
@@ -111,7 +111,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			PrintWriter pWriter = new PrintWriter(writer);
 			
 			for(String str: VARIABLES_MISSING_VARIABLE_DESCRIPTION) {
-				pWriter.write(str + "\n");
+				pWriter.println(str);
 			}
 			pWriter.flush();
 
