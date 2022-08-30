@@ -1,7 +1,11 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,11 +13,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import com.opencsv.CSVWriter;
 
 public class DBGAPDictionaryModel extends DictionaryModel {
 
@@ -346,13 +353,40 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
 				
 				if(baseModel.derived_var_description.isBlank()) {
-					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(new String[] { baseModel.derived_study_id,  });
+					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(new String[] { keyLookup });
 				}
 				//baseModel.metadata.putAll(dict.metadata);
 			} else {
 				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(new String[] { keyLookup });
 			};
 		});
+		
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + dict.variables.get(0).study_id + "_Dictionaries_Missing_From_HPDS_Data_Strore.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
+			
+			CSVWriter csvwriter = new CSVWriter(writer);
+			
+			csvwriter.writeAll(DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA);
+			csvwriter.flush();
+
+			csvwriter.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + dict.variables.get(0).study_id + "_Dictionaries_Missing_Variable_Description.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
+			
+			CSVWriter csvwriter = new CSVWriter(writer);
+			
+			csvwriter.writeAll(VARIABLES_MISSING_VARIABLE_DESCRIPTION);
+			csvwriter.flush();
+
+			csvwriter.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		/* bad looping
 		baseDictionary.entrySet().forEach(entry -> {
 									
