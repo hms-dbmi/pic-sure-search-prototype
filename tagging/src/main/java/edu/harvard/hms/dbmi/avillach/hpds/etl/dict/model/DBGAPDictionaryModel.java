@@ -26,6 +26,10 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 
 	public static List<DBGAPDictionaryModel> allModels = new ArrayList<>();
 	
+	public static List<String[]> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new ArrayList<String[]>();
+
+	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
+
 	private String id;
 	private String name;
 	private String study_id;
@@ -131,11 +135,11 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
 				
 				if(baseModel.derived_var_description.isBlank()) {
-					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(keyLookup.split("\\"));
+					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(new String[] { keyLookup });
 				}
 				//baseModel.metadata.putAll(dict.metadata);
 			} else {
-				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(keyLookup.split("\\"));
+				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(new String[] { keyLookup });
 			};
 		});
 		
@@ -407,9 +411,5 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
-
-	public static List<String[]> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new ArrayList<String[]>();
 
 }
