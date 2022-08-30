@@ -80,11 +80,36 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		}
 
 		System.out.println("updating base dictionaries");
-		reportMissingColumnmeta();
+
 		for(DBGAPDictionaryModel model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
 		}
-		
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + "DBGap_Compliant_Dictionaries_Missing_From_HPDS_Data_Store.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
+			
+			CSVWriter csvwriter = new CSVWriter(writer);
+			
+			csvwriter.writeAll(DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA);
+			csvwriter.flush();
+
+			csvwriter.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + "DBGap_Compliant_Dictionaries_Missing_Variable_Description.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
+			
+			CSVWriter csvwriter = new CSVWriter(writer);
+			
+			csvwriter.writeAll(VARIABLES_MISSING_VARIABLE_DESCRIPTION);
+			csvwriter.flush();
+
+			csvwriter.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return baseDictionary;
 	}
 
@@ -353,40 +378,15 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
 				
 				if(baseModel.derived_var_description.isBlank()) {
-					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(new String[] { keyLookup });
+					VARIABLES_MISSING_VARIABLE_DESCRIPTION.add(keyLookup.split("\\"));
 				}
 				//baseModel.metadata.putAll(dict.metadata);
 			} else {
-				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(new String[] { keyLookup });
+				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(keyLookup.split("\\"));
 			};
 		});
 		
-		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + dict.variables.get(0).study_id + "_Dictionaries_Missing_From_HPDS_Data_Strore.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-			
-			CSVWriter csvwriter = new CSVWriter(writer);
-			
-			csvwriter.writeAll(DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA);
-			csvwriter.flush();
 
-			csvwriter.close();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("/usr/local/docker-config/search/" + dict.variables.get(0).study_id + "_Dictionaries_Missing_Variable_Description.csv"), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
-			
-			CSVWriter csvwriter = new CSVWriter(writer);
-			
-			csvwriter.writeAll(VARIABLES_MISSING_VARIABLE_DESCRIPTION);
-			csvwriter.flush();
-
-			csvwriter.close();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		/* bad looping
 		baseDictionary.entrySet().forEach(entry -> {
 									
