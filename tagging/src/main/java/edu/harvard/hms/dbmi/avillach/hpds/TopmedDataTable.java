@@ -8,6 +8,8 @@ import org.jsoup.nodes.Document;
 
 import com.google.common.collect.Sets;
 
+import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter.ColumnMetaCSVRecord;
 import edu.harvard.hms.dbmi.avillach.hpds.model.SearchQuery;
 
 public class TopmedDataTable implements Serializable {
@@ -31,10 +33,58 @@ public class TopmedDataTable implements Serializable {
 		metadata.put("participant_set", getDataTableAttribute(doc, "participant_set"));
 		metadata.put("date_created", getDataTableAttribute(doc, "date_created"));
 		metadata.put("description", doc.getElementsByTag("data_table").first().getElementsByTag("description").first().text());
+		
 		variables = new TreeMap<>();
+		
 		doc.getElementsByTag("variable").stream().forEach(variable -> {
-			variables.put(variable.attr("id"), new TopmedVariable(this, variable));
+			TopmedVariable tVar;
+			try {
+				tVar = new TopmedVariable(this, variable);
+				variables.put(variable.attr("id").replaceAll("\\.v.*", ""), tVar);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
 		});
+	}
+
+	public TopmedDataTable(RawDataImporter.ColumnMetaCSVRecord csvr) {
+		metadata = new TreeMap<>();
+		variables = new TreeMap<>();
+		
+		String[] concept = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
+		int studyDepth = concept.length;
+		if(studyDepth == 4) {
+			metadata.put("columnmeta_id", concept[1]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[1]);
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[2], var);
+		}
+		if(studyDepth == 3) {
+			metadata.put("columnmeta_id", concept[1]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[1]);
+
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[2], var);
+		}
+		if(studyDepth == 2) {
+			metadata.put("columnmeta_id", concept[1]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[1]);
+
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[1], var);
+		}
+		if(studyDepth == 1) {
+			metadata.put("columnmeta_id", concept[0]);
+			metadata.put("columnmeta_study_id", concept[0]);
+			metadata.put("columnmeta_description", concept[0]);
+
+			TopmedVariable var =  new TopmedVariable(this, csvr);
+			variables.put(concept[0], var);
+		}
+
 	}
 
 	public void generateTagMap() {

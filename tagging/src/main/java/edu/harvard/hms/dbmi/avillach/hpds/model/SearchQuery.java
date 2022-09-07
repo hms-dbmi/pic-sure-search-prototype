@@ -15,5 +15,5 @@ public class SearchQuery {
     private final List<String> includedTags;
     private final List<String> excludedTags;
     private final boolean returnTags;
-    private final boolean returnAllResults;
+    private final int offset, limit;
 }

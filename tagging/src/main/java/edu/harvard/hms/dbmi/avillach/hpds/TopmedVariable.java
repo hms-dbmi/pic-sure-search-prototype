@@ -5,10 +5,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jsoup.nodes.Element;
+
+import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter.ColumnMetaCSVRecord;
 
 public class TopmedVariable implements Serializable  {
 
@@ -18,59 +22,129 @@ public class TopmedVariable implements Serializable  {
 	private static final long serialVersionUID = 1802723843452332984L;
 
 	private static final List<String> EXCLUDED_WORDS_LIST = List.of(
-			"IF",
-			"IS",
+			"ABOUT",
+			"ADDITIONAL",
+			"ALL",
+			"ALSO",
+			"AN",
+			"AND",
+			"ANY",
+			"ARE",
+			"AT",
+			"BEEN",
+			"BEING",
+			"BETWEEN",
+			"BUT",
+			"BR",
+			"BY",
+			"C0",
+			"C1",
+			"C2",
+			"C3",
+			"C4",
+			"CODE",
+			"CONTAIN",
+			"DEFINITIONS",
+			"DESCRIBING",
+			"DID",
+			"DO",
+			"DOCUMENT",
+			"DON",
+			"EDU",
+			"ESPECIALLY",
+			"ETC",
+			"EVER",
+			"FILE",
 			"FOR",
-			"THE",
+			"FROM",
+			"GIVEN",
+			"HAD",
+			"HAS",
+			"HAVE",
+			"HAVING",
+			"HOW",
+			"HTTP",
+			"IF",
+			"IN",
+			"INFORMATION",
+			"IS",
+			"IT",
+			"KNOW",
+			"LAST",
+			"MAYBE",
+			"MEANINGS",
+			"NEW",
+			"NO",
 			"NOT",
 			"OF",
 			"ON",
+			"ONLY",
 			"OR",
-			"DID",
-			"BEEN",
+			"OTHER",
+			"OTHERS",
+			"OUT",
+			"P1",
+			"P1",
+			"P2",
+			"P3",
+			"P4",
+			"P5",
+			"P6",
+			"P7",
+			"P8",
+			"P9",
+			"P10",
+			"P11",
+			"P12",
+			"P13",
+			"P14",
+			"P15",
+			"P16",
+			"P17",
+			"PAST",
+			"PROVIDED",
 			"SEE",
-			"FROM",
-			"LAST",
-			"EVER",
+			"SINCE",
+			"SOME",
+			"SHE",
+			"STUDY",
+			"STRING",
+			"SUBJECTS",
+			"TAKEN",
+			"THAT",
+			"THE",
+			"THEN",
+			"THIS",
+			"THROUGH",
+			"TO",
+			"UNKNOWN",
+			"VALUE",
+			"VARIABLES",
+			"WAS",
+			"WELL",
 			"WERE",
 			"WHERE",
-			"TO",
-			"BETWEEN",
-			"IN",
-			"ONLY",
-			"THAT",
-			"AN",
-			"AT",
-			"YOU",
-			"ANY",
-			"PAST",
-			"BY",
-			"HAVE",
+			"WHEREVER",
 			"WHILE",
-			"HAVING",
-			"YOUR",
-			"HAD",
-			"HAS",
-			"OTHER",
-			"THIS",
-			"THEN",
-			"WAS",
-			"ARE",
-			"AND",
-			"UNKNOWN"
+			"WWW",
+			"YOU",
+			"YOUR"
 			);
 	private HashMap<String, String> metadata;
 	private HashMap<String, String> values;
 	private HashSet<String> metadata_tags = new HashSet<>();
 	private HashSet<String> value_tags = new HashSet<>();
 	private HashSet<String> allTagsLowercase = new HashSet<>();
-	
+
 	private String studyId;
 	private String dtId;
 	private String varId;
+	private boolean is_categorical;
+	private boolean is_continuous;
 
 	public TopmedVariable(){
-
+		this.metadata = new HashMap<>();
+		this.values = new HashMap<>();
 	}
 
 	public TopmedVariable(TopmedDataTable topmedDataTable, Element e){
@@ -96,9 +170,134 @@ public class TopmedVariable implements Serializable  {
 		buildTags();
 	}
 
-	private void buildTags() {
-		for(String value : metadata.values()) {
-			metadata_tags.addAll(filterTags(value));
+
+	public TopmedVariable(TopmedDataTable topmedDataTable, ColumnMetaCSVRecord csvr) {
+		this.metadata = new HashMap<>();
+		this.values = new HashMap<>();
+		
+		if(csvr.categorical) {
+			for(String value: csvr.categoryValues) {
+				value = value.trim();
+				this.values.put(value, value);
+				this.value_tags.add(value);
+				this.allTagsLowercase.add(value.toLowerCase());
+			}
+		} else {
+			this.values = new HashMap<>();
+			this.value_tags = new HashSet<>();
+			this.allTagsLowercase = new HashSet<>();
+			metadata.put("columnmeta_min", String.valueOf(csvr.min));
+			metadata.put("columnmeta_max", String.valueOf(csvr.max));
+		}
+		this.dtId = topmedDataTable.metadata.get("columnmeta_id");
+		this.studyId = topmedDataTable.metadata.get("columnmeta_study_id");
+		this.is_categorical = csvr.categorical ? true: false;
+		this.is_continuous = csvr.categorical ? false: true;
+		metadata.put("columnmeta_study_id", studyId);
+		metadata.put("columnmeta_var_group_id", topmedDataTable.metadata.get("columnmeta_id"));
+		metadata.put("columnmeta_observation_count", String.valueOf(csvr.observationCount));
+		metadata.put("columnmeta_var_group_description", topmedDataTable.metadata.get("columnmeta_description"));
+		metadata.put("columnmeta_patient_count", String.valueOf(csvr.patientCount));
+		metadata.put("columnmeta_HPDS_PATH", csvr.name);
+		metadata.put("columnmeta_data_type", csvr.categorical ? "categorical": "continuous");
+		String[] patharr = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
+		
+		if(patharr.length == 4) {
+			this.varId = patharr[2];
+			metadata.put("columnmeta_var_id", patharr[3]);
+			metadata.put("columnmeta_name", patharr[2]);
+			metadata.put("columnmeta_description", patharr[3]);
+			//metadata.put("description", patharr[3]);
+
+		} 
+		if(patharr.length == 3) {
+			this.varId = patharr[2];
+			metadata.put("columnmeta_var_id", patharr[2]);
+			metadata.put("columnmeta_name", patharr[2]);
+			metadata.put("columnmeta_description", patharr[2]);
+			//metadata.put("description", patharr[2]);
+
+		} 
+		if(patharr.length == 2) {
+			this.varId = patharr[1];
+			metadata.put("columnmeta_var_id", patharr[1]);
+			metadata.put("columnmeta_name", patharr[1]);
+			metadata.put("columnmeta_description", patharr[1]);
+			//metadata.put("description", patharr[1]);
+
+		} 
+		if(patharr.length == 1) {
+			this.varId = patharr[0];
+			metadata.put("columnmeta_var_id", patharr[0]);
+			metadata.put("columnmeta_name", patharr[0]);
+			metadata.put("columnmeta_description", patharr[0]);
+			//metadata.put("description", patharr[0]);
+
+		}
+		
+		for(String metaKey : this.metadata.keySet()) {
+			this.metadata_tags.add(metaKey);
+			this.allTagsLowercase.add(metaKey.toLowerCase());
+		}
+		
+		
+	}
+
+	private void determineVariableType() {
+		String type = null;
+		if(this.metadata.containsKey("calculated_type") && !this.metadata.get("calculated_type").isEmpty()) {
+			type = this.metadata.get("calculated_type");
+		}else if(this.metadata.containsKey("type") && !this.metadata.get("type").isEmpty()) {
+			type = this.metadata.get("type");
+		}else if(this.metadata.containsKey("reported_type") && !this.metadata.get("reported_type").isEmpty()) {
+			type = this.metadata.get("reported_type");
+		}
+		if(type.equalsIgnoreCase("decimal")
+				||type.equalsIgnoreCase("numeric")
+				||type.equalsIgnoreCase("integer")
+				||type.equalsIgnoreCase("Numeral")
+				||type.equalsIgnoreCase("decimal, encoded")
+				||type.equalsIgnoreCase("decimal, encoded value")
+				||type.equalsIgnoreCase("number")
+				||type.equalsIgnoreCase("Num")
+				||type.equalsIgnoreCase("real, encoded value")
+				||type.equalsIgnoreCase("1")
+				||type.equalsIgnoreCase("9")
+				) {
+			this.setIs_categorical(false);
+			this.setIs_continuous(true);
+			return;
+		}else if(type.equalsIgnoreCase("encoded")  
+				|| type.equalsIgnoreCase("string") 
+				|| type.equalsIgnoreCase("string (numeral)") 
+				|| type.equalsIgnoreCase("char") 
+				|| type.equalsIgnoreCase("coded") 
+				|| type.equalsIgnoreCase("encoded,string") 
+				|| type.equalsIgnoreCase("encoded value") 
+				|| type.equalsIgnoreCase("string, encoded value") 
+				|| type.equalsIgnoreCase("year") 
+				|| type.equalsIgnoreCase("DATETIME") 
+				|| type.equalsIgnoreCase("character") 
+				|| type.equalsIgnoreCase("enum_integer") 
+				|| type.equalsIgnoreCase("empty field") 
+				|| type.equalsIgnoreCase("encoded values") 
+				|| type.equalsIgnoreCase("integer, encoded value")
+				|| type.equalsIgnoreCase("integer, encoded") 
+				) {
+			this.setIs_categorical(true);
+			this.setIs_continuous(false);
+			return;
+		}
+		throw new RuntimeException("Could not determine type of variable : " + varId + " : " + this.metadata.get("type") + " : " + this.metadata.get("calculated_type") + " : " + this.metadata.get("reported_type"));
+	}
+
+	public void buildTags() {
+		for(Entry<String, String> entry : metadata.entrySet()) {
+			if(!entry.getKey().contentEquals("dataTableDescription")
+					&& !entry.getKey().contentEquals("dataTableName")
+					) {
+				metadata_tags.addAll(filterTags(entry.getValue()));
+			}
 		}
 		for(String value : values.values()) {
 			value_tags.addAll(filterTags(value));
@@ -120,7 +319,6 @@ public class TopmedVariable implements Serializable  {
 					return val2.length() > 1 
 							&& !val2.matches("^\\d+$") 
 							&& !EXCLUDED_WORDS_LIST.contains(val2.toUpperCase()) 
-							&& !val2.toUpperCase().matches("^PHV\\d+$") 
 							&& !val2.toUpperCase().matches("^V\\d+$");}).map((String var)->{
 								return var.toUpperCase();}).collect(Collectors.toList());
 	}
@@ -128,7 +326,7 @@ public class TopmedVariable implements Serializable  {
 	private String lastInput = "";
 	private double lastScore;
 
-	double relevance(String input) {
+	synchronized double relevance(String input) {
 		String inputTrimmed = input.toLowerCase().trim();
 		if(inputTrimmed.contentEquals(lastInput)) {
 			return lastScore;
@@ -137,13 +335,13 @@ public class TopmedVariable implements Serializable  {
 		double[] score = {0};
 		String[] inputs = inputTrimmed.split("[\\s\\p{Punct}]+");
 		for(String input2 : inputs) {
-			allTagsLowercase.stream().filter((tag)->{
+			Stream<String> tagsContainingInput = allTagsLowercase.stream().filter((tag)->{
 				return tag.contains(input2);
-			}).forEach((tag)->{
-				score[0] = score[0] +
-						(tag.contentEquals(input2)?3:1);
 			});
-			
+			tagsContainingInput.forEach((tag)->{
+				score[0] = score[0] +
+						(tag.contentEquals(input2)?100:1);
+			});
 		}
 		lastScore = score[0];
 		return score[0];
@@ -159,7 +357,11 @@ public class TopmedVariable implements Serializable  {
 				this.metadata.put("var_report_comment", cleanText(commentElement.ownText()));
 			}
 		});
+		e.attributes().forEach((attr)->{
+			metadata.put(attr.getKey(), attr.getValue());
+		});
 		buildTags();
+		determineVariableType();
 	}
 
 	private String cleanText(String text) {
@@ -221,7 +423,7 @@ public class TopmedVariable implements Serializable  {
 	public void setStudyId(String studyId) {
 		this.studyId = studyId;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -257,6 +459,22 @@ public class TopmedVariable implements Serializable  {
 		} else if (!varId.equals(other.varId))
 			return false;
 		return true;
+	}
+
+	public boolean isIs_categorical() {
+		return is_categorical;
+	}
+
+	public void setIs_categorical(boolean is_categorical) {
+		this.is_categorical = is_categorical;
+	}
+
+	public boolean isIs_continuous() {
+		return is_continuous;
+	}
+
+	public void setIs_continuous(boolean is_continuous) {
+		this.is_continuous = is_continuous;
 	}
 
 }

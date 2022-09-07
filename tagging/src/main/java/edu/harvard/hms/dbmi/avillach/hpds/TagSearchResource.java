@@ -23,7 +23,7 @@ import java.util.zip.GZIPInputStream;
 public class TagSearchResource implements IResourceRS {
 
     private TreeMap<String, TopmedDataTable> fhsDictionary;
-    private static final String TMP_DICTIONARY_JAVABIN = "/tmp/dictionary.javabin";
+    private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
     private static final int INITIAL_RESULTS_SIZE = 20;
 
     public TagSearchResource() {
@@ -42,10 +42,12 @@ public class TagSearchResource implements IResourceRS {
     @Path("/search")
     public SearchResults search(SearchRequest searchRequest) {
         final SearchQuery searchQuery = searchRequest.getQuery();
+        final int resultOffset = searchQuery.getOffset();
+        final int resultLimit = searchQuery.getLimit() > 0 ? searchQuery.getLimit() : INITIAL_RESULTS_SIZE;
         Map<Double, List<TopmedVariable>> results = new TreeMap<>();
         TreeMap<String,Integer> tagStats = new TreeMap<String, Integer>();
-        for(TopmedDataTable table : fhsDictionary.values()) {
-
+        Collection<TopmedDataTable> allTables = fhsDictionary.values();
+    	for(TopmedDataTable table : allTables) {
             Map<Double, List<TopmedVariable>> search = table.searchVariables(searchQuery);
             if (search.size() == 0) {
                 continue;
@@ -89,29 +91,33 @@ public class TagSearchResource implements IResourceRS {
                 }
             }
             tagResults = tagStats.entrySet().stream()
-                    .map(entry -> new TagResult(entry.getKey(), entry.getValue()));
+                    .map(entry -> {
+                    	return new TagResult(entry.getKey(), entry.getValue());
+                    }).sorted(Comparator.comparing(TagResult::getScore).reversed());
             if(tagStats.size()>10) {
                 tagResults = tagResults.filter(result -> 
-                	result.getTag().matches("PHS\\d{6}+.*") || 
+                result.getScore() > 0 && (
+                result.getTag().toLowerCase().matches("dcc harmonized data set") ||
+        		result.getTag().matches("PHS\\d{6}+.*") || 
+        		result.getTag().toUpperCase().matches("PHT\\d{6}+.*") || 
                 	(result.getScore() > numVars * .05 && result.getScore() < numVars * .95)
-                );
+                ));
             }
-            tagResults = tagResults.sorted(Comparator.comparing(TagResult::getScore).reversed());
         }
 
         // flatten the results for each score into a list of search results
         List<SearchResult> searchResults = results.entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream().map(topmedVariable -> new SearchResult(topmedVariable, entry.getKey())))
-                .sorted(Comparator.comparing(SearchResult::getScore).reversed().thenComparing(result -> result.getResult().getMetadata().get("description")))
+                .sorted(Comparator.comparing(SearchResult::getScore).reversed().thenComparing(result -> result.getResult().getMetadata().get("columnmeta_description")))
                 .collect(Collectors.toList());
 
         int searchResultsSize = searchResults.size();
-        if (!searchRequest.getQuery().isReturnAllResults()) {
-            searchResults = searchResults.subList(0, Math.min(INITIAL_RESULTS_SIZE, searchResults.size()));
-        }
+//        if (!searchRequest.getQuery().isReturnAllResults()) {
+//            searchResults = searchResults.subList(0, Math.min(INITIAL_RESULTS_SIZE, searchResults.size()));
+//        }
         TagSearchResponse tagSearchResponse = new TagSearchResponse(
                 tagResults.collect(Collectors.toList()),
-                searchResults,
+                searchResults.subList(resultOffset, Math.min(searchResults.size(),resultOffset + resultLimit)),
                 searchResultsSize
         );
         return new SearchResults()
@@ -139,26 +145,28 @@ public class TagSearchResource implements IResourceRS {
     @Path("/query/sync")
     public Response querySync(QueryRequest queryRequest) {
         switch (queryRequest.getQuery().getEntityType()) {
-            case DATA_TABLE:
-                return getDataTable(queryRequest.getQuery().getId());
+	        case DATA_TABLE:
+	            return getDataTable(queryRequest.getQuery().getId());
             default:
                 throw new RuntimeException("Invalid Entity type");
         }
     }
 
-    private Response getDataTable(String id) {
-        TopmedDataTable topmedDataTable = fhsDictionary.get(String.valueOf(id));
+	private Response getDataTable(String dataTableId) {
+        TopmedDataTable topmedDataTable = fhsDictionary.get(String.valueOf(dataTableId));
         return Response.ok(topmedDataTable).build();
     }
 
     @Override
+    @POST
+    @Path("/query/format")
     public Response queryFormat(QueryRequest resultRequest) {
-        return null;
+        return Response.ok(resultRequest.getQuery()).build();
     }
 
 
     private TreeMap<String, TopmedDataTable> readDictionary() {
-        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(TMP_DICTIONARY_JAVABIN)));){
+        try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(JAVABIN)));){
             return (TreeMap<String, TopmedDataTable>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
