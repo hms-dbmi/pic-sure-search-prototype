@@ -33,7 +33,10 @@ public class TagSearchResource implements IResourceRS {
 
     @Override
     public ResourceInfo info(QueryRequest queryRequest) {
-        return null;
+    	//need to return a value here so that PIC-SURE will know this resource is active
+	    ResourceInfo info = new ResourceInfo();
+        info.setName("Pic-Sure Dictionary Resource");
+        return info;
     }
 
     @SneakyThrows
