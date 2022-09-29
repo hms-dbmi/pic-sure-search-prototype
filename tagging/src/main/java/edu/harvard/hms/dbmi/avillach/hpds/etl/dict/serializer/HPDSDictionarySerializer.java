@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.tags.TagBuilder;
 
 /**
  * 
@@ -20,17 +21,15 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
  */
 public class HPDSDictionarySerializer {
 	
-	// Dictionary object that will be serialized and written
-	private TreeMap<String, TopmedDataTable> hpdsDictionary = new  TreeMap<String, TopmedDataTable>();
+	/**
+	 *  Dictionary object that will be serialized and written
+	 */
+	private TreeMap<String, TopmedDataTable> hpdsDictionary = new TreeMap<String, TopmedDataTable>();
 	
-	// use this object to explicitly ignore any metadata tags that you do not want generated.
-	private static List<String> IGNORE_META_KEYS = List.of(
-			"hashed_var_id"
-			);
 	
 	/**
 	 * This is the public method that can be called to serialize DictionaryModel Objects into 
-	 * a useable javabin for search 
+	 * a usable javabin for search 
 	 * 
 	 * @param dictionaries
 	 * @return
@@ -43,86 +42,32 @@ public class HPDSDictionarySerializer {
 
 			buildDataTable(entry);
 		}
-		// build tags
-		buildTags();
+		// User TagBuilder Class to build tags
+		try {
+			TagBuilder.class.getDeclaredConstructor().newInstance().buildTags(hpdsDictionary);;
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return hpdsDictionary;
 	}
 	
-	/**
-	 * 
-	 * This method will build the metadata tags for new search.
-	 * 
-	 * 
-	 * 
-	 */
-	private void buildTags() {
-		for(Entry<String, TopmedDataTable> hpdsDictEntry: hpdsDictionary.entrySet()) {
-			
-			hpdsDictEntry.getValue().variables.forEach((varid, var) -> {
-				var.getMetadata().forEach((k,v) -> {
-					try {
-						if(IGNORE_META_KEYS.contains(k)) return;
-						TopmedVariable tvMethods = TopmedVariable.class.getDeclaredConstructor().newInstance();
-						
-						// phs to upper and lower
-						if(!var.getStudyId().isBlank()) {
-							// cannot filter lowercase objects as filter tags always returns an uppercases value
-							// which is fine as we do not want to filter any study ids.
-							var.getMetadata_tags().add(var.getStudyId().toLowerCase());
-							var.getMetadata_tags().addAll(tvMethods.filterTags(var.getStudyId().toUpperCase()));
-						}
-						
-						// pht to upper and lower
-						if(!var.getDtId().isBlank()) {
-							var.getMetadata_tags().add(var.getDtId().toLowerCase());
-							var.getMetadata_tags().addAll(tvMethods.filterTags(var.getDtId().toUpperCase()));
-						}
-						
-						
-						// phv to upper and lower
-						var.getMetadata_tags().add(var.getVarId().toLowerCase());
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getVarId().toUpperCase()));
-												
-						// data type
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("columnmeta_data_type").toUpperCase()));
-						
-						// variable encoded name
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("columnmeta_name").toUpperCase()));
-						
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("derived_var_description").toUpperCase()));
-						
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("derived_study_abv_name").toUpperCase()));
-						
-						var.getMetadata_tags().addAll(tvMethods.filterTags(var.getMetadata().get("derived_study_description").toUpperCase()));
-						
-						
-					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-						// TODO exception handling
-						e.printStackTrace();
-					}
-				});
-				// add values to metadata tags and value tags
-				for(String value: var.getValues().values()) {
-					try {
-						var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
-						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
-					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-						e.printStackTrace();
-					}
-		
-				}
-				for(String valuesTolower: var.getValue_tags()) {
-					var.allTagsLowercase.add(valuesTolower.toLowerCase());
-				}
-				for(String metatagsTolower: var.getMetadata_tags()) {
-					var.allTagsLowercase.add(metatagsTolower.toLowerCase());
-				}
-			});
-			hpdsDictEntry.getValue().generateTagMap();
-		}		
-	}
+
 
 	/**
 	 * This will build the dictionary data table and it's associated variables.

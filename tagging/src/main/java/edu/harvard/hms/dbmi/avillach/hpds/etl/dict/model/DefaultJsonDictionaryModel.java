@@ -135,7 +135,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			// currently variable_name is the encoded variable_id
 			// and variable name is the decoded variable_id stored in variable_name
 			
-			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : this.variableId;
+			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : "";
 			defaultJsonDictionaryModel.derived_var_description = this.variableName;
 			
 			// var type is derived from columnmeta data		

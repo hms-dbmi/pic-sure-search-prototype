@@ -20,6 +20,12 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
 import edu.harvard.hms.dbmi.avillach.hpds.data.phenotype.ColumnMeta;
 
+/**
+ * 
+ * Deprecated as validations are now being done in the etl model classes
+ *
+ */
+@Deprecated
 public class ColumnMetaReconciliation {
     private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
 	private static final String JAVABIN2 = "/usr/local/docker-config/search/dictionary_original.javabin";

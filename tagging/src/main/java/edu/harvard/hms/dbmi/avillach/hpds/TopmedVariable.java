@@ -20,7 +20,13 @@ public class TopmedVariable implements Serializable  {
 	 * 
 	 */
 	private static final long serialVersionUID = 1802723843452332984L;
-
+	/**
+	 * This list should be deprecated and removed as this methodology is 
+	 * only used during data integration.  No other process should be using 
+	 * this list as the tags will already have been excluded.  
+	 * 
+	 */
+	@Deprecated
 	private static final List<String> EXCLUDED_WORDS_LIST = List.of(
 			"a",
 			"about",
@@ -237,6 +243,13 @@ public class TopmedVariable implements Serializable  {
 		this.values = new HashMap<>();
 	}
 
+	/**
+	 * used by the old integration engine no longer viable
+	 * 
+	 * @param topmedDataTable
+	 * @param e
+	 */
+	@Deprecated 
 	public TopmedVariable(TopmedDataTable topmedDataTable, Element e){
 		this.metadata = new HashMap<>();
 		this.values = new HashMap<>();
@@ -260,7 +273,13 @@ public class TopmedVariable implements Serializable  {
 		buildTags();
 	}
 
-
+	/**
+	 * used by the old integration engine no longer viable
+	 * 
+	 * @param topmedDataTable
+	 * @param csvr
+	 */
+	@Deprecated
 	public TopmedVariable(TopmedDataTable topmedDataTable, ColumnMetaCSVRecord csvr) {
 		this.metadata = new HashMap<>();
 		this.values = new HashMap<>();
@@ -332,7 +351,12 @@ public class TopmedVariable implements Serializable  {
 		
 		
 	}
-
+	
+	/**
+	 * Used by the old engine and doesnt work accurately as dbgap dictionaries 
+	 * are not accurate at determining data type
+	 */
+	@Deprecated
 	private void determineVariableType() {
 		String type = null;
 		if(this.metadata.containsKey("calculated_type") && !this.metadata.get("calculated_type").isEmpty()) {
@@ -381,6 +405,11 @@ public class TopmedVariable implements Serializable  {
 		throw new RuntimeException("Could not determine type of variable : " + varId + " : " + this.metadata.get("type") + " : " + this.metadata.get("calculated_type") + " : " + this.metadata.get("reported_type"));
 	}
 
+	/**
+	 * Deprecated  
+	 * Build tags is now being handled by TagBuilder class
+	 */
+	@Deprecated
 	public void buildTags() {
 		for(Entry<String, String> entry : metadata.entrySet()) {
 			if(!entry.getKey().contentEquals("dataTableDescription")
@@ -404,6 +433,15 @@ public class TopmedVariable implements Serializable  {
 		}).collect(Collectors.toSet()));
 	}
 
+	/**
+	 * 
+	 * Deprecated
+	 * is now being handled by TagBuilder class
+	 * 
+	 * @param value
+	 * @return
+	 */
+	@Deprecated
 	public List<String> filterTags(String value) {
 		return Arrays.asList(value.split("[\\s\\p{Punct}]"))
 				.stream().filter((val2)->{
@@ -439,7 +477,11 @@ public class TopmedVariable implements Serializable  {
 		lastScore = score[0];
 		return score[0];
 	}
-
+	/**
+	 * Deprecated as this is being handled by etl model for dbgap
+	 * @param e
+	 */
+	@Deprecated
 	public void addVarReportMeta(Element e) {
 		e.getAllElements().stream().forEach((Element element)->{
 			Element descriptionElement = element.getElementsByTag("description").first();
