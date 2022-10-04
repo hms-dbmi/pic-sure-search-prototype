@@ -1,14 +1,18 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl.tags;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import org.apache.cxf.helpers.FileUtils;
 
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
@@ -300,6 +304,7 @@ public class TagBuilder {
 			hpdsDictEntry.getValue().generateTagMap();
 		}		
 	}
+	
 	/**
 	 * 
 	 * Used to filter out tags
@@ -344,4 +349,22 @@ public class TagBuilder {
 			}
 		}
 	}
+	/**
+	 * This method can be called to load the Excluded word list from 
+	 * a separate data file.
+	 * 
+	 * Not yet implemented see comments below
+	 */
+	public void populateExcludedWordListFromDataFile(File excludedWordListFile) {
+		try {
+			// Excluded word list cannot be final and probably should be a Set instead of a list
+			// line below can be uncommented to populate the list from a file with those changes
+			//EXCLUDED_WORDS_LIST = new HashSet<String>(FileUtils.readLines(excludedWordListFile));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
 }
