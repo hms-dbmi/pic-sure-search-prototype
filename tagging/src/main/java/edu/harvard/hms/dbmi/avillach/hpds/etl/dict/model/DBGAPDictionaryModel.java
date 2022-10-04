@@ -24,12 +24,29 @@ import org.jsoup.nodes.Element;
 
 import com.opencsv.CSVWriter;
 
+/**
+ * 
+ * This model class will populate the required fields in the abstract Dictionary model
+ * 
+ * DBGap Dictionaries are formatted in xml
+ * 
+ * @author TDeSain
+ *
+ */
+
 public class DBGAPDictionaryModel extends DictionaryModel {
 
 	public static List<DBGAPDictionaryModel> allModels = new ArrayList<>();
 	
+	// this collection gathers any missing variable descriptions in data dictionaries
+	// the collection will be written out to a flat file and stored in s3
 	public static Set<String> VARIABLES_MISSING_VARIABLE_DESCRIPTION = new TreeSet<String>();
 
+	/* this collection gathers any missing dictionary described in data dictionaries that do not exist in columnmeta
+	 Which is not a failure in validation as variables can potentially not be loaded for various reasons ( no data for the variable, data file is malformed or empty, etc.. )
+	 
+	 the collection will be written out to a flat file and stored in s3
+	*/
 	public static Set<String> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new TreeSet<String>();
 
 	private String id;
@@ -415,6 +432,12 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 
 	@Override
 	public Map<String, DictionaryModel> build() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, DictionaryModel> build(Map<String, DictionaryModel> baseDictionary) {
 		// TODO Auto-generated method stub
 		return null;
 	}

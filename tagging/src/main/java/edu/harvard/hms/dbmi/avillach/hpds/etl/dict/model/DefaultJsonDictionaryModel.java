@@ -23,9 +23,9 @@ import com.opencsv.CSVWriter;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.DictionaryImporterUtil;
 
 /**
- * This the model for 
+ * This model is used for the internal dictionaries for non-compliant studies
  * 
- *
+ * It is presumed that any studies processing internal json will use this model.
  */
 public class DefaultJsonDictionaryModel extends DictionaryModel {
 
@@ -443,5 +443,11 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 
 	public DefaultJsonDictionaryModel(DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
 		super(defaultJsonDictionaryModel);
+	}
+
+	@Override
+	public Map<String, DictionaryModel> build(Map<String, DictionaryModel> baseDictionary) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

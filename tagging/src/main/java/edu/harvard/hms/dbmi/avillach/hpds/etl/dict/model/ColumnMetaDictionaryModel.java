@@ -217,6 +217,10 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	/**
+	 * not used for this model
+	 */
 	@Override
 	public Map<String, DictionaryModel> build(String[] controlFileRow, Map<String, DictionaryModel> baseDictionary) {
 		// TODO Auto-generated method stub

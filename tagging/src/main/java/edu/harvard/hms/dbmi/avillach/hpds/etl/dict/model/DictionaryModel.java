@@ -68,6 +68,10 @@ public abstract class DictionaryModel {
 	}
 	/**
 	 * Cloning method.  
+	 * 
+	 * The Internal Json Dictionaries uses this to populate it's required fields.  This is a bit more straight forward
+	 * then other models.  Could potentially switch other models to use the same methodology.
+	 * 
 	 * @param defaultJsonDictionaryModel
 	 */
 	public DictionaryModel(DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
@@ -87,9 +91,31 @@ public abstract class DictionaryModel {
 		this.columnmeta_patient_count = defaultJsonDictionaryModel.columnmeta_patient_count;
 		this.columnmeta_hpds_path = defaultJsonDictionaryModel.columnmeta_hpds_path;	}
 
-
+	/**
+	 * base method to build dictionary models not used 
+	 * @return
+	 */
 	public abstract Map<String, DictionaryModel> build();
 	
+	/** 
+	 * The base dictionary is generated via the columnmeta data stored in HPDS resource.
+	 * The dictionary resource needs to align with the HPDS resource or else the application will break
+	 *
+	 * Only the ColumnMetaDictionaryModel should be calling this method at this time unless another source of 
+	 * truth for what is stored in HPDS besides the columnMeta data is used.  
+	 */
+	public abstract Map<String, DictionaryModel> build(Map<String, DictionaryModel> baseDictionary);
+
+
+	/**
+	 * 
+	 * This method needs to be used by each Model as it builds the dictionary model and updates
+	 * the base dictionaries generated  
+	 * 
+	 * @param controlFileRow
+	 * @param baseDictionary
+	 * @return
+	 */
 	public abstract Map<String, DictionaryModel> build(String[] controlFileRow, Map<String,DictionaryModel> baseDictionary);
 
 	public String getDerived_var_id() {
@@ -211,18 +237,6 @@ public abstract class DictionaryModel {
 
 	public void setValues(List<String> values) {
 		this.values = values;
-	}
-
-
-	/** 
-	 * Columnmeta is the base dictionary generated which this method is meant to do
-	 * could be used if another base dictionary is used instead.
-	 * 
-	 * This could probably just be abstract at this layer currently
-	 */
-	public Map<String, DictionaryModel> build(Map<String, DictionaryModel> baseDictionary) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	

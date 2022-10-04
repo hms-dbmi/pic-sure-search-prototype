@@ -52,9 +52,6 @@ public class DictionaryImporterUtil {
 	public static void main(String[] args) {
 		parameterOverrides(args);
 		
-		//preRunValidations();
-		// Build base dictionary entries 
-		
 		try {
 			
 			DictionaryImporterUtil.class.getDeclaredConstructor().newInstance().run();
@@ -86,9 +83,7 @@ public class DictionaryImporterUtil {
 		hpdsDictionaries = HPDSDictionarySerializer.class.getDeclaredConstructor().newInstance().serialize(dictionaries);
 		// Stigmatizing variables			
 		doStigmatizeVariables();
-		
-		//validateDictionary();
-		
+				
 		writeDictionary();
 		
 	}
@@ -307,7 +302,12 @@ public class DictionaryImporterUtil {
 	}
 
 
-	// use this for passing args and setting variables if needed.
+	/**
+	 * Can use this method to handle making constants configurable
+	 * if needed.
+	 * 
+	 * @param args
+	 */
 	private static void parameterOverrides(String[] args) {
 		// TODO Auto-generated method stub
 		

@@ -14,13 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
- * Pretty simple model the dbgap dictionaries do not contain much information
  * 
- * Would be great to generate our own dictionaries using the DefaultJsonDictionaryModel which is our internal
- * dictionaries that we generate.
- * 
- * This can then be deprecated.
- * @author Tom
+ * New model used to ingest the internal DCC Harmonized Dictionaries.
  *
  */
 public class DCCHarmonizedDictionaryModel2 extends DictionaryModel {
@@ -104,6 +99,12 @@ public class DCCHarmonizedDictionaryModel2 extends DictionaryModel {
 
 	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DCCHarmonizedDictionaryModel2 model) {
 
+	}
+
+	@Override
+	public Map<String, DictionaryModel> build(Map<String, DictionaryModel> baseDictionary) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

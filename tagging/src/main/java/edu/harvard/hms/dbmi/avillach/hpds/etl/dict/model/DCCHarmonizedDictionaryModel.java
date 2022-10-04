@@ -14,13 +14,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Pretty simple model the dbgap dictionaries do not contain much information
  * 
- * Would be great to generate our own dictionaries using the DefaultJsonDictionaryModel which is our internal
- * dictionaries that we generate.
+ * This ingests the dictionaries provided by dbgap for harmonized.  They are not complete
+ * and we have generated our own that are more accurate.
  * 
- * This can then be deprecated.
- * @author Tom
+ * This can then be deprecated and DCCHarmonizedDictionaryModel2 should be refactored by changing it to 
+ * DCCHarmonizedDictionaryModel and deleting this class
  *
  */
+@Deprecated
 public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 
 	public static List<DCCHarmonizedDictionaryModel> allModels = new ArrayList<>();
@@ -104,6 +105,12 @@ public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 			
 		});
 		return lookup;
+	}
+
+	@Override
+	public Map<String, DictionaryModel> build(Map<String, DictionaryModel> baseDictionary) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

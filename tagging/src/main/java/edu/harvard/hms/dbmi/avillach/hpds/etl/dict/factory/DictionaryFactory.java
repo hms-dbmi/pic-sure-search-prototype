@@ -14,7 +14,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryMo
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
 /**
- * Factory will read from the input directory and use the control file to handle with dictionary
+ * Factory will read from the input directory and use the control file to handle which dictionary
  * model to build.
  * 
  * All models will return a collection<String,DictionaryModel>

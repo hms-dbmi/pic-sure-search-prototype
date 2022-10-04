@@ -17,8 +17,6 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.tags.TagBuilder;
 /**
  * This class will serialize the DictionaryModel Class into the pic-sure new search
  *  dictionary data entities TopmedVariable and TopmedDataTable 
- * 
- * 
  *
  */
 public class HPDSDictionarySerializer {
