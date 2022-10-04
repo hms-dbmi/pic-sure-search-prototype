@@ -309,6 +309,25 @@
 							<goal>single</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>DictionaryImporterUtil</id>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>edu.harvard.hms.dbmi.avillach.hpds.etl.DictionaryImporterUtil</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<classifier>DictionaryImporterUtil</classifier>
+							<finalName>DictionaryImporterUtil</finalName>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>

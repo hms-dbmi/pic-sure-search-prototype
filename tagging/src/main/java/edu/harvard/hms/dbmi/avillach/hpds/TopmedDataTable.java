@@ -19,12 +19,21 @@ public class TopmedDataTable implements Serializable {
 	private static final long serialVersionUID = -2138670854234447527L;
 	public TreeMap<String, String> metadata;
 	public TreeMap<String, TopmedVariable> variables;
-	private HashMap<String, Set<TopmedVariable>> tagMap;
+	public HashMap<String, Set<TopmedVariable>> tagMap;
 
 	public TopmedDataTable(){
-
+		variables = new TreeMap<String, TopmedVariable>();
+		metadata = new TreeMap<String, String>();
+		tagMap = new HashMap<String, Set<TopmedVariable>>();
 	}
 
+	/**
+	 * Deprecated
+	 * Constructor used by old etl process / engine
+	 * @param doc
+	 * @param data_dict_file
+	 */
+	@Deprecated
 	public TopmedDataTable(Document doc, String data_dict_file){
 		metadata = new TreeMap<>();
 		metadata.put("id", getDataTableAttribute(doc, "id"));
@@ -46,7 +55,11 @@ public class TopmedDataTable implements Serializable {
 			}
 		});
 	}
-
+	/**
+	 * Deprecated
+	 * Constructor used by old etl process / engine
+	 */
+	@Deprecated
 	public TopmedDataTable(RawDataImporter.ColumnMetaCSVRecord csvr) {
 		metadata = new TreeMap<>();
 		variables = new TreeMap<>();
@@ -86,7 +99,12 @@ public class TopmedDataTable implements Serializable {
 		}
 
 	}
-
+	/**
+	 * 
+	 * Deprecated and is now handled in the TagBuilder class
+	 * 
+	 */
+	@Deprecated
 	public void generateTagMap() {
 		tagMap = new HashMap<>();
 		Set<String> tags = new HashSet<String>();
@@ -107,6 +125,13 @@ public class TopmedDataTable implements Serializable {
 		}
 	}
 
+	/**
+	 * Deprecated - old methodology used in deprecated etl process
+	 * @param doc
+	 * @param attrName
+	 * @return
+	 */
+	@Deprecated
 	private String getDataTableAttribute(Document doc, String attrName) {
 		return doc.getElementsByTag("data_table").first().attr(attrName);
 	}
@@ -145,6 +170,12 @@ public class TopmedDataTable implements Serializable {
 		return results;
 	}
 
+	/**
+	 * Deprecated - old methodology used in deprecated etl process
+	 * 
+	 * @param doc
+	 */
+	@Deprecated
 	public void loadVarReport(Document doc) {
 		this.metadata.put("study_description", getDataTableAttribute(doc, "study_name"));
 		doc.getElementsByTag("variable").stream().forEach(variable -> {

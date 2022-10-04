@@ -73,13 +73,25 @@ public class DefaultJsonDataDictionaryBuilder {
 			
 				} else {
 					for(FormGroup fg: (Set<FormGroup>) field.get(dict)) {
+						
+						String formGroupDesc = fg.formGroupDesc == null ? fg.formGroupDesc : "unknown";
+						
+						dataTable.metadata.put("columnmeta_var_group_description", fg.formGroupDesc);
+						
+						String varGroupId = fg.formGroupName == null ? fg.formGroupDesc : fg.formGroupName;
+						
+						dataTable.metadata.put("columnmeta_var_group_id", varGroupId);
+						
 						for(Form form: fg.form) {
 							for(Variable var: form.variableGroup.variables) {
 								//for(Field varField : var.getClass().getDeclaredFields()) {
 								TopmedVariable topmedVar = new TopmedVariable();
-								topmedVar.setDtId(dict.getStudyAccession());
-								topmedVar.setVarId(var.variableId);
+								topmedVar.setDtId(fg.formGroupDesc);
+								topmedVar.setVarId(var.variableId.trim());
 								topmedVar.getMetadata().put("columnmeta_description",var.variableName);
+								topmedVar.getMetadata().put("columnmeta_var_group_description", fg.formGroupDesc);
+								topmedVar.getMetadata().put("columnmeta_var_group_id", varGroupId);
+								topmedVar.getMetadata().put("columnmeta_var_id", var.variableId.trim());
 								dataTable.variables.put(var.variableId, topmedVar);
 							}
 						}
@@ -110,26 +122,6 @@ public class DefaultJsonDataDictionaryBuilder {
 			String varDesc = node.get("description").asText();
 			
 			harmonized.put(varName, varDesc);
-			
-			/*
-			node.forEach((node2) -> {
-				
-				dict.setStudyAccession("DCC Harmonized data set");
-				dict.setStudyFullName("DCC Harmonized data set");
-				dict.setStudyShortName("");
-				dict.setStudyUrl("");
-				
-				JsonNode formGroups = node2.has("form_group") ? node2.get("form_group"): null;
-				// if no formgroups not given start with form element
-				if(formGroups != null) {
-					dict.setFormGroups(formGroups);
-				} else {
-					dict.setFormGroupsWOaGroup(node2);
-				}
-				//dict.setFormGroups(buildForms(formGroups));
-				
-			});*/
-			//jsonHPDSDictionary.put(dict.getStudyAccession(), buildTopmedDataTable(dict));
 			
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block

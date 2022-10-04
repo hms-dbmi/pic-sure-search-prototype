@@ -20,121 +20,217 @@ public class TopmedVariable implements Serializable  {
 	 * 
 	 */
 	private static final long serialVersionUID = 1802723843452332984L;
-
+	/**
+	 * This list should be deprecated and removed as this methodology is 
+	 * only used during data integration.  No other process should be using 
+	 * this list as the tags will already have been excluded.  
+	 * 
+	 */
+	@Deprecated
 	private static final List<String> EXCLUDED_WORDS_LIST = List.of(
-			"ABOUT",
-			"ADDITIONAL",
-			"ALL",
-			"ALSO",
-			"AN",
-			"AND",
-			"ANY",
-			"ARE",
-			"AT",
-			"BEEN",
-			"BEING",
-			"BETWEEN",
-			"BUT",
-			"BR",
-			"BY",
-			"C0",
-			"C1",
-			"C2",
-			"C3",
-			"C4",
-			"CODE",
-			"CONTAIN",
-			"DEFINITIONS",
-			"DESCRIBING",
-			"DID",
-			"DO",
-			"DOCUMENT",
-			"DON",
-			"EDU",
-			"ESPECIALLY",
-			"ETC",
-			"EVER",
-			"FILE",
-			"FOR",
-			"FROM",
-			"GIVEN",
-			"HAD",
-			"HAS",
-			"HAVE",
-			"HAVING",
-			"HOW",
-			"HTTP",
-			"IF",
-			"IN",
-			"INFORMATION",
-			"IS",
-			"IT",
-			"KNOW",
-			"LAST",
-			"MAYBE",
-			"MEANINGS",
-			"NEW",
-			"NO",
-			"NOT",
-			"OF",
-			"ON",
-			"ONLY",
-			"OR",
-			"OTHER",
-			"OTHERS",
-			"OUT",
-			"P1",
-			"P1",
-			"P2",
-			"P3",
-			"P4",
-			"P5",
-			"P6",
-			"P7",
-			"P8",
-			"P9",
-			"P10",
-			"P11",
-			"P12",
-			"P13",
-			"P14",
-			"P15",
-			"P16",
-			"P17",
-			"PAST",
-			"PROVIDED",
-			"SEE",
-			"SINCE",
-			"SOME",
-			"SHE",
-			"STUDY",
-			"STRING",
-			"SUBJECTS",
-			"TAKEN",
-			"THAT",
-			"THE",
-			"THEN",
-			"THIS",
-			"THROUGH",
-			"TO",
-			"UNKNOWN",
-			"VALUE",
-			"VARIABLES",
-			"WAS",
-			"WELL",
-			"WERE",
-			"WHERE",
-			"WHEREVER",
-			"WHILE",
-			"WWW",
-			"YOU",
-			"YOUR"
+			"a",
+			"about",
+			"again",
+			"AH",
+			"all",
+			"almost",
+			"also",
+			"although",
+			"always",
+			"among",
+			"an",
+			"and",
+			"another",
+			"any",
+			"are",
+			"as",
+			"associated",
+			"associated",
+			"at",
+			"be",
+			"because",
+			"been",
+			"before",
+			"being",
+			"between",
+			"both",
+			"broad",
+			"but",
+			"by",
+			"calculated",
+			"can",
+			"cardia",
+			"could",
+			"data",
+			"decimal",
+			"derived",
+			"desaturation",
+			"descriptions",
+			"dictionaries",
+			"did",
+			"do",
+			"documentation",
+			"documents",
+			"does",
+			"done",
+			"dopm",
+			"due",
+			"during",
+			"each ",
+			"ehough",
+			"either",
+			"encoded",
+			"end",
+			"enum",
+			"especially",
+			"etc",
+			"extracted",
+			"fhs",
+			"find",
+			"format",
+			"format",
+			"found",
+			"framingham",
+			"from",
+			"further",
+			"getting",
+			"had",
+			"happen",
+			"has",
+			"have",
+			"having ",
+			"here",
+			"how",
+			"however",
+			"i",
+			"if",
+			"in",
+			"inserted",
+			"institute",
+			"integer",
+			"into",
+			"is",
+			"it",
+			"its",
+			"itself",
+			"just",
+			"kg",
+			"km",
+			"left",
+			"made",
+			"main",
+			"mainly",
+			"make",
+			"may",
+			"me",
+			"mg",
+			"might",
+			"might",
+			"ml",
+			"mm",
+			"most",
+			"mostly",
+			"must",
+			"nearly",
+			"neither",
+			"nhlbi",
+			"no",
+			"nor",
+			"not",
+			"now",
+			"numeric",
+			"NWD100097",
+			"obtained",
+			"of",
+			"often",
+			"often",
+			"often",
+			"on",
+			"one",
+			"or",
+			"our",
+			"overall",
+			"participant",
+			"people",
+			"perhaps",
+			"please",
+			"pmid",
+			"position",
+			"possible",
+			"probably",
+			"quite",
+			"rather",
+			"really",
+			"reason",
+			"regarding",
+			"repository",
+			"right",
+			"sas",
+			"sb",
+			"seem",
+			"seen",
+			"several",
+			"should",
+			"show",
+			"showed",
+			"shown",
+			"shows",
+			"significantly",
+			"since",
+			"slice",
+			"so",
+			"some",
+			"study",
+			"submitted",
+			"such",
+			"sure",
+			"system",
+			"than",
+			"that",
+			"the",
+			"their",
+			"them",
+			"then",
+			"there",
+			"therefore",
+			"these",
+			"they",
+			"this",
+			"those",
+			"through",
+			"thus",
+			"time",
+			"to",
+			"too",
+			"uab",
+			"up",
+			"upon",
+			"values",
+			"various",
+			"very",
+			"was",
+			"we",
+			"were",
+			"what",
+			"when",
+			"whi",
+			"which",
+			"while",
+			"with",
+			"within",
+			"without",
+			"would",
+			"XX",
+			"XXXXX",
+			"XXXXXXXXXXXXXXXXXXXX",
+			"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+			"yes"
 			);
-	private HashMap<String, String> metadata;
-	private HashMap<String, String> values;
+	private HashMap<String, String> metadata = new HashMap<String, String>();
+	private HashMap<String, String> values = new HashMap<String, String>();
 	private HashSet<String> metadata_tags = new HashSet<>();
 	private HashSet<String> value_tags = new HashSet<>();
-	private HashSet<String> allTagsLowercase = new HashSet<>();
+	public HashSet<String> allTagsLowercase = new HashSet<>();
 
 	private String studyId;
 	private String dtId;
@@ -147,6 +243,13 @@ public class TopmedVariable implements Serializable  {
 		this.values = new HashMap<>();
 	}
 
+	/**
+	 * used by the old integration engine no longer viable
+	 * 
+	 * @param topmedDataTable
+	 * @param e
+	 */
+	@Deprecated 
 	public TopmedVariable(TopmedDataTable topmedDataTable, Element e){
 		this.metadata = new HashMap<>();
 		this.values = new HashMap<>();
@@ -170,7 +273,13 @@ public class TopmedVariable implements Serializable  {
 		buildTags();
 	}
 
-
+	/**
+	 * used by the old integration engine no longer viable
+	 * 
+	 * @param topmedDataTable
+	 * @param csvr
+	 */
+	@Deprecated
 	public TopmedVariable(TopmedDataTable topmedDataTable, ColumnMetaCSVRecord csvr) {
 		this.metadata = new HashMap<>();
 		this.values = new HashMap<>();
@@ -242,7 +351,12 @@ public class TopmedVariable implements Serializable  {
 		
 		
 	}
-
+	
+	/**
+	 * Used by the old engine and doesnt work accurately as dbgap dictionaries 
+	 * are not accurate at determining data type
+	 */
+	@Deprecated
 	private void determineVariableType() {
 		String type = null;
 		if(this.metadata.containsKey("calculated_type") && !this.metadata.get("calculated_type").isEmpty()) {
@@ -291,6 +405,11 @@ public class TopmedVariable implements Serializable  {
 		throw new RuntimeException("Could not determine type of variable : " + varId + " : " + this.metadata.get("type") + " : " + this.metadata.get("calculated_type") + " : " + this.metadata.get("reported_type"));
 	}
 
+	/**
+	 * Deprecated  
+	 * Build tags is now being handled by TagBuilder class
+	 */
+	@Deprecated
 	public void buildTags() {
 		for(Entry<String, String> entry : metadata.entrySet()) {
 			if(!entry.getKey().contentEquals("dataTableDescription")
@@ -305,6 +424,7 @@ public class TopmedVariable implements Serializable  {
 		metadata_tags.add(dtId);
 		metadata_tags.add(studyId);
 		metadata_tags.add(studyId.split("\\.")[0].toUpperCase());
+		
 		allTagsLowercase.addAll(value_tags.stream().map((tag)->{
 			return tag.toLowerCase();
 		}).collect(Collectors.toSet()));
@@ -313,12 +433,23 @@ public class TopmedVariable implements Serializable  {
 		}).collect(Collectors.toSet()));
 	}
 
-	private List<String> filterTags(String value) {
+	/**
+	 * 
+	 * Deprecated
+	 * is now being handled by TagBuilder class
+	 * 
+	 * @param value
+	 * @return
+	 */
+	@Deprecated
+	public List<String> filterTags(String value) {
 		return Arrays.asList(value.split("[\\s\\p{Punct}]"))
 				.stream().filter((val2)->{
 					return val2.length() > 1 
-							&& !val2.matches("^\\d+$") 
-							&& !EXCLUDED_WORDS_LIST.contains(val2.toUpperCase()) 
+							&& !val2.isBlank()
+							&& !val2.matches("^\\d+$")
+							&& !EXCLUDED_WORDS_LIST.stream().anyMatch(val2::equalsIgnoreCase)
+							//&& !EXCLUDED_WORDS_LIST.contains(val2.toUpperCase()) 
 							&& !val2.toUpperCase().matches("^V\\d+$");}).map((String var)->{
 								return var.toUpperCase();}).collect(Collectors.toList());
 	}
@@ -346,7 +477,11 @@ public class TopmedVariable implements Serializable  {
 		lastScore = score[0];
 		return score[0];
 	}
-
+	/**
+	 * Deprecated as this is being handled by etl model for dbgap
+	 * @param e
+	 */
+	@Deprecated
 	public void addVarReportMeta(Element e) {
 		e.getAllElements().stream().forEach((Element element)->{
 			Element descriptionElement = element.getElementsByTag("description").first();
