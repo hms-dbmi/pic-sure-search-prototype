@@ -515,8 +515,9 @@ public class TopmedVariable implements Serializable  {
 		return values;
 	}
 
-	public void setValues(HashMap<String, String> values) {
+	public TopmedVariable setValues(HashMap<String, String> values) {
 		this.values = values;
+		return this;
 	}
 
 	public HashSet<String> getMetadata_tags() {
