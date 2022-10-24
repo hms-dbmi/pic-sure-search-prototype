@@ -112,8 +112,8 @@ public class TagSearchResource implements IResourceRS {
         List<SearchResult> searchResults = results.entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
                         .map(topmedVariable -> {
-                            if (searchQuery.isExcludeVariableValues()) {
-                                return topmedVariable.setValues(new HashMap<>());
+                            if (topmedVariable.getValues().size() > 0 && searchQuery.getVariableValuesLimit() != null && searchQuery.getVariableValuesLimit() > 0) {
+                                return topmedVariable.copy(searchQuery.getVariableValuesLimit());
                             }
                             return topmedVariable;
                         })
@@ -177,7 +177,12 @@ public class TagSearchResource implements IResourceRS {
 
     private TreeMap<String, TopmedDataTable> readDictionary() {
         try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(JAVABIN)));){
-            return (TreeMap<String, TopmedDataTable>) ois.readObject();
+            TreeMap<String, TopmedDataTable> dictionary = (TreeMap<String, TopmedDataTable>) ois.readObject();
+            // Remove "values" key from TopmedVariable.medatada map -- they are redundant, they are also set in TopmedVariable.values
+            dictionary.values().forEach(topmedDataTable -> {
+                topmedDataTable.variables.values().forEach(topmedVariable -> topmedVariable.getMetadata().remove("values"));
+            });
+            return dictionary;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

@@ -227,7 +227,7 @@ public class TopmedVariable implements Serializable  {
 			"yes"
 			);
 	private HashMap<String, String> metadata = new HashMap<String, String>();
-	private HashMap<String, String> values = new HashMap<String, String>();
+	private Map<String, String> values = new HashMap<String, String>();
 	private HashSet<String> metadata_tags = new HashSet<>();
 	private HashSet<String> value_tags = new HashSet<>();
 	public HashSet<String> allTagsLowercase = new HashSet<>();
@@ -511,13 +511,12 @@ public class TopmedVariable implements Serializable  {
 		this.metadata = metadata;
 	}
 
-	public HashMap<String, String> getValues() {
+	public Map<String, String> getValues() {
 		return values;
 	}
 
-	public TopmedVariable setValues(HashMap<String, String> values) {
+	public void setValues(HashMap<String, String> values) {
 		this.values = values;
-		return this;
 	}
 
 	public HashSet<String> getMetadata_tags() {
@@ -611,6 +610,38 @@ public class TopmedVariable implements Serializable  {
 
 	public void setIs_continuous(boolean is_continuous) {
 		this.is_continuous = is_continuous;
+	}
+
+	/**
+	 * Make a copy of this object.
+	 *
+	 * @param valueLimit maximum number of values to include in copy
+	 */
+	public TopmedVariable copy(int valueLimit) {
+		//  TODO: Since this object is not immutable, any changes to any of its fields will be reflected in any shared copies,
+		//  i.e. in TagSearchResource.fhsDictionary. We should create and use an immutable version of this object
+		//  for caching and including in service responses
+		TopmedVariable topmedVariable = new TopmedVariable();
+		topmedVariable.metadata = this.metadata;
+
+		if (this.values.size() > valueLimit) {
+			topmedVariable.values = this.values.entrySet().stream()
+					.limit(valueLimit)
+					.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+		} else {
+			topmedVariable.values = new HashMap<>(this.values);
+		}
+		topmedVariable.metadata_tags = this.metadata_tags;
+		topmedVariable.value_tags = this.value_tags;
+		topmedVariable.allTagsLowercase = this.allTagsLowercase;
+		topmedVariable.studyId = this.studyId;
+		topmedVariable.dtId = this.dtId;
+		topmedVariable.varId = this.varId;
+		topmedVariable.is_categorical = this.is_categorical;
+		topmedVariable.is_continuous = this.is_continuous;
+		topmedVariable.lastInput = this.lastInput;
+		topmedVariable.lastScore = this.lastScore;
+		return topmedVariable;
 	}
 
 }
