@@ -1,15 +1,14 @@
 package edu.harvard.hms.dbmi.avillach.hpds;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.jsoup.nodes.Element;
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter.ColumnMetaCSVRecord;
@@ -226,11 +225,11 @@ public class TopmedVariable implements Serializable  {
 			"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 			"yes"
 			);
-	private HashMap<String, String> metadata = new HashMap<String, String>();
+	private Map<String, String> metadata = new HashMap<String, String>();
 	private Map<String, String> values = new HashMap<String, String>();
-	private HashSet<String> metadata_tags = new HashSet<>();
-	private HashSet<String> value_tags = new HashSet<>();
-	public HashSet<String> allTagsLowercase = new HashSet<>();
+	private Set<String> metadata_tags = new HashSet<>();
+	private Set<String> value_tags = new HashSet<>();
+	public Set<String> allTagsLowercase = new HashSet<>();
 
 	private String studyId;
 	private String dtId;
@@ -503,7 +502,7 @@ public class TopmedVariable implements Serializable  {
 		return text.replaceAll("<a href.*>", "").replaceAll("</a>", "").replaceAll("&#39;", "'");
 	}
 
-	public HashMap<String, String> getMetadata() {
+	public Map<String, String> getMetadata() {
 		return metadata;
 	}
 
@@ -519,7 +518,7 @@ public class TopmedVariable implements Serializable  {
 		this.values = values;
 	}
 
-	public HashSet<String> getMetadata_tags() {
+	public Set<String> getMetadata_tags() {
 		return metadata_tags;
 	}
 
@@ -527,7 +526,7 @@ public class TopmedVariable implements Serializable  {
 		this.metadata_tags = metadata_tags;
 	}
 
-	public HashSet<String> getValue_tags() {
+	public Set<String> getValue_tags() {
 		return value_tags;
 	}
 
@@ -622,18 +621,19 @@ public class TopmedVariable implements Serializable  {
 		//  i.e. in TagSearchResource.fhsDictionary. We should create and use an immutable version of this object
 		//  for caching and including in service responses
 		TopmedVariable topmedVariable = new TopmedVariable();
-		topmedVariable.metadata = this.metadata;
+		topmedVariable.metadata = ImmutableMap.copyOf(this.metadata);
 
 		if (this.values.size() > valueLimit) {
-			topmedVariable.values = this.values.entrySet().stream()
+			Map<String, String> valuesCopy = this.values.entrySet().stream()
 					.limit(valueLimit)
 					.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+			topmedVariable.values = ImmutableMap.copyOf(valuesCopy);
 		} else {
-			topmedVariable.values = new HashMap<>(this.values);
+			topmedVariable.values = ImmutableMap.copyOf(this.values);
 		}
-		topmedVariable.metadata_tags = this.metadata_tags;
-		topmedVariable.value_tags = this.value_tags;
-		topmedVariable.allTagsLowercase = this.allTagsLowercase;
+		topmedVariable.metadata_tags = ImmutableSet.copyOf(this.metadata_tags);
+		topmedVariable.value_tags = ImmutableSet.copyOf(this.value_tags);
+		topmedVariable.allTagsLowercase = ImmutableSet.copyOf(this.allTagsLowercase);
 		topmedVariable.studyId = this.studyId;
 		topmedVariable.dtId = this.dtId;
 		topmedVariable.varId = this.varId;
