@@ -112,7 +112,7 @@ public class TagSearchResource implements IResourceRS {
         List<SearchResult> searchResults = results.entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
                         .map(topmedVariable -> {
-                            if (searchQuery.getVariableValuesLimit() != null && searchQuery.getVariableValuesLimit() > topmedVariable.getValues().size()) {
+                            if (searchQuery.getVariableValuesLimit() != null && searchQuery.getVariableValuesLimit() < topmedVariable.getValues().size()) {
                                 return topmedVariable.copy(searchQuery.getVariableValuesLimit());
                             }
                             return topmedVariable;
