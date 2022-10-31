@@ -7,6 +7,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.jsoup.nodes.Element;
@@ -227,8 +228,11 @@ public class TopmedVariable implements Serializable  {
 			);
 	private Map<String, String> metadata = new HashMap<String, String>();
 	private Map<String, String> values = new HashMap<String, String>();
+	@JsonIgnore
 	private Set<String> metadata_tags = new HashSet<>();
+	@JsonIgnore
 	private Set<String> value_tags = new HashSet<>();
+	@JsonIgnore
 	public Set<String> allTagsLowercase = new HashSet<>();
 
 	private String studyId;
