@@ -18,10 +18,13 @@ public class TopmedDataTable implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -2138670854234447527L;
-	public TreeMap<String, String> metadata;
-	public TreeMap<String, TopmedVariable> variables;
+	public SortedMap<String, String> metadata;
+	public SortedMap<String, TopmedVariable> variables;
+	/**
+	 * This field is enormous and should not be serialized
+	 */
 	@JsonIgnore
-	public HashMap<String, Set<TopmedVariable>> tagMap;
+	public Map<String, Set<TopmedVariable>> tagMap;
 
 	public TopmedDataTable(){
 		variables = new TreeMap<String, TopmedVariable>();

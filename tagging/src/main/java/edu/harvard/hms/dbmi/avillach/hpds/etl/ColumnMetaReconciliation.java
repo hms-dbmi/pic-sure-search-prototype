@@ -1,15 +1,9 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl;
 
 import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -254,7 +248,7 @@ public class ColumnMetaReconciliation {
 		TreeMap<String, TopmedDataTable> updatedDictionary = new TreeMap<>();
 		
 		for(Entry<String, TopmedDataTable> entry : dictionary.entrySet()) {
-			TreeMap<String, String> metadata = entry.getValue().metadata;
+			SortedMap<String, String> metadata = entry.getValue().metadata;
 			String newKey;
 			if(!metadata.get("columnmeta_study_id").equals(metadata.get("columnmeta_id"))) {
 				newKey = metadata.get("columnmeta_study_id") + "_" + metadata.get("columnmeta_id");
@@ -331,23 +325,23 @@ public class ColumnMetaReconciliation {
 			List<String> variablesNotInHPDS = new ArrayList<String>();
 			entry.getValue().variables.entrySet().forEach((variable)->{
 				variablesInDictionary.add(variable.getValue().getMetadata().get("columnmeta_HPDS_PATH"));
-				HashMap<String, String> updatedValues = new HashMap<>();
+				List<String> updatedValues = new ArrayList<>();
 				ColumnMeta variableMeta = metaStore[0].get(variable.getValue().getMetadata().get("columnmeta_HPDS_PATH"));
 				if(variableMeta!=null) {
 					if(variableMeta.isCategorical()) {
 						variable.getValue().getMetadata().put("columnmeta_data_type","categorical");
 						variable.getValue().setIs_categorical(true);
 						variable.getValue().setIs_continuous(false);
-						Set<String> categories = new TreeSet(variable.getValue().getValues().values());
+						Set<String> categories = new TreeSet(variable.getValue().getValues());
 						Set<String> metaCategories = new TreeSet(variableMeta.getCategoryValues());
 						Set<String> categoriesMissingFromDictionary = categoriesMissingFromDictionary(categories, metaCategories);
 						if(categoriesMissingFromDictionary.size()>1) {
 							categoriesMissingFromHPDS.add(variable.getKey() + " is missing these categories in the dictionary but they exist in HPDS : " + categoriesMissingFromDictionary + "\n");
 						}
-						variable.getValue().getValues().entrySet().forEach((value)->{
+						variable.getValue().getValues().forEach((value)->{
 							if(variableMeta!=null) {
-								if(variableMeta.getCategoryValues().contains(value.getValue())){
-									updatedValues.put(value.getKey(), value.getValue());
+								if(variableMeta.getCategoryValues().contains(value)){
+									updatedValues.add(value);
 								}
 							}
 						});
@@ -361,7 +355,7 @@ public class ColumnMetaReconciliation {
 						variable.getValue().setIs_continuous(true);
 						variable.getValue().getMetadata().put("columnmeta_max",variableMeta.getMax().toString());
 						variable.getValue().getMetadata().put("columnmeta_min",variableMeta.getMin().toString());
-						variable.getValue().setValues(new HashMap<String, String>());
+						variable.getValue().setValues(new ArrayList<>());
 					}
 					variable.getValue().getValue_tags().removeIf((string)->{
 						return stopWordList.contains(string.toLowerCase());

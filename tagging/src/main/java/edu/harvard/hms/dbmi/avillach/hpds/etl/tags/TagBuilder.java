@@ -284,7 +284,7 @@ public class TagBuilder {
 					}
 				});
 				// add values to metadata tags and value tags
-				for(String value: var.getValues().values()) {
+				for(String value: var.getValues()) {
 					try {
 						var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
 						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));

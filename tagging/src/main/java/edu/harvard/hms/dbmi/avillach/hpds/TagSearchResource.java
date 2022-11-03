@@ -22,7 +22,8 @@ import java.util.zip.GZIPInputStream;
 @Consumes({"application/json"})
 public class TagSearchResource implements IResourceRS {
 
-    private TreeMap<String, TopmedDataTable> fhsDictionary;
+    public static final Comparator<SearchResult> SEARCH_RESULT_COMPARATOR = Comparator.comparing(SearchResult::getScore).reversed().thenComparing(result -> result.getResult().getMetadata().get("columnmeta_description"));
+    private SortedMap<String, TopmedDataTable> fhsDictionary;
     private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
     private static final int INITIAL_RESULTS_SIZE = 20;
 
@@ -30,6 +31,9 @@ public class TagSearchResource implements IResourceRS {
         fhsDictionary = readDictionary();
     }
 
+    public TagSearchResource(SortedMap<String, TopmedDataTable> fhsDictionary) {
+        this.fhsDictionary = fhsDictionary;
+    }
 
     @Override
     public ResourceInfo info(QueryRequest queryRequest) {
@@ -118,7 +122,7 @@ public class TagSearchResource implements IResourceRS {
                             return topmedVariable;
                         })
                         .map(topmedVariable -> new SearchResult(topmedVariable, entry.getKey())))
-                .sorted(Comparator.comparing(SearchResult::getScore).reversed().thenComparing(result -> result.getResult().getMetadata().get("columnmeta_description")))
+                .sorted(SEARCH_RESULT_COMPARATOR)
                 .collect(Collectors.toList());
 
         int searchResultsSize = searchResults.size();
@@ -175,9 +179,9 @@ public class TagSearchResource implements IResourceRS {
     }
 
 
-    private TreeMap<String, TopmedDataTable> readDictionary() {
+    private SortedMap<String, TopmedDataTable> readDictionary() {
         try(ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(new FileInputStream(JAVABIN)));){
-            TreeMap<String, TopmedDataTable> dictionary = (TreeMap<String, TopmedDataTable>) ois.readObject();
+            SortedMap<String, TopmedDataTable> dictionary = (SortedMap<String, TopmedDataTable>) ois.readObject();
             // Remove "values" key from TopmedVariable.medatada map -- they are redundant, they are also set in TopmedVariable.values
             dictionary.values().forEach(topmedDataTable -> {
                 topmedDataTable.variables.values().forEach(topmedVariable -> topmedVariable.getMetadata().remove("values"));
