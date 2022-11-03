@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.cxf.helpers.FileUtils;
 
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
@@ -27,7 +28,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
  */
 public class TagBuilder {
 
-	private static final List<String> EXCLUDED_WORDS_LIST = List.of(
+	private static final List<String> EXCLUDED_WORDS_LIST = ImmutableList.of(
 			"a",
 			"about",
 			"again",
@@ -59,7 +60,6 @@ public class TagBuilder {
 			"by",
 			"calculated",
 			"can",
-			"cardia",
 			"could",
 			"data",
 			"decimal",
@@ -85,7 +85,6 @@ public class TagBuilder {
 			"especially",
 			"etc",
 			"extracted",
-			"fhs",
 			"find",
 			"format",
 			"format",

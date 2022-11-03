@@ -19,7 +19,7 @@ public class TopmedVariable implements Serializable  {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1802723843452332984L;
+	private static final long serialVersionUID = -317988926878698761L;
 	/**
 	 * This list should be deprecated and removed as this methodology is 
 	 * only used during data integration.  No other process should be using 
@@ -27,7 +27,7 @@ public class TopmedVariable implements Serializable  {
 	 * 
 	 */
 	@Deprecated
-	private static final List<String> EXCLUDED_WORDS_LIST = List.of(
+	private static final List<String> EXCLUDED_WORDS_LIST = ImmutableList.of(
 			"a",
 			"about",
 			"again",
@@ -59,7 +59,6 @@ public class TopmedVariable implements Serializable  {
 			"by",
 			"calculated",
 			"can",
-			"cardia",
 			"could",
 			"data",
 			"decimal",
@@ -85,7 +84,6 @@ public class TopmedVariable implements Serializable  {
 			"especially",
 			"etc",
 			"extracted",
-			"fhs",
 			"find",
 			"format",
 			"format",
