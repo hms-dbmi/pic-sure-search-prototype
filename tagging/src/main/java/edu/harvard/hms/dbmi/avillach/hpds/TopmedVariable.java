@@ -1,15 +1,15 @@
 package edu.harvard.hms.dbmi.avillach.hpds;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.jsoup.nodes.Element;
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter.ColumnMetaCSVRecord;
@@ -19,7 +19,7 @@ public class TopmedVariable implements Serializable  {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1802723843452332984L;
+	private static final long serialVersionUID = -317988926878698761L;
 	/**
 	 * This list should be deprecated and removed as this methodology is 
 	 * only used during data integration.  No other process should be using 
@@ -27,7 +27,7 @@ public class TopmedVariable implements Serializable  {
 	 * 
 	 */
 	@Deprecated
-	private static final List<String> EXCLUDED_WORDS_LIST = List.of(
+	private static final List<String> EXCLUDED_WORDS_LIST = ImmutableList.of(
 			"a",
 			"about",
 			"again",
@@ -59,7 +59,6 @@ public class TopmedVariable implements Serializable  {
 			"by",
 			"calculated",
 			"can",
-			"cardia",
 			"could",
 			"data",
 			"decimal",
@@ -85,7 +84,6 @@ public class TopmedVariable implements Serializable  {
 			"especially",
 			"etc",
 			"extracted",
-			"fhs",
 			"find",
 			"format",
 			"format",
@@ -226,11 +224,14 @@ public class TopmedVariable implements Serializable  {
 			"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 			"yes"
 			);
-	private HashMap<String, String> metadata = new HashMap<String, String>();
-	private HashMap<String, String> values = new HashMap<String, String>();
-	private HashSet<String> metadata_tags = new HashSet<>();
-	private HashSet<String> value_tags = new HashSet<>();
-	public HashSet<String> allTagsLowercase = new HashSet<>();
+	private Map<String, String> metadata;
+	private List<String> values;
+	@JsonIgnore
+	private Set<String> metadata_tags = new HashSet<>();
+	@JsonIgnore
+	private Set<String> value_tags = new HashSet<>();
+	@JsonIgnore
+	public Set<String> allTagsLowercase = new HashSet<>();
 
 	private String studyId;
 	private String dtId;
@@ -240,7 +241,7 @@ public class TopmedVariable implements Serializable  {
 
 	public TopmedVariable(){
 		this.metadata = new HashMap<>();
-		this.values = new HashMap<>();
+		this.values = new ArrayList<>();
 	}
 
 	/**
@@ -252,10 +253,10 @@ public class TopmedVariable implements Serializable  {
 	@Deprecated 
 	public TopmedVariable(TopmedDataTable topmedDataTable, Element e){
 		this.metadata = new HashMap<>();
-		this.values = new HashMap<>();
+		this.values = new ArrayList<>();
 		e.getAllElements().stream().forEach((element)->{
 			if(element.tag().getName().equalsIgnoreCase("value")) {
-				this.values.put(element.attr("code"), element.ownText());
+				this.values.add(element.ownText());
 			} else {
 				if(!element.tag().getName().equalsIgnoreCase("comment")) {
 					this.metadata.put(element.tagName(), element.ownText());
@@ -282,18 +283,16 @@ public class TopmedVariable implements Serializable  {
 	@Deprecated
 	public TopmedVariable(TopmedDataTable topmedDataTable, ColumnMetaCSVRecord csvr) {
 		this.metadata = new HashMap<>();
-		this.values = new HashMap<>();
+		this.values = new ArrayList<>();
 		
 		if(csvr.categorical) {
 			for(String value: csvr.categoryValues) {
 				value = value.trim();
-				this.values.put(value, value);
+				this.values.add(value);
 				this.value_tags.add(value);
 				this.allTagsLowercase.add(value.toLowerCase());
 			}
 		} else {
-			this.values = new HashMap<>();
-			this.value_tags = new HashSet<>();
 			this.allTagsLowercase = new HashSet<>();
 			metadata.put("columnmeta_min", String.valueOf(csvr.min));
 			metadata.put("columnmeta_max", String.valueOf(csvr.max));
@@ -418,7 +417,7 @@ public class TopmedVariable implements Serializable  {
 				metadata_tags.addAll(filterTags(entry.getValue()));
 			}
 		}
-		for(String value : values.values()) {
+		for(String value : values) {
 			value_tags.addAll(filterTags(value));
 		}
 		metadata_tags.add(dtId);
@@ -503,60 +502,67 @@ public class TopmedVariable implements Serializable  {
 		return text.replaceAll("<a href.*>", "").replaceAll("</a>", "").replaceAll("&#39;", "'");
 	}
 
-	public HashMap<String, String> getMetadata() {
+	public Map<String, String> getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(HashMap<String, String> metadata) {
+	public TopmedVariable setMetadata(Map<String, String> metadata) {
 		this.metadata = metadata;
+		return this;
 	}
 
-	public HashMap<String, String> getValues() {
+	public List<String> getValues() {
 		return values;
 	}
 
-	public void setValues(HashMap<String, String> values) {
+	public TopmedVariable setValues(List<String> values) {
 		this.values = values;
+		return this;
 	}
 
-	public HashSet<String> getMetadata_tags() {
+	public Set<String> getMetadata_tags() {
 		return metadata_tags;
 	}
 
-	public void setMetadata_tags(HashSet<String> metadata_tags) {
+	public TopmedVariable setMetadata_tags(Set<String> metadata_tags) {
 		this.metadata_tags = metadata_tags;
+		return this;
 	}
 
-	public HashSet<String> getValue_tags() {
+	public Set<String> getValue_tags() {
 		return value_tags;
 	}
 
-	public void setValue_tags(HashSet<String> value_tags) {
+	public TopmedVariable setValue_tags(Set<String> value_tags) {
 		this.value_tags = value_tags;
+		return this;
 	}
 
 	public String getVarId() {
 		return varId;
 	}
 
-	public void setVarId(String varId) {
+	public TopmedVariable setVarId(String varId) {
 		this.varId = varId;
+		return this;
 	}
 
 	public String getDtId() {
 		return dtId;
 	}
 
-	public void setDtId(String dtId) {
+	public TopmedVariable setDtId(String dtId) {
 		this.dtId = dtId;
+		return this;
 	}
 
 	public String getStudyId() {
 		return studyId;
 	}
 
-	public void setStudyId(String studyId) {
+	public TopmedVariable setStudyId(String studyId) {
 		this.studyId = studyId;
+		return this;
 	}
 
 	@Override
@@ -600,16 +606,51 @@ public class TopmedVariable implements Serializable  {
 		return is_categorical;
 	}
 
-	public void setIs_categorical(boolean is_categorical) {
+	public TopmedVariable setIs_categorical(boolean is_categorical) {
 		this.is_categorical = is_categorical;
+		return this;
 	}
 
 	public boolean isIs_continuous() {
 		return is_continuous;
 	}
 
-	public void setIs_continuous(boolean is_continuous) {
+	public TopmedVariable setIs_continuous(boolean is_continuous) {
 		this.is_continuous = is_continuous;
+		return this;
+	}
+
+	/**
+	 * Make a copy of this object.
+	 *
+	 * @param valueLimit maximum number of values to include in copy
+	 */
+	public TopmedVariable copy(int valueLimit) {
+		//  TODO: Since this object is not immutable, any changes to any of its fields will be reflected in any shared copies,
+		//  i.e. in TagSearchResource.fhsDictionary. We should create and use an immutable version of this object
+		//  for caching and including in service responses
+		TopmedVariable topmedVariable = new TopmedVariable();
+		topmedVariable.metadata = ImmutableMap.copyOf(this.metadata);
+
+		if (this.values.size() > valueLimit) {
+			List<String> valuesCopy = this.values.stream()
+					.limit(valueLimit)
+					.collect(Collectors.toList());
+			topmedVariable.values = ImmutableList.copyOf(valuesCopy);
+		} else {
+			topmedVariable.values = ImmutableList.copyOf(this.values);
+		}
+		topmedVariable.metadata_tags = ImmutableSet.copyOf(this.metadata_tags);
+		topmedVariable.value_tags = ImmutableSet.copyOf(this.value_tags);
+		topmedVariable.allTagsLowercase = ImmutableSet.copyOf(this.allTagsLowercase);
+		topmedVariable.studyId = this.studyId;
+		topmedVariable.dtId = this.dtId;
+		topmedVariable.varId = this.varId;
+		topmedVariable.is_categorical = this.is_categorical;
+		topmedVariable.is_continuous = this.is_continuous;
+		topmedVariable.lastInput = this.lastInput;
+		topmedVariable.lastScore = this.lastScore;
+		return topmedVariable;
 	}
 
 }

@@ -2,9 +2,6 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.serializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -168,7 +165,7 @@ public class HPDSDictionarySerializer {
 			} else {
 				for(String value: entry.getValue().values) {
 					
-					var.getValues().put(value,value);
+					var.getValues().add(value);
 				
 				}
 			}

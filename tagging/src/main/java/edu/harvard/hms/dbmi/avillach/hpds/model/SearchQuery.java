@@ -16,4 +16,11 @@ public class SearchQuery {
     private final List<String> excludedTags;
     private final boolean returnTags;
     private final int offset, limit;
+    /**
+     * Parameter to limit variable values returned. Using the following rules:
+     * NULL: return all variable values
+     * 0: return no variable values
+     * n > 0: return at most n variable values
+     */
+    private final Integer variableValuesLimit;
 }

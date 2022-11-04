@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jsoup.nodes.Document;
 
 import com.google.common.collect.Sets;
@@ -17,9 +18,13 @@ public class TopmedDataTable implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -2138670854234447527L;
-	public TreeMap<String, String> metadata;
-	public TreeMap<String, TopmedVariable> variables;
-	public HashMap<String, Set<TopmedVariable>> tagMap;
+	public SortedMap<String, String> metadata;
+	public SortedMap<String, TopmedVariable> variables;
+	/**
+	 * This field is enormous and should not be serialized
+	 */
+	@JsonIgnore
+	public Map<String, Set<TopmedVariable>> tagMap;
 
 	public TopmedDataTable(){
 		variables = new TreeMap<String, TopmedVariable>();
