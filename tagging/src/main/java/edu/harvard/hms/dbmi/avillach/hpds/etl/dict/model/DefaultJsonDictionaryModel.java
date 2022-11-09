@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
 
-import edu.harvard.hms.dbmi.avillach.hpds.etl.DictionaryImporterUtil;
-
 /**
  * This model is used for the internal dictionaries for non-compliant studies
  * 
@@ -243,7 +241,6 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			for(File study : new File(inputDirectory).listFiles()) {
 	        	if(studyFolder.getName().contains("hrmn")) continue;
 	        	if(!study.getName().endsWith("metadata.json")) continue;
-		        DefaultJsonDictionaryModel dict = new DefaultJsonDictionaryModel(study.getAbsolutePath());
 					//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
 			}	
 		}

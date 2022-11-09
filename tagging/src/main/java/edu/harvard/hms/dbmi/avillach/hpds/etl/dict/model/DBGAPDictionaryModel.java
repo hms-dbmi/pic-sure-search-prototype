@@ -4,14 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,8 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
-import com.opencsv.CSVWriter;
 
 /**
  * 
@@ -56,16 +51,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	private String date_created;
 	private String description;
 	private List<DBGapVariable> variables = new ArrayList<>();
-	
-	// add a list of element filters for the dynamic metadata to ignore
-	private static final List<String> ALL_ELEMENTS_FILTERS_LIST = Arrays.asList( 
-	); 
-	// map of element filters for the dynamic metadata to ignore ( either as a white list or black list not sure yet )
-	// map is associated to the phs level this will give more granularity if elements in the list is breaking studies 
-	// example black list: if ignoring "total" element breaks all other studies it should be added to this list where for the phs where we want to omit
-	private static final Map<String,String>  ALL_ELEMENTS_FILTERS_MAP = new HashMap<>() {
-		
-	};
+
 	
 	@Override
 	public Map<String, DictionaryModel> build(String[] controlFileRow, Map<String, DictionaryModel> baseDictionary) {
@@ -192,12 +178,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 		
 		
 	}
-
-	private void reportMissingColumnmeta() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	private void buildVarReport(DBGAPDictionaryModel dict, String absolutePath) {
         File dataDictFile = new File(absolutePath);
 
@@ -297,63 +278,6 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 			x.incrementAndGet();
 		});
 		return index;
-	}
-
-	/**
-	 * method to gather all of a variables elements textvals and element attributes 
-	 * should work with  both data_dictionaries and var report. 
-	 * 
-	 * @param metaDataPrefix - prefix for the metadata key that is being generated
-	 * @param element - the variable element that is being ingested
-	 */
-	private Map<String,String> collectAllMetadataForElement(String metaDataPrefix, Element e) {
-		
-		Map<String,String> metadata = new HashMap<>();
-		
-		e.getAllElements().stream().forEach((Element element)->{
-			
-			
-			String elementText = element.ownText();
-			
-			String elementParentTexts = element.parents().text();
-			
-			if(!ALL_ELEMENTS_FILTERS_LIST.contains(elementText)) {
-				// does current element have a text val?
-				// if so add to metadata
-				// if multiple element tags exist create an enumerated key association
-				if(!elementText.isBlank()) {
-					if(metadata.containsKey(metaDataPrefix + element.tagName())) {
-						int enumeratedKey = determineMetaKeyIteration(metadata.keySet(),metaDataPrefix + element.tagName());
-						metadata.put(metaDataPrefix + element.tagName() + "_" + enumeratedKey, elementText);
-					} else {
-						metadata.put(metaDataPrefix + element.tagName(), elementText);
-					}
-				}
-				// does current element have attributes 
-				
-				element.attributes().forEach((attr)->{
-					if(metadata.containsKey(metaDataPrefix + attr.getKey())) {
-						int enumeratedKey = determineMetaKeyIteration(metadata.keySet(),metaDataPrefix + attr.getKey());
-						metadata.put(metaDataPrefix + attr.getKey() + "_" + enumeratedKey, attr.getValue());
-
-					} else {
-						metadata.put(metaDataPrefix + attr.getKey(), attr.getValue());
-
-					}
-				});
-			}
-		});
-		
-		return metadata;
-	}
-
-	private int determineMetaKeyIteration(Set<String> set, String string) {
-		Set<String> matchKeys = new HashSet<>();
-		set.stream().forEach(key ->{
-			if(key.contains(string)) matchKeys.add(key);
-		});
-		
-		return matchKeys.size() - 1;
 	}
 
 	public DBGAPDictionaryModel(String xmlType, String absolutePath) {

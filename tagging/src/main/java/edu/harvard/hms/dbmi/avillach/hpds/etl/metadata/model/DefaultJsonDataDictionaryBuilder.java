@@ -3,7 +3,6 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.metadata.model;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -112,7 +111,6 @@ public class DefaultJsonDataDictionaryBuilder {
 
 	public static TreeMap<String, String> buildHarmonized(File file) {
 		TreeMap<String, String> harmonized = new TreeMap<>();
-		DefaultJsonDataDictionary dict = new DefaultJsonDataDictionary();
 
 		ObjectMapper mapper = new ObjectMapper();
 		try {

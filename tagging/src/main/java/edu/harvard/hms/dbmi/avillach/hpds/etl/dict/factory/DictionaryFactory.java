@@ -8,7 +8,6 @@ import com.google.common.hash.Hashing;
 
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.ColumnMetaDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DBGAPDictionaryModel;
-import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DCCHarmonizedDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DCCHarmonizedDictionaryModel2;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
@@ -52,9 +51,6 @@ public class DictionaryFactory {
 		}
 		if(dictionaryModel.equalsIgnoreCase("DBGAPDictionaryModel")) {
 			return new DBGAPDictionaryModel();
-		}
-		if(dictionaryModel.equalsIgnoreCase("DCCHarmonizedDictionaryModel")) {
-			return new DCCHarmonizedDictionaryModel();
 		}
 		if(dictionaryModel.equalsIgnoreCase("DCCHarmonizedDictionaryModel2")) {
 			return new DCCHarmonizedDictionaryModel2();

@@ -1,8 +1,6 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl.tags;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +11,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.cxf.helpers.FileUtils;
 
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
@@ -285,10 +282,10 @@ public class TagBuilder {
 				// add values to metadata tags and value tags
 				for(String value: var.getValues()) {
 					try {
-						var.getValue_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
-						var.getMetadata_tags().addAll(TopmedVariable.class.getDeclaredConstructor().newInstance().filterTags(value.toUpperCase()));
-					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+						var.getValue_tags().addAll(this.filterTags(value.toUpperCase()));
+						var.getMetadata_tags().addAll(this.filterTags(value.toUpperCase()));
+					} catch (IllegalArgumentException |
+						 SecurityException e) {
 						e.printStackTrace();
 					}
 		
@@ -300,7 +297,7 @@ public class TagBuilder {
 					var.allTagsLowercase.add(metatagsTolower.toLowerCase());
 				}
 			});
-			hpdsDictEntry.getValue().generateTagMap();
+			this.generateTagMap(hpdsDictEntry.getValue());
 		}		
 	}
 	

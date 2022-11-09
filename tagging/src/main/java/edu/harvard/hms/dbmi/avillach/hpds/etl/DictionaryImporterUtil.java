@@ -15,8 +15,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.zip.GZIPOutputStream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.RFC4180Parser;
@@ -164,45 +162,6 @@ public class DictionaryImporterUtil {
 		}
 		
 		
-	}
-
-
-	/**
-	 * Validations need to be done to ensure the following:
-	 * - Required fields contain their expected values 
-	 * - Required metadata contain their expected values
-	 * - Check that each record in the columnMeta.csv has had a dictionary generated for it.
-	 * 
-	 * These validations are currently not compliant with requirements
-	 * deprecated to use validations done in ALS-3252 once it is tested.
-	 */
-	@Deprecated
-	private void validateDictionary() {
-		
-		DictionaryValidator validator = new DictionaryValidator();
-		
-		validator.validateDictionary(hpdsDictionaries);
-		
-		
-	}
-
-	/**
-	 * prerun validations to ensure prerequisites exists
-	 * currently commented out but can developed and implemented now that 
-	 * ingestion process is stabilizing.
-	 */
-	private static void preRunValidations() {
-		// validate required files and directory structure exist
-		if(!DictionaryFactory.validate()) throw new RuntimeException("Dictionary config invalid"); 
-		if(!Files.exists(Paths.get(DATA_INPUT_DIR))) throw new RuntimeException(DATA_INPUT_DIR + " does not exist");
-		if(!Paths.get(DATA_INPUT_DIR).toFile().isDirectory()) throw new RuntimeException(DATA_INPUT_DIR + " is not a directory");
-		
-		if(!Files.exists(Paths.get(OUTPUT_DIR))) throw new RuntimeException(OUTPUT_DIR + " does not exist");
-		if(!Paths.get(OUTPUT_DIR).toFile().isDirectory()) throw new RuntimeException(OUTPUT_DIR + " is not a directory");
-
-		//if(!Files.exists(Paths.get(DICTIONARY_OUTPUT_NAME))) throw new RuntimeException(DICTIONARY_OUTPUT_NAME + " does not exist");
-		//if(!Paths.get(DICTIONARY_OUTPUT_NAME).toFile().isDirectory()) throw new RuntimeException(DICTIONARY_OUTPUT_NAME + " is not a directory");
-
 	}
 	
 	/**

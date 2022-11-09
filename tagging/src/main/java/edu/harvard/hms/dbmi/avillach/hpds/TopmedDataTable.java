@@ -9,8 +9,6 @@ import org.jsoup.nodes.Document;
 
 import com.google.common.collect.Sets;
 
-import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter;
-import edu.harvard.hms.dbmi.avillach.hpds.etl.RawDataImporter.ColumnMetaCSVRecord;
 import edu.harvard.hms.dbmi.avillach.hpds.model.SearchQuery;
 
 public class TopmedDataTable implements Serializable {
@@ -30,115 +28,6 @@ public class TopmedDataTable implements Serializable {
 		variables = new TreeMap<String, TopmedVariable>();
 		metadata = new TreeMap<String, String>();
 		tagMap = new HashMap<String, Set<TopmedVariable>>();
-	}
-
-	/**
-	 * Deprecated
-	 * Constructor used by old etl process / engine
-	 * @param doc
-	 * @param data_dict_file
-	 */
-	@Deprecated
-	public TopmedDataTable(Document doc, String data_dict_file){
-		metadata = new TreeMap<>();
-		metadata.put("id", getDataTableAttribute(doc, "id"));
-		metadata.put("name", data_dict_file.split("\\.")[4]);
-		metadata.put("study_id", getDataTableAttribute(doc, "study_id"));
-		metadata.put("participant_set", getDataTableAttribute(doc, "participant_set"));
-		metadata.put("date_created", getDataTableAttribute(doc, "date_created"));
-		metadata.put("description", doc.getElementsByTag("data_table").first().getElementsByTag("description").first().text());
-		
-		variables = new TreeMap<>();
-		
-		doc.getElementsByTag("variable").stream().forEach(variable -> {
-			TopmedVariable tVar;
-			try {
-				tVar = new TopmedVariable(this, variable);
-				variables.put(variable.attr("id").replaceAll("\\.v.*", ""), tVar);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		});
-	}
-	/**
-	 * Deprecated
-	 * Constructor used by old etl process / engine
-	 */
-	@Deprecated
-	public TopmedDataTable(RawDataImporter.ColumnMetaCSVRecord csvr) {
-		metadata = new TreeMap<>();
-		variables = new TreeMap<>();
-		
-		String[] concept = csvr.name.substring(1,csvr.name.length() - 1).split("\\\\");
-		int studyDepth = concept.length;
-		if(studyDepth == 4) {
-			metadata.put("columnmeta_id", concept[1]);
-			metadata.put("columnmeta_study_id", concept[0]);
-			metadata.put("columnmeta_description", concept[1]);
-			TopmedVariable var =  new TopmedVariable(this, csvr);
-			variables.put(concept[2], var);
-		}
-		if(studyDepth == 3) {
-			metadata.put("columnmeta_id", concept[1]);
-			metadata.put("columnmeta_study_id", concept[0]);
-			metadata.put("columnmeta_description", concept[1]);
-
-			TopmedVariable var =  new TopmedVariable(this, csvr);
-			variables.put(concept[2], var);
-		}
-		if(studyDepth == 2) {
-			metadata.put("columnmeta_id", concept[1]);
-			metadata.put("columnmeta_study_id", concept[0]);
-			metadata.put("columnmeta_description", concept[1]);
-
-			TopmedVariable var =  new TopmedVariable(this, csvr);
-			variables.put(concept[1], var);
-		}
-		if(studyDepth == 1) {
-			metadata.put("columnmeta_id", concept[0]);
-			metadata.put("columnmeta_study_id", concept[0]);
-			metadata.put("columnmeta_description", concept[0]);
-
-			TopmedVariable var =  new TopmedVariable(this, csvr);
-			variables.put(concept[0], var);
-		}
-
-	}
-	/**
-	 * 
-	 * Deprecated and is now handled in the TagBuilder class
-	 * 
-	 */
-	@Deprecated
-	public void generateTagMap() {
-		tagMap = new HashMap<>();
-		Set<String> tags = new HashSet<String>();
-		for(TopmedVariable variable : variables.values()) {
-			tags.addAll(variable.getMetadata_tags());
-			tags.addAll(variable.getValue_tags());
-		}
-		for(String tag : tags) {
-			tagMap.put(tag, new HashSet<TopmedVariable>());
-		}
-		for(TopmedVariable variable : variables.values()) {
-			for(String tag : variable.getMetadata_tags()) {
-				tagMap.get(tag).add(variable);
-			}
-			for(String tag : variable.getValue_tags()) {
-				tagMap.get(tag).add(variable);
-			}
-		}
-	}
-
-	/**
-	 * Deprecated - old methodology used in deprecated etl process
-	 * @param doc
-	 * @param attrName
-	 * @return
-	 */
-	@Deprecated
-	private String getDataTableAttribute(Document doc, String attrName) {
-		return doc.getElementsByTag("data_table").first().attr(attrName);
 	}
 
 	public Map<Double, List<TopmedVariable>> searchVariables(SearchQuery searchQuery) {
@@ -175,19 +64,4 @@ public class TopmedDataTable implements Serializable {
 		return results;
 	}
 
-	/**
-	 * Deprecated - old methodology used in deprecated etl process
-	 * 
-	 * @param doc
-	 */
-	@Deprecated
-	public void loadVarReport(Document doc) {
-		this.metadata.put("study_description", getDataTableAttribute(doc, "study_name"));
-		doc.getElementsByTag("variable").stream().forEach(variable -> {
-			TopmedVariable var = variables.get(variable.attr("id").replaceFirst("\\.p\\d.*$", ""));
-			if(var!=null) {
-				var.addVarReportMeta(variable);
-			}
-		});
-	}
 }

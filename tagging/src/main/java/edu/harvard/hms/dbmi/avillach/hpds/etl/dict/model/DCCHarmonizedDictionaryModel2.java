@@ -3,7 +3,6 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -95,10 +94,6 @@ public class DCCHarmonizedDictionaryModel2 extends DictionaryModel {
 		}
 		
 		return null;
-	}
-
-	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DCCHarmonizedDictionaryModel2 model) {
-
 	}
 
 	@Override
