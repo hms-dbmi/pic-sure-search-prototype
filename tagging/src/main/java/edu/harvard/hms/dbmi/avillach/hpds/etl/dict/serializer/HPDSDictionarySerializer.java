@@ -38,6 +38,8 @@ public class HPDSDictionarySerializer {
 		for(Entry<String,DictionaryModel> entry: dictionaries.entrySet()) {
 
 			buildDataTable(entry);
+			
+			dictionaries.remove(entry.getKey());
 		}
 		// User TagBuilder Class to build tags
 		try {
