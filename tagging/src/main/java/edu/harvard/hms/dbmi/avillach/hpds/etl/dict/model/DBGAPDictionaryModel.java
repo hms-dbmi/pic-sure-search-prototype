@@ -69,8 +69,9 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	        	if(fileNameArr.length < 7 ) continue; 
 	        	String fileVarName = fileNameArr[fileNameArr.length - 3];
 				//if(studyFolder.getName().contains("hrmn")) continue;
-	        	
-				if(!study.getName().endsWith("data_dict.xml")) continue;
+				if(!study.getName().endsWith("xml")) continue;
+
+				if(!study.getName().contains("data_dict")) continue;
 	
 				DBGAPDictionaryModel dict = new DBGAPDictionaryModel("data_dict", study.getAbsolutePath());
 				
@@ -78,8 +79,9 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				if(!studyFolder.isFile()) {
 					for(File varReport : studyFolder.listFiles()) {
 						if(!varReport.getName().contains(fileVarName)) continue;
-						if(!varReport.getName().endsWith("var_report.xml")) continue;
-						
+						if(!varReport.getName().endsWith("xml")) continue;
+						if(!study.getName().contains("var_report")) continue;
+
 						buildVarReport(dict, varReport.getAbsolutePath());
 					}
 				}
@@ -140,7 +142,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_group_id = var.data_table_id.isBlank() ? baseModel.derived_group_id : var.data_table_id;
 				baseModel.derived_var_name = var.variable_encoded_name;
 				baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
-				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
+				baseModel.derived_var_description = var.variable_description.isBlank() ? "": var.variable_description;
 				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
 				
