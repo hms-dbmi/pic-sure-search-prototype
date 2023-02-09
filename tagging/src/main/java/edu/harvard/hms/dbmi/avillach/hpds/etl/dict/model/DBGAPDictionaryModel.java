@@ -68,9 +68,9 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	        	String[] fileNameArr = study.getName().split("\\.");
 	        	if(fileNameArr.length < 7 ) continue; 
 	        	String fileVarName = fileNameArr[fileNameArr.length - 3];
-				//if(studyFolder.getName().contains("hrmn")) continue;
-	        	
-				if(!study.getName().endsWith("data_dict.xml")) continue;
+
+	        	if(!study.getName().endsWith("xml")) continue;
+				if(!study.getName().contains("data_dict")) continue;
 	
 				DBGAPDictionaryModel dict = new DBGAPDictionaryModel("data_dict", study.getAbsolutePath());
 				
@@ -140,7 +140,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				baseModel.derived_group_id = var.data_table_id.isBlank() ? baseModel.derived_group_id : var.data_table_id;
 				baseModel.derived_var_name = var.variable_encoded_name;
 				baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
-				baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
+				baseModel.derived_var_description = var.variable_description.isBlank() ? "": var.variable_description;
 				baseModel.derived_study_id = var.study_id.isBlank() ? baseModel.derived_study_id : var.study_id;
 				baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
 				
@@ -152,30 +152,6 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 				DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA.add(keyLookup);
 			};
 		});
-		
-	
-		/* bad looping
-		baseDictionary.entrySet().forEach(entry -> {
-									
-			for(DBGapVariable var: dict.variables) {
-				if(entry.getValue().columnmeta_hpds_path.contains(var.study_id.split("\\.")[0]) && 
-					entry.getValue().columnmeta_hpds_path.contains(var.data_table_id.split("\\.")[0]) &&
-					entry.getValue().columnmeta_hpds_path.contains(var.variable_id.split("\\.")[0])) {
-					
-					DictionaryModel baseModel = entry.getValue();
-					
-					baseModel.derived_group_description = var.data_table_description.isBlank() ? baseModel.derived_group_description: var.data_table_description;
-					baseModel.derived_group_name = var.data_table_name.isBlank() ? baseModel.derived_group_name: var.data_table_name;
-					baseModel.derived_var_id = var.variable_id.isBlank() ? baseModel.derived_var_id: var.variable_id;
-					baseModel.derived_var_description = var.variable_description.isBlank() ? baseModel.derived_var_description: var.variable_description;
-					baseModel.derived_study_id = dict.study_id.isBlank() ? baseModel.derived_study_id : dict.study_id;
-					baseModel.derived_study_description = dict.description.isBlank() ? baseModel.derived_study_description : dict.description;
-					
-				}
-				
-			}
-		}); */
-		
 		
 	}
 	
@@ -215,12 +191,7 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 	}
 
 	private void addVarReportData(DBGAPDictionaryModel dict, Element variableElement) {
-		// Create a new 
-		//TopmedVariable variableObject = new TopmedVariable();
-	
-		//variableObject.addVarReportMeta(variableElement);
-		
-		//Instead of using this lets use the method that already exists in the TopmedVariable class
+
 		String varReportPrefix = "var_report_";
 		
 		Map<String,Integer> dictIndex = dict.buildVariableIndex();
@@ -243,29 +214,6 @@ public class DBGAPDictionaryModel extends DictionaryModel {
 					
 					//dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
 				}
-				/*
-				dict.variables.forEach(dbGapVariable ->{
-					
-					String[] elementVarIdArr = element.attr("id").split("\\.");
-					if(elementVarIdArr.length > 0) {
-						
-						if(elementVarIdArr[0].startsWith("phv")) {
-							String elementVarId = elementVarIdArr[0];
-							// Ingest the var report into the var_report_metadata data map
-							if(dbGapVariable.variable_id.startsWith(elementVarId)) {
-
-								dbGapVariable.all_metadata.put(varReportPrefix + "description", element.getElementsByTag("description").first().text());
-								
-								dbGapVariable.all_metadata.put(varReportPrefix + "study_description", dict.description);
-								
-								dbGapVariable.all_metadata.putAll(collectAllMetadataForElement(varReportPrefix,element));
-
-							}
-						}
-						
-					}
-					
-				});*/
 			}
 		});
 		

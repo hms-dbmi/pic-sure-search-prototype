@@ -33,6 +33,9 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 	private String studyUrl;
 	private String studyShortName;
 	private Set<FormGroup> formGroups = new HashSet<FormGroup>();
+
+	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
+
 	
 	public class FormGroup {
 		
@@ -242,7 +245,6 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 	        	if(studyFolder.getName().contains("hrmn")) continue;
 	        	if(!study.getName().endsWith("metadata.json")) continue;
 	        	DefaultJsonDictionaryModel dict = new DefaultJsonDictionaryModel(study.getAbsolutePath());
-					//File f = new File("./data/babyhug/rawData/babyhug_metadata.json");
 			}	
 		}
 		System.out.println("Looking for missing dictionaries");
@@ -276,7 +278,6 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		
 	}
 	
-	public static List<String[]> DICTIONARIES_MISSING_IN_HPDS_COLUMNMETA_DATA = new ArrayList<String[]>();
 			
 	private void reportMissingDictionaries(Map<String, DictionaryModel> baseDictionary, String[] controlFileRow) {
 		

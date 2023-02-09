@@ -39,7 +39,6 @@ public class HPDSDictionarySerializer {
 
 			buildDataTable(entry);
 			
-			dictionaries.remove(entry.getKey());
 		}
 		// User TagBuilder Class to build tags
 		try {
