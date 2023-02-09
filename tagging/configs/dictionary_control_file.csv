@@ -57,6 +57,7 @@ SARCOIDOSIS,phs001207,/local/source/phs001207/rawData/,DBGAPDictionaryModel
 SARP,phs000422,/local/source/phs000422/rawData/,DBGAPDictionaryModel
 SAS,phs000914,/local/source/phs000914/rawData/,DBGAPDictionaryModel
 SAS,phs000972,/local/source/phs000972/rawData/,DBGAPDictionaryModel
+SHARP,phs000166,/local/source/phs000166/rawData/,DBGAPDictionaryModel
 STOP-II,phs002386,/local/source/phs002386/rawData/,DefaultJsonDictionaryModel
 THRV,phs001387,/local/source/phs001387/rawData/,DBGAPDictionaryModel
 VAFAR,phs000997,/local/source/phs000997/rawData/,DBGAPDictionaryModel
