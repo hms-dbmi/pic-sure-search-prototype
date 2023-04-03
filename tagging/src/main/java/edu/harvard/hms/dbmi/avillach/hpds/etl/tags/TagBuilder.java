@@ -30,21 +30,20 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory.DictionaryFactory;
  */
 public class TagBuilder {
 
-	private static Set<String> STOP_WORDS = populateStopWordListFromDataFile();
+	private static Set<String> STOP_WORDS;
 
 	/**
 	 * Method to populate the stopwords set
 	 */
-	public static HashSet<String> populateStopWordListFromDataFile() {
+	public static void populateStopWordListFromDataFile() {
 		try {
 				
-			return Sets.newHashSet(Files.readLines(Paths.get(DictionaryFactory.STOP_WORDS_FILE).toFile(),StandardCharsets.UTF_8));
+			STOP_WORDS = Sets.newHashSet(Files.readLines(Paths.get(DictionaryFactory.STOP_WORDS_FILE).toFile(),StandardCharsets.UTF_8));
 			
 		} catch (Exception e) {			
 			e.printStackTrace();
 			System.err.println(e);
 		}
-		return null;
 	
 	}
 	/**
@@ -59,6 +58,9 @@ public class TagBuilder {
 	 * 
 	 */
 	public void buildTags(TreeMap<String, TopmedDataTable> hpdsDictionary) {
+		
+		populateStopWordListFromDataFile();
+		
 		for(Entry<String, TopmedDataTable> hpdsDictEntry: hpdsDictionary.entrySet()) {
 			
 			hpdsDictEntry.getValue().variables.forEach((varid, var) -> {

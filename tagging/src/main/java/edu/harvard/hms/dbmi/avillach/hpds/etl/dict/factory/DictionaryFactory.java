@@ -35,7 +35,7 @@ public class DictionaryFactory {
 	// Config file to control study and its dictionary builder to use
 	public static String DICTIONARY_CONTROL_FILE = CONFIG_DIR + "dictionary_control_file.csv";
 
-	public static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "stop_words.txt";
+	public static String STOP_WORDS_FILE = CONFIG_DIR + "stop_words.txt";
 	
 	// columnmeta data file.  required to generate any dictionaries
 	
