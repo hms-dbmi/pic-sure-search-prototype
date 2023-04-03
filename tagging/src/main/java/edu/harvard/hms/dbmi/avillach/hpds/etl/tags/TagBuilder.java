@@ -31,23 +31,16 @@ public class TagBuilder {
 
 	private static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "stop_words.txt";
 	
-	private static final Set<String> STOP_WORDS = populateStopWordListFromDataFile(STOP_WORDS_FILE);
+	private static final Set<String> STOP_WORDS = populateStopWordListFromDataFile();
 
 			
 	/**
 	 * Method to populate the stopwords set
 	 */
-	public static HashSet<String> populateStopWordListFromDataFile(String stopWordsFile) {
+	public static HashSet<String> populateStopWordListFromDataFile() {
 		try {
-			File swf = new File(stopWordsFile);
-			
-			if(swf.isFile()) {
 				
-				return Sets.newHashSet(Files.readLines(swf,StandardCharsets.UTF_8));
-				
-			} else {
-				throw new IOException("Stop word file is missing from: " + stopWordsFile);
-			}
+			return Sets.newHashSet(Files.readLines(new File(STOP_WORDS_FILE),StandardCharsets.UTF_8));
 			
 		} catch (Exception e) {			
 			e.printStackTrace();
