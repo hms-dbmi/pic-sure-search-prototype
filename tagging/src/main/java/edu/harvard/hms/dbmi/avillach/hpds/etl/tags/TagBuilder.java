@@ -3,6 +3,7 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.tags;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +38,7 @@ public class TagBuilder {
 	public static HashSet<String> populateStopWordListFromDataFile() {
 		try {
 				
-			return Sets.newHashSet(Files.readLines(new File(DictionaryFactory.STOP_WORDS_FILE),StandardCharsets.UTF_8));
+			return Sets.newHashSet(Files.readLines(Paths.get(DictionaryFactory.STOP_WORDS_FILE).toFile(),StandardCharsets.UTF_8));
 			
 		} catch (Exception e) {			
 			e.printStackTrace();
