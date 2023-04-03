@@ -3,7 +3,6 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.tags;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,20 +29,23 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory.DictionaryFactory;
  */
 public class TagBuilder {
 
-	private static Set<String> STOP_WORDS;
-
+	private static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "stop_words.txt";
+	
+	private static final Set<String> STOP_WORDS = populateStopWordListFromDataFile();
+	
 	/**
 	 * Method to populate the stopwords set
 	 */
-	public static void populateStopWordListFromDataFile() {
+	public static HashSet<String> populateStopWordListFromDataFile() {
 		try {
 				
-			STOP_WORDS = Sets.newHashSet(Files.readLines(Paths.get(DictionaryFactory.STOP_WORDS_FILE).toFile(),StandardCharsets.UTF_8));
+			return Sets.newHashSet(Files.readLines(new File(STOP_WORDS_FILE),StandardCharsets.UTF_8));
 			
 		} catch (Exception e) {			
 			e.printStackTrace();
 			System.err.println(e);
 		}
+		return null;
 	
 	}
 	/**
@@ -58,9 +60,6 @@ public class TagBuilder {
 	 * 
 	 */
 	public void buildTags(TreeMap<String, TopmedDataTable> hpdsDictionary) {
-		
-		populateStopWordListFromDataFile();
-		
 		for(Entry<String, TopmedDataTable> hpdsDictEntry: hpdsDictionary.entrySet()) {
 			
 			hpdsDictEntry.getValue().variables.forEach((varid, var) -> {
