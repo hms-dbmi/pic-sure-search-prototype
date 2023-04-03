@@ -29,7 +29,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory.DictionaryFactory;
  */
 public class TagBuilder {
 
-	private static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "STOP_WORDS";
+	private static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "stop_words.txt";
 	
 	private static final Set<String> STOP_WORDS = populateStopWordListFromDataFile(STOP_WORDS_FILE);
 
