@@ -3,6 +3,7 @@ package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
 
 import com.google.common.hash.Hashing;
 
@@ -33,8 +34,14 @@ public class DictionaryFactory {
 	public static String CONFIG_DIR = "./configs/";
 	// Config file to control study and its dictionary builder to use
 	public static String DICTIONARY_CONTROL_FILE = CONFIG_DIR + "dictionary_control_file.csv";
+
+	public static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "stop_words.txt";
+	
 	// columnmeta data file.  required to generate any dictionaries
-	private static String DATA_INPUT_DIR = "/local/source/";
+	
+	
+	
+	private static String DATA_INPUT_DIR = "./local/source/";
 
 	public static String COLUMN_META_FILE = DATA_INPUT_DIR + "columnMeta.csv";
 

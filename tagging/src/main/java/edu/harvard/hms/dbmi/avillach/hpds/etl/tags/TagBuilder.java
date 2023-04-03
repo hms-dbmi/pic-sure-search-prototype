@@ -29,18 +29,15 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory.DictionaryFactory;
  */
 public class TagBuilder {
 
-	private static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "stop_words.txt";
-	
-	private static final Set<String> STOP_WORDS = populateStopWordListFromDataFile();
+	private static Set<String> STOP_WORDS = populateStopWordListFromDataFile();
 
-			
 	/**
 	 * Method to populate the stopwords set
 	 */
 	public static HashSet<String> populateStopWordListFromDataFile() {
 		try {
 				
-			return Sets.newHashSet(Files.readLines(new File(STOP_WORDS_FILE),StandardCharsets.UTF_8));
+			return Sets.newHashSet(Files.readLines(new File(DictionaryFactory.STOP_WORDS_FILE),StandardCharsets.UTF_8));
 			
 		} catch (Exception e) {			
 			e.printStackTrace();
