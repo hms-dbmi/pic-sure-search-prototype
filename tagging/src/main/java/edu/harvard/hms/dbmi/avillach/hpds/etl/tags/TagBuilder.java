@@ -1,6 +1,8 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl.tags;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,10 +12,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedDataTable;
 import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.factory.DictionaryFactory;
 
 /**
  * 
@@ -25,203 +29,33 @@ import edu.harvard.hms.dbmi.avillach.hpds.TopmedVariable;
  */
 public class TagBuilder {
 
-	private static final List<String> EXCLUDED_WORDS_LIST = ImmutableList.of(
-			"a",
-			"about",
-			"again",
-			"AH",
-			"all",
-			"almost",
-			"also",
-			"although",
-			"always",
-			"among",
-			"an",
-			"and",
-			"another",
-			"any",
-			"are",
-			"as",
-			"associated",
-			"associated",
-			"at",
-			"be",
-			"because",
-			"been",
-			"before",
-			"being",
-			"between",
-			"both",
-			"broad",
-			"but",
-			"by",
-			"calculated",
-			"can",
-			"could",
-			"data",
-			"decimal",
-			"derived",
-			"desaturation",
-			"descriptions",
-			"dictionaries",
-			"did",
-			"do",
-			"documentation",
-			"documents",
-			"does",
-			"done",
-			"dopm",
-			"due",
-			"during",
-			"each ",
-			"ehough",
-			"either",
-			"encoded",
-			"end",
-			"enum",
-			"especially",
-			"etc",
-			"extracted",
-			"find",
-			"format",
-			"format",
-			"found",
-			"framingham",
-			"from",
-			"further",
-			"getting",
-			"had",
-			"happen",
-			"has",
-			"have",
-			"having ",
-			"here",
-			"how",
-			"however",
-			"i",
-			"if",
-			"in",
-			"inserted",
-			"institute",
-			"integer",
-			"into",
-			"is",
-			"it",
-			"its",
-			"itself",
-			"just",
-			"kg",
-			"km",
-			"left",
-			"made",
-			"main",
-			"mainly",
-			"make",
-			"may",
-			"me",
-			"mg",
-			"might",
-			"might",
-			"ml",
-			"mm",
-			"most",
-			"mostly",
-			"must",
-			"nearly",
-			"neither",
-			"nhlbi",
-			"no",
-			"nor",
-			"not",
-			"now",
-			"numeric",
-			"NWD100097",
-			"obtained",
-			"of",
-			"often",
-			"often",
-			"often",
-			"on",
-			"one",
-			"or",
-			"our",
-			"overall",
-			"participant",
-			"people",
-			"perhaps",
-			"please",
-			"pmid",
-			"position",
-			"possible",
-			"probably",
-			"quite",
-			"rather",
-			"really",
-			"reason",
-			"regarding",
-			"repository",
-			"right",
-			"sas",
-			"sb",
-			"seem",
-			"seen",
-			"several",
-			"should",
-			"show",
-			"showed",
-			"shown",
-			"shows",
-			"significantly",
-			"since",
-			"slice",
-			"so",
-			"some",
-			"study",
-			"submitted",
-			"such",
-			"sure",
-			"system",
-			"than",
-			"that",
-			"the",
-			"their",
-			"them",
-			"then",
-			"there",
-			"therefore",
-			"these",
-			"they",
-			"this",
-			"those",
-			"through",
-			"thus",
-			"time",
-			"to",
-			"too",
-			"uab",
-			"up",
-			"upon",
-			"values",
-			"various",
-			"very",
-			"was",
-			"we",
-			"were",
-			"what",
-			"when",
-			"whi",
-			"which",
-			"while",
-			"with",
-			"within",
-			"without",
-			"would",
-			"XX",
-			"XXXXX",
-			"XXXXXXXXXXXXXXXXXXXX",
-			"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-			"yes"
-			);
+	private static final String STOP_WORDS_FILE = DictionaryFactory.CONFIG_DIR + "STOP_WORDS";
+	
+	private static final Set<String> STOP_WORDS = populateStopWordListFromDataFile(STOP_WORDS_FILE);
+
+			
+	/**
+	 * Method to populate the stopwords set
+	 */
+	public static HashSet<String> populateStopWordListFromDataFile(String stopWordsFile) {
+		try {
+			File swf = new File(stopWordsFile);
+			
+			if(swf.isFile()) {
+				
+				return Sets.newHashSet(Files.readLines(swf,StandardCharsets.UTF_8));
+				
+			} else {
+				throw new IOException("Stop word file is missing from: " + stopWordsFile);
+			}
+			
+		} catch (Exception e) {			
+			e.printStackTrace();
+			System.err.println(e);
+		}
+		return null;
+	
+	}
 	/**
 	 * List of element keys to ignore
 	 */
@@ -315,14 +149,13 @@ public class TagBuilder {
 					return val2.length() > 1 
 							&& !val2.isBlank()
 							&& !val2.matches("^\\d+$")
-							&& !EXCLUDED_WORDS_LIST.stream().anyMatch(val2::equalsIgnoreCase)
-							//&& !EXCLUDED_WORDS_LIST.contains(val2.toUpperCase()) 
+							&& !STOP_WORDS.stream().anyMatch(val2::equalsIgnoreCase)
 							&& !val2.toUpperCase().matches("^V\\d+$");}).map((String var)->{
 								return var.toUpperCase();}).collect(Collectors.toList());
 	}
 	
 	/**
-	 * Generates the tagMap Hash Map which is basically the index used by search
+	 * Generates the tagMap
 	 * 
 	 * @param dt
 	 */
@@ -344,23 +177,6 @@ public class TagBuilder {
 				dt.tagMap.get(tag).add(variable);
 			}
 		}
-	}
-	/**
-	 * This method can be called to load the Excluded word list from 
-	 * a separate data file.
-	 * 
-	 * Not yet implemented see comments below
-	 */
-	public void populateExcludedWordListFromDataFile(File excludedWordListFile) {
-		try {
-			// Excluded word list cannot be final and probably should be a Set instead of a list
-			// line below can be uncommented to populate the list from a file with those changes
-			//EXCLUDED_WORDS_LIST = new HashSet<String>(FileUtils.readLines(excludedWordListFile));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 	
 }

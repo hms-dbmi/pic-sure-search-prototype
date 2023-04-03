@@ -70,7 +70,7 @@ public class HPDSDictionarySerializer {
 	/**
 	 * This will build the dictionary data table and it's associated variables.
 	 * 
-	 * The code block for backward compatibility can be deprecated as the data model 
+	 * The code block is for backward compatibility 
 	 * matures.
 	 * 
 	 * @param entry
