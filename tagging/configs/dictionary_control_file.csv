@@ -34,7 +34,7 @@ GENSALT,phs001217,/local/source/phs001217/rawData/,DBGAPDictionaryModel
 GOLDN,phs001359,/local/source/phs001359/rawData/,DBGAPDictionaryModel
 HCHSSOL,phs000810,/local/source/phs000810/rawData/,DBGAPDictionaryModel
 HCT_for_SCD,phs002385,/local/source/phs002385/rawData/,DefaultJsonDictionaryModel
-HRMN,DCC Harmonized data set,/local/source/hrmn/rawData/,DCCHarmonizedDictionaryModel2
+HRMN,DCC Harmonized data set,/local/source/hrmn/rawData/,DCCHarmonizedDictionaryModel
 HVH,phs000993,/local/source/phs000993/rawData/,DBGAPDictionaryModel
 HVH,phs001013,/local/source/phs001013/rawData/,DBGAPDictionaryModel
 HYPERGEN,phs001293,/local/source/phs001293/rawData/,DBGAPDictionaryModel

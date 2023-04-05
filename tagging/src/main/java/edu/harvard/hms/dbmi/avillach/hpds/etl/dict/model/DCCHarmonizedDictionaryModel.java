@@ -17,15 +17,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * New model used to ingest the internal DCC Harmonized Dictionaries.
  *
  */
-public class DCCHarmonizedDictionaryModel2 extends DictionaryModel {
+public class DCCHarmonizedDictionaryModel extends DictionaryModel {
 
-	public static List<DCCHarmonizedDictionaryModel2> allModels = new ArrayList<>();
+	public static List<DCCHarmonizedDictionaryModel> allModels = new ArrayList<>();
 	
-	public DCCHarmonizedDictionaryModel2(String fileName) {
+	public DCCHarmonizedDictionaryModel(String fileName) {
 
 	}
 
-	public DCCHarmonizedDictionaryModel2() {
+	public DCCHarmonizedDictionaryModel() {
 		// TODO Auto-generated constructor stub
 	}
 
