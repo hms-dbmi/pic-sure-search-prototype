@@ -144,7 +144,7 @@ public class DefaultJsonDictionaryModel_NewFormat extends DictionaryModel {
 			// and variable name is the decoded variable_id stored in variable_name
 			
 			this.variableName = variableNode.has("variable_name") ? variableNode.get("variable_name").asText() : "";
-			defaultJsonDictionaryModel.derived_var_description = this.variableName;
+			defaultJsonDictionaryModel.derived_var_description = variableNode.has("variable_description")? variableNode.get("variable_description").asText() : "";
 			
 			// var type is derived from columnmeta data		
 			this.variableType = variableNode.has("variable_type") ? variableNode.get("variable_type").asText() : "";

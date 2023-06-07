@@ -33,7 +33,7 @@ public abstract class DictionaryModel {
 	public String columnmeta_patient_count = "";
 	public String columnmeta_hpds_path = "";
 	public String hashed_var_id = "";
-	
+	public String data_hierarchy = "";
 	//public Map<String, String> valuesMap;
 	public List<String> values;
 	// removing this for now as dynamic metadata will be built out after release
@@ -107,7 +107,8 @@ public abstract class DictionaryModel {
 		this.columnmeta_max = defaultJsonDictionaryModel.columnmeta_max;
 		this.columnmeta_observation_count = defaultJsonDictionaryModel.columnmeta_observation_count;
 		this.columnmeta_patient_count = defaultJsonDictionaryModel.columnmeta_patient_count;
-		this.columnmeta_hpds_path = defaultJsonDictionaryModel.columnmeta_hpds_path;	
+		this.columnmeta_hpds_path = defaultJsonDictionaryModel.columnmeta_hpds_path;
+		this.data_hierarchy = defaultJsonDictionaryModel.data_hierarchy;
 	}
 
 	/**
