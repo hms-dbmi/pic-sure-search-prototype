@@ -1,5 +1,6 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public abstract class DictionaryModel {
 	//public Map<String, String> valuesMap;
 	public List<String> values;
 	// removing this for now as dynamic metadata will be built out after release
-	//public Map<String,String> metadata = new HashMap<String,String>();
+	public Map<String,String> derived_variable_level_data = new HashMap<String,String>();
 	
 	public DictionaryModel() {
 		super();
@@ -88,7 +89,26 @@ public abstract class DictionaryModel {
 		this.columnmeta_max = defaultJsonDictionaryModel.columnmeta_max;
 		this.columnmeta_observation_count = defaultJsonDictionaryModel.columnmeta_observation_count;
 		this.columnmeta_patient_count = defaultJsonDictionaryModel.columnmeta_patient_count;
-		this.columnmeta_hpds_path = defaultJsonDictionaryModel.columnmeta_hpds_path;	}
+		this.columnmeta_hpds_path = defaultJsonDictionaryModel.columnmeta_hpds_path;	
+	}
+	
+	public DictionaryModel(DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
+		this.derived_var_id = defaultJsonDictionaryModel.derived_var_id;
+		this.derived_var_name = defaultJsonDictionaryModel.derived_var_name;
+		this.derived_var_description = defaultJsonDictionaryModel.derived_var_description;
+		this.derived_group_id = defaultJsonDictionaryModel.derived_group_id;
+		this.derived_group_name = defaultJsonDictionaryModel.derived_group_name;
+		this.derived_group_description = defaultJsonDictionaryModel.derived_group_description;
+		this.derived_study_id = defaultJsonDictionaryModel.derived_study_id;
+		this.derived_study_description = defaultJsonDictionaryModel.derived_study_description;
+		this.columnmeta_data_type = defaultJsonDictionaryModel.columnmeta_data_type;
+		this.columnmeta_is_stigmatized = defaultJsonDictionaryModel.columnmeta_is_stigmatized;
+		this.columnmeta_min = defaultJsonDictionaryModel.columnmeta_min;
+		this.columnmeta_max = defaultJsonDictionaryModel.columnmeta_max;
+		this.columnmeta_observation_count = defaultJsonDictionaryModel.columnmeta_observation_count;
+		this.columnmeta_patient_count = defaultJsonDictionaryModel.columnmeta_patient_count;
+		this.columnmeta_hpds_path = defaultJsonDictionaryModel.columnmeta_hpds_path;	
+	}
 
 	/**
 	 * base method to build dictionary models not used 

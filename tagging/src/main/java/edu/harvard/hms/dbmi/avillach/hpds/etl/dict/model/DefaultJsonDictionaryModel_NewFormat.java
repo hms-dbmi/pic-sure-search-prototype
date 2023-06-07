@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,11 +25,12 @@ import com.opencsv.CSVWriter;
  * This model is used for the internal dictionaries for non-compliant studies
  * 
  * It is presumed that any studies processing internal json will use this model.
+ * 
+ * This class should replace the DefaultDictionaryModel once test case and other studies are migrated to new json format.
  */
-@Deprecated
-public class DefaultJsonDictionaryModel extends DictionaryModel {
+public class DefaultJsonDictionaryModel_NewFormat extends DictionaryModel {
 
-	public static List<DefaultJsonDictionaryModel> allModels = new ArrayList<>();
+	public static List<DefaultJsonDictionaryModel_NewFormat> allModels = new ArrayList<>();
 	private String studyAccession;
 	private String studyFullName;
 	private String studyUrl;
@@ -45,12 +47,19 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public String formName;
 		public Set<Form> form = new HashSet<Form>();
 		
-		public FormGroup(JsonNode formGroupNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
-			this.formGroupName = formGroupNode.has("form_group_name") ? formGroupNode.get("form_group_name").asText(): "";
+		/**
+		 * empty form group to handle if json does not contain a form group.
+		 */
+		public FormGroup() {
+			
+		};
+		
+		public FormGroup(JsonNode formGroupNode, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
+			//this.formGroupName = formGroupNode.has("form_group_name") ? formGroupNode.get("form_group_name").asText(): "";
 			defaultJsonDictionaryModel.derived_group_name = this.formGroupName;
 			defaultJsonDictionaryModel.derived_group_id = this.formGroupName;
 
-			this.formGroupDesc = formGroupNode.has("form_group_description") ? formGroupNode.get("form_group_description").asText():"";
+			//this.formGroupDesc = formGroupNode.has("form_group_description") ? formGroupNode.get("form_group_description").asText():"";
 			defaultJsonDictionaryModel.derived_group_description = this.formGroupDesc;
 			
 			if(formGroupNode.has("form") ) {
@@ -60,10 +69,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 				}
 			}		
 		}
-
-		public FormGroup() {
-			// TODO Auto-generated constructor stub
-		}
+		
 		
 	}
 	public class Form {
@@ -72,9 +78,9 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public String formName;
 		public VariableGroup variableGroup;
 		
-		public Form(JsonNode formNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+		public Form(JsonNode formNode, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 
-			this.dataFileName = formNode.has("data_file_name") ? formNode.get("data_file_name").asText() : "";
+			//this.dataFileName = formNode.has("data_file_name") ? formNode.get("data_file_name").asText() : "";
 			
 			this.formDescription = formNode.has("form_description") ? formNode.get("form_description").asText() : "";
 			this.formName = formNode.has("form_name") ? formNode.get("form_name").asText() : "";
@@ -97,7 +103,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public String variableGroupName;
 		public String variableGroupId;
 		
-		public VariableGroup(JsonNode variableGroupNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+		public VariableGroup(JsonNode variableGroupNode, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 			this.variableGroupName = variableGroupNode.has("variable_group_name") ? variableGroupNode.get("variable_group_name").asText() : "";
 			this.variableGroupDesc = variableGroupNode.has("variable_group_description") ? variableGroupNode.get("variable_group_description").asText() : "";
 			if(variableGroupNode.has("variable")) {
@@ -110,7 +116,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		}
 
 
-		public VariableGroup(String varGroupName, JsonNode node, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+		public VariableGroup(String varGroupName, JsonNode node, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 			this.variableGroupName = varGroupName;
 			if(node.has("variable")) {
 				
@@ -126,9 +132,9 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		public String variableName;
 		public String variableType;
 
-		public Set<VariableMetadata> variableMetadata = new HashSet<>();
+		//public Set<VariableMetadata> variableMetadata = new HashSet<>();
 		
-		public Variable(JsonNode variableNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+		public Variable(JsonNode variableNode, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 			
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
 			defaultJsonDictionaryModel.derived_var_id = this.variableId;
@@ -143,32 +149,50 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			// var type is derived from columnmeta data		
 			this.variableType = variableNode.has("variable_type") ? variableNode.get("variable_type").asText() : "";
 			
-			if(variableNode.has("variable_metadata")) {
+			if(variableNode.has("derived_variable_level_data")) {
+				
+				for(JsonNode derivedVariableLevelData: variableNode.get("derived_variable_level_data")) {
+					//this.variableMetadata.add(new VariableMetadata(variableMetadataNode, defaultJsonDictionaryModel));
+					//break;
+					Iterator<String> fieldNames = derivedVariableLevelData.fieldNames();
+					
+					String fieldName;
+					
+					while((fieldName = fieldNames.next()) != null) {
+						
+						defaultJsonDictionaryModel.derived_variable_level_data.put(fieldName,derivedVariableLevelData.get(fieldName).asText());
+					
+					}
+					
+					
+				}
+				/*
 				for(JsonNode variableMetadataNode: variableNode.get("variable_metadata")) {
 					this.variableMetadata.add(new VariableMetadata(variableMetadataNode, defaultJsonDictionaryModel));
 					break;
 				}
+				*/
 			} else {
-				allModels.add(new DefaultJsonDictionaryModel(defaultJsonDictionaryModel));
+				allModels.add(new DefaultJsonDictionaryModel_NewFormat(defaultJsonDictionaryModel));
 
 			}
 		}
 	}
-	
+	/*
 	public class VariableMetadata {
 		
 		public String variableDescription;
 		public String variableLabelFromDataDictionary;
 		
-		public VariableMetadata(JsonNode variableMetadataNode, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+		public VariableMetadata(JsonNode variableMetadataNode, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 			this.variableDescription = variableMetadataNode.has("variable_description") ? variableMetadataNode.get("variable_description").asText(): "";
-			this.variableLabelFromDataDictionary =  variableMetadataNode.has("variable_label_from_data_dictionary") ? variableMetadataNode.get("variable_label_from_data_dictionary").asText() : "";
+			//this.variableLabelFromDataDictionary =  variableMetadataNode.has("variable_label_from_data_dictionary") ? variableMetadataNode.get("variable_label_from_data_dictionary").asText() : "";
 		    //defaultJsonDictionaryModel.derived_var_description = this.variableDescription;
-			allModels.add(new DefaultJsonDictionaryModel(defaultJsonDictionaryModel));
+			allModels.add(new DefaultJsonDictionaryModel_NewFormat(defaultJsonDictionaryModel));
 
 		}
 	}
-	
+	*/
 	public String getStudyAccession() {
 		return studyAccession;
 	}
@@ -209,13 +233,13 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		this.formGroups = formGroups;
 	}
 
-	public void setFormGroups(JsonNode node, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+	public void setFormGroups(JsonNode node, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 		node.forEach(formGroupNode -> {
 			this.formGroups.add(new FormGroup(formGroupNode,defaultJsonDictionaryModel));
 		});
 	}
 	
-	public void setFormGroupsWOaGroup(JsonNode node, DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+	public void setFormGroupsWOaGroup(JsonNode node, DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 		
 		FormGroup fg = new FormGroup();
 		fg.formGroupDesc = "unknown";
@@ -245,7 +269,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 			for(File study : new File(inputDirectory).listFiles()) {
 	        	if(studyFolder.getName().contains("hrmn")) continue;
 	        	if(!study.getName().endsWith("metadata.json")) continue;
-	        	DefaultJsonDictionaryModel dict = new DefaultJsonDictionaryModel(study.getAbsolutePath());
+	        	DefaultJsonDictionaryModel_NewFormat dict = new DefaultJsonDictionaryModel_NewFormat(study.getAbsolutePath());
 			}	
 		}
 		System.out.println("Looking for missing dictionaries");
@@ -254,7 +278,7 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 
 		System.out.println("Updating base dictionary.");
 		
-		for(DefaultJsonDictionaryModel model: allModels) {
+		for(DefaultJsonDictionaryModel_NewFormat model: allModels) {
 			updateBaseDictionary(baseDictionary, model);
 		}
 		
@@ -322,14 +346,14 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 	private Set<String> collectVariableNames() {
 		Set<String> set = new HashSet<String>();
 		
-		for(DefaultJsonDictionaryModel model: allModels) {
+		for(DefaultJsonDictionaryModel_NewFormat model: allModels) {
 			set.add(model.derived_var_name);
 		}
 		
 		return set;
 	}
 
-	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DefaultJsonDictionaryModel dict) {
+	private void updateBaseDictionary(Map<String, DictionaryModel> baseDictionary, DefaultJsonDictionaryModel_NewFormat dict) {
 
 		//baseDictionary.entrySet().forEach(entry -> {
 			
@@ -389,18 +413,15 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		baseDictionary.get(key).derived_study_description = dict.derived_study_description.isBlank() ? baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_study_description: dict.derived_study_description;
 		baseDictionary.get(key).derived_group_id = dict.studyFullName;
 		
-		//for(FormGroup fg: dict.formGroups) {
-			//for()
-		//}
+		
 		}
-		//}
-		//}); 
+	
 	}
 
 	/**
 	 * Builds data from the json data. 
 	 */
-	public DefaultJsonDictionaryModel(String filename) {
+	public DefaultJsonDictionaryModel_NewFormat(String filename) {
 		
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -437,11 +458,11 @@ public class DefaultJsonDictionaryModel extends DictionaryModel {
 		
 	}
 
-	public DefaultJsonDictionaryModel() {
+	public DefaultJsonDictionaryModel_NewFormat() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public DefaultJsonDictionaryModel(DefaultJsonDictionaryModel defaultJsonDictionaryModel) {
+	public DefaultJsonDictionaryModel_NewFormat(DefaultJsonDictionaryModel_NewFormat defaultJsonDictionaryModel) {
 		super(defaultJsonDictionaryModel);
 	}
 
