@@ -139,7 +139,7 @@ public class DefaultJsonDictionaryModel_NewFormat extends DictionaryModel {
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
 			defaultJsonDictionaryModel.derived_var_id = this.variableId;
 			defaultJsonDictionaryModel.derived_var_name = this.variableId;
-
+			defaultJsonDictionaryModel.data_hierarchy = variableNode.has("data_hierarchy") ? variableNode.get("data_hierarchy").asText() : "";
 			// currently variable_name is the encoded variable_id
 			// and variable name is the decoded variable_id stored in variable_name
 			
@@ -165,7 +165,7 @@ public class DefaultJsonDictionaryModel_NewFormat extends DictionaryModel {
 					
 					}
 					
-					
+					allModels.add(new DefaultJsonDictionaryModel_NewFormat(defaultJsonDictionaryModel));
 				}
 				/*
 				for(JsonNode variableMetadataNode: variableNode.get("variable_metadata")) {

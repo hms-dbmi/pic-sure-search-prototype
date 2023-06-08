@@ -109,6 +109,7 @@ public abstract class DictionaryModel {
 		this.columnmeta_patient_count = defaultJsonDictionaryModel.columnmeta_patient_count;
 		this.columnmeta_hpds_path = defaultJsonDictionaryModel.columnmeta_hpds_path;
 		this.data_hierarchy = defaultJsonDictionaryModel.data_hierarchy;
+		this.derived_variable_level_data = defaultJsonDictionaryModel.derived_variable_level_data;
 	}
 
 	/**
