@@ -10,6 +10,7 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.ColumnMetaDictionaryMod
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DBGAPDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DCCHarmonizedDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryModel;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryModel_NewFormat;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
 
 /**
@@ -53,6 +54,9 @@ public class DictionaryFactory {
 		} 
 		if(dictionaryModel.equalsIgnoreCase("DefaultJsonDictionaryModel")) {
 			return new DefaultJsonDictionaryModel();
+		}
+		if(dictionaryModel.equalsIgnoreCase("DefaultJsonDictionaryModel_NewFormat")) {
+			return new DefaultJsonDictionaryModel_NewFormat();
 		}
 		if(dictionaryModel.equalsIgnoreCase("DBGAPDictionaryModel")) {
 			return new DBGAPDictionaryModel();

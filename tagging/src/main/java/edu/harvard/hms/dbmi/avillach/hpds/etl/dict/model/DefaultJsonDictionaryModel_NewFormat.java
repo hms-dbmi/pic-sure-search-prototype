@@ -154,13 +154,14 @@ public class DefaultJsonDictionaryModel_NewFormat extends DictionaryModel {
 				for(JsonNode derivedVariableLevelData: variableNode.get("derived_variable_level_data")) {
 					//this.variableMetadata.add(new VariableMetadata(variableMetadataNode, defaultJsonDictionaryModel));
 					//break;
-					Iterator<String> fieldNames = derivedVariableLevelData.fieldNames();
+					Iterator<Entry<String, JsonNode>> derivedVariableLevelDataElements = derivedVariableLevelData.fields();
 					
-					String fieldName;
+					Entry derivedVariableLevelDataElement;
 					
-					while((fieldName = fieldNames.next()) != null) {
+					while(derivedVariableLevelDataElements.hasNext()) {
 						
-						defaultJsonDictionaryModel.derived_variable_level_data.put(fieldName,derivedVariableLevelData.get(fieldName).asText());
+						derivedVariableLevelDataElement = derivedVariableLevelDataElements.next();
+						defaultJsonDictionaryModel.derived_variable_level_data.put(derivedVariableLevelDataElement.getKey().toString(),derivedVariableLevelDataElement.getValue().toString());
 					
 					}
 					
