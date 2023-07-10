@@ -19,6 +19,7 @@ COPDGENE,phs000951,/local/source/phs000951/rawData/,DBGAPDictionaryModel
 CRA,phs000988,/local/source/phs000988/rawData/,DBGAPDictionaryModel
 CSSCD,phs002362,/local/source/phs002362/rawData/,DefaultJsonDictionaryModel
 DHS,phs001412,/local/source/phs001412/rawData/,DBGAPDictionaryModel
+DIR,phs003212,/local/source/phs003212/rawData/,DefaultJsonDictionaryModel_NewFormat
 ECLIPSE,phs001252,/local/source/phs001252/rawData/,DBGAPDictionaryModel
 EOCOPD,phs000946,/local/source/phs000946/rawData/,DBGAPDictionaryModel
 FHS,phs000007,/local/source/phs000007/rawData/,DBGAPDictionaryModel
