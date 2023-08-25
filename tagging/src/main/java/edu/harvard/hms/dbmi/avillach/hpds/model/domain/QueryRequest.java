@@ -1,10 +1,12 @@
 package edu.harvard.hms.dbmi.avillach.hpds.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class QueryRequest {
 
 	private Map<String, String> resourceCredentials = new HashMap<>();
