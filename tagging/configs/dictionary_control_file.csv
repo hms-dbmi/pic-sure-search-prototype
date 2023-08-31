@@ -5,8 +5,8 @@ AMISH,phs000956,/local/source/phs000956/rawData/,DBGAPDictionaryModel
 ARIC,phs001211,/local/source/phs001211/rawData/,DBGAPDictionaryModel
 BABYHUG,phs002415,/local/source/phs002415/rawData/,DefaultJsonDictionaryModel
 BAGS,phs001143,/local/source/phs001143/rawData/,DBGAPDictionaryModel
-biolincc_camp,tutorial-biolincc_camp,/local/source/tutorial-biolincc_camp/,DefaultJsonDictionaryModel
-biolincc_digitalis,tutorial-biolincc_digitalis,/local/source/tutorial-biolincc_digitalis/,DefaultJsonDictionaryModel_NewFormat
+biolincc_camp,tutorial-biolincc_camp,/local/source/tutorial-biolincc_camp/rawData/,DefaultJsonDictionaryModel
+biolincc_digitalis,tutorial-biolincc_digitalis,/local/source/tutorial-biolincc_digitalis/rawData/,DefaultJsonDictionaryModel_NewFormat
 C3PO,phs002415,/local/source/phs002752/rawData/,DefaultJsonDictionaryModel
 CARDIA,phs000285,/local/source/phs000285/rawData/,DBGAPDictionaryModel
 CATHGEN,phs000703,/local/source/phs000703/rawData/,DBGAPDictionaryModel
