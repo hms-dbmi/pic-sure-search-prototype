@@ -5,5 +5,6 @@ ADD  ./target/DictionaryImporterUtil-jar-with-dependencies.jar .
 #ADD  ./configs/stop_words.txt ./configs/
 # Just add all of the config files
 ADD ./configs/ ./configs/
+ADD ./local/source/ /local/source/
 
 ENTRYPOINT ["java", "-Xmx64g", "-jar", "DictionaryImporterUtil-jar-with-dependencies.jar"]
