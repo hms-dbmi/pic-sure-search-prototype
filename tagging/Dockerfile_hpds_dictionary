@@ -1,8 +1,9 @@
 FROM openjdk:11-jre-slim as loader
 #ADD  ./target/RawDataImporter-jar-with-dependencies.jar .
 ADD  ./target/DictionaryImporterUtil-jar-with-dependencies.jar .
-ADD  ./configs/dictionary_control_file.csv ./configs/
-ADD  ./configs/stop_words.txt ./configs/
-
+#ADD  ./configs/dictionary_control_file.csv ./configs/
+#ADD  ./configs/stop_words.txt ./configs/
+# Just add all of the config files
+ADD ./configs/ ./configs/
 
 ENTRYPOINT ["java", "-Xmx64g", "-jar", "DictionaryImporterUtil-jar-with-dependencies.jar"]

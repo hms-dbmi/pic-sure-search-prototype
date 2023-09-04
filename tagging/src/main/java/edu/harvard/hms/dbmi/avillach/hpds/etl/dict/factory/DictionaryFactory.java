@@ -32,8 +32,11 @@ public class DictionaryFactory {
 	 *  External Config / Required files
 	 */
 	public static String CONFIG_DIR = "./configs/";
+	
+	public static String CONTROL_FILE_NAME = "dictionary_control_file.csv";
+	
 	// Config file to control study and its dictionary builder to use
-	public static String DICTIONARY_CONTROL_FILE = CONFIG_DIR + "dictionary_control_file.csv";
+	public static String DICTIONARY_CONTROL_FILE = CONFIG_DIR + CONTROL_FILE_NAME;
 	
 	
 	// columnmeta data file.  required to generate any dictionaries

@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.zip.GZIPOutputStream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.RFC4180Parser;
@@ -38,15 +41,19 @@ import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.serializer.HPDSDictionarySeri
  */
 public class DictionaryImporterUtil {
 	// directory and file structure
-	private static String DATA_INPUT_DIR = "/local/source/";
-	private static String OUTPUT_DIR = "/usr/local/docker-config/search/";
+	private static String DATA_INPUT_DIR = "./local/source/";
+	private static String OUTPUT_DIR = "./output/";
     private static final String JAVABIN = OUTPUT_DIR + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
 
 	private Map<String,DictionaryModel> dictionaries = new TreeMap<>();
 	private TreeMap<String, TopmedDataTable> hpdsDictionaries = new TreeMap<String, TopmedDataTable>();
 	
 	private Set<String> stigmatizedPaths = new HashSet<>();
-    
+	
+	private List<String[]> controlFile = new ArrayList<>();
+	// Index for the model schema column in the control file.
+	private Integer controlFileModelTypeIndex = 3; 
+
 	public static void main(String[] args) {
 		parameterOverrides(args);
 		
@@ -76,13 +83,34 @@ public class DictionaryImporterUtil {
 		// initialize base dictionaries from the columnMeta.csv and control file 
 		dictionaries = buildColumnMetaDictionaries();
 
-		buildDictionariesFromControlFile();		
+		buildControlFile();
+		
+		buildDictionaries();
+		
 		// Serialize dictionary models into the dictionary Data Table and Variable dictionary Objects.
 		hpdsDictionaries = HPDSDictionarySerializer.class.getDeclaredConstructor().newInstance().serialize(dictionaries);
+
 		// Stigmatizing variables			
 		doStigmatizeVariables();
 				
 		writeDictionary();
+		
+	}
+
+	private void buildControlFile() {
+		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.DICTIONARY_CONTROL_FILE))) {
+			CSVReader csvReader = new CSVReader(buffer);
+			
+			controlFile = csvReader.readAll();		
+				
+		} catch (IOException e) {
+		    System.err.println("Unable to read control file: " + DictionaryFactory.DICTIONARY_CONTROL_FILE);
+		    e.printStackTrace();
+		} catch (CsvException e) {
+			System.err.println("Dictionary Control File is not in csv format: " + DictionaryFactory.DICTIONARY_CONTROL_FILE);
+			e.printStackTrace();
+		};
+		
 		
 	}
 
@@ -91,77 +119,57 @@ public class DictionaryImporterUtil {
 	 * @return
 	 */
 	private Map<String, DictionaryModel> buildColumnMetaDictionaries() {
+		Map<String, DictionaryModel> columMetaDictionaries = new TreeMap<>();
 		try {
 			ColumnMetaDictionaryModel columnmetaModel = (ColumnMetaDictionaryModel) DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel("columnmetadata");
-			
-			BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.DICTIONARY_CONTROL_FILE));
-			
-			CSVReader csvReader = new CSVReader(buffer);
-			
-			List<String[]> controlFile = csvReader.readAll();
-			
-			csvReader.close();
-			
-			return columnmetaModel.build(controlFile, dictionaries);
+		
+			columMetaDictionaries = columnmetaModel.build(controlFile, dictionaries);
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			System.err.println("Error generating dictionary model.");
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CsvException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} 
+		if(columMetaDictionaries == null || columMetaDictionaries.isEmpty()) {
+			throw new RuntimeException("Error processing column meta data.");
 		}
-		return null;
+		return columMetaDictionaries;
 	}
 
 
 	/**
 	 * Build method for control file.
+	 * 
+	 * A Variable must exist in columnmeta in order for them to enrich their dictionaries.
+	 * If it does not exist in the columnmeta then it does not exist in the HPDS backend
 	 */
-	private void buildDictionariesFromControlFile() {
-		
-		try {
-			// iterate over dict control file
-			BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.DICTIONARY_CONTROL_FILE));
-			
-			CSVReader csvReader = new CSVReader(buffer);
-			
-			csvReader.readAll().forEach(controlFileRow -> {
-				// variables must exist in columnmeta.
-				// Build current studies dictionary models and update the base dictionary object.				
-				try {
-					System.out.println(Arrays.toString(controlFileRow));
-	
-					String dictionaryModel = controlFileRow[3];
-					
-					DictionaryModel controlFileModel = DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel(dictionaryModel);
-					
-					if(controlFileModel == null) {
-						System.err.println(dictionaryModel + " is an invalid model");
-					}
-					// columnmeta is the base dictionaries no need to build it again.
-					else if(!(controlFileModel instanceof ColumnMetaDictionaryModel)) {
-						controlFileModel.build(controlFileRow, dictionaries);
-					}
-					
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					System.err.println("Error generating dictionary model.");
-					e.printStackTrace();
+	private void buildDictionaries() {
+		// iterate over dict control file
+		controlFile.forEach(controlFileRow -> {
+			// 
+			// Build current studies dictionary models and update the base dictionary object.				
+			try {
+				System.out.println("Processing: " + Arrays.toString(controlFileRow));
+
+				String dictionaryModel = controlFileRow[controlFileModelTypeIndex];
+				
+				// This will build the appropriate model for each study based on the model schema given in the control file
+				DictionaryModel controlFileModel = DictionaryFactory.class.getDeclaredConstructor().newInstance().getDictionaryModel(dictionaryModel);
+				
+				if(controlFileModel == null) {
+					System.err.println(dictionaryModel + " is an invalid model");
+				}
+				// columnmeta is the base dictionaries no need to build it again.
+				else if(!(controlFileModel instanceof ColumnMetaDictionaryModel)) {
+					controlFileModel.build(controlFileRow, dictionaries);
 				}
 				
-				
-			});
-		} catch (IOException | CsvException e) {
-			System.err.println("Error Reading Dictionary control file.");
-			e.printStackTrace();
-		}
-		
-		
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				System.err.println("Error generating dictionary model.");
+				e.printStackTrace();
+			}
+		});		
 	}
 	
 	/**
@@ -241,7 +249,7 @@ public class DictionaryImporterUtil {
 	    // code block to output dictionary in a json format
 	    // very useful for development. so leaving it in.  could add a arg flag to pass that will build the json if needed.
 	    // DO NOT TRY AND OUTPUT THE JSON FILE FOR THE ENTIRE DICTIONARY.  It will be a GIGANTIC file and not very useful.
-	    /*  
+	      
 	    ObjectMapper mapper = new ObjectMapper();
 	    
 	    try {
@@ -257,7 +265,7 @@ public class DictionaryImporterUtil {
 			e.printStackTrace();
 		}
 	    
-	    */
+	    
 	}
 
 
