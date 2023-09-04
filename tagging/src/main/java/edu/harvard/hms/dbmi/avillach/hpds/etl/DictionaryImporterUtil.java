@@ -44,6 +44,7 @@ public class DictionaryImporterUtil {
 	private static String DATA_INPUT_DIR = "./local/source/";
 	private static String OUTPUT_DIR = "./output/";
     private static final String JAVABIN = OUTPUT_DIR + "dictionary.javabin"; //"/usr/local/docker-config/search/dictionary.javabin";
+	private static final boolean SKIP_CONTROL_FILE_HEADER = true;
 
 	private Map<String,DictionaryModel> dictionaries = new TreeMap<>();
 	private TreeMap<String, TopmedDataTable> hpdsDictionaries = new TreeMap<String, TopmedDataTable>();
@@ -100,7 +101,9 @@ public class DictionaryImporterUtil {
 	private void buildControlFile() {
 		try(BufferedReader buffer = Files.newBufferedReader(Paths.get(DictionaryFactory.DICTIONARY_CONTROL_FILE))) {
 			CSVReader csvReader = new CSVReader(buffer);
-			
+			if(SKIP_CONTROL_FILE_HEADER) {
+				csvReader.skip(1);
+			}
 			controlFile = csvReader.readAll();		
 				
 		} catch (IOException e) {
