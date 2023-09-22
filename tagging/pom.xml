@@ -206,45 +206,6 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-				<version>1.8.2</version>
-				<configuration>
-					<container>
-						<systemProperties>
-						</systemProperties>
-						<containerId>tomcat9x</containerId>
-						<zipUrlInstaller>
-							<url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/9.0.41/tomcat-9.0.41.zip</url>
-						</zipUrlInstaller>
-					</container>
-					<configuration>
-						<properties>
-							<cargo.jvmargs>-Xmx2g -Xms1g</cargo.jvmargs>
-							<cargo.port.offset>1</cargo.port.offset>
-							<!-- cargo.start.jvmargs>-Xmx2g -Xms1g</cargo.start.jvmargs-->
-							<cargo.start.jvmargs> -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 
-								</cargo.start.jvmargs>
-						</properties>
-					</configuration>
-					<deployables>
-						<deployable>
-							<groupId>org.codehaus.cargo</groupId>
-							<artifactId>simple-war</artifactId>
-							<type>war</type>
-							<location>target/${project.artifactId}-${project.version}.war</location>
-							<properties>
-								<context>jaxrs-service</context>
-							</properties>
-						</deployable>
-					</deployables>
-				</configuration>
-				<!-- <executions> <execution> <id>start-server</id> <phase>pre-integration-test</phase> 
-					<goals> <goal>start</goal> </goals> </execution> <execution> <id>stop-server</id> 
-					<phase>post-integration-test</phase> <goals> <goal>stop</goal> </goals> </execution> 
-					</executions> -->
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.22.2</version>
