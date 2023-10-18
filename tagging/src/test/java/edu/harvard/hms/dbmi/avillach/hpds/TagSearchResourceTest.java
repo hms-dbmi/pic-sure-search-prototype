@@ -10,10 +10,17 @@ import edu.harvard.hms.dbmi.avillach.hpds.model.domain.SearchRequest;
 import edu.harvard.hms.dbmi.avillach.hpds.model.domain.SearchResults;
 import org.junit.Before;
 import org.junit.Test;
+import java.io.ByteArrayInputStream;
+import org.springframework.core.io.ByteArrayResource;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 import java.util.*;
 
 import static org.junit.Assert.*;
+
+import org.springframework.core.io.Resource;
 
 public class TagSearchResourceTest {
 
@@ -220,5 +227,59 @@ public class TagSearchResourceTest {
         tagSearchResponse.getSearchResults().forEach(searchResult -> {
             assertEquals(searchResult.getResult().getValues().size(), 4);
         });
+    }
+
+    @Test
+    public void testGetFENCEMappingWithValidJson() throws Exception {
+        // Define your JSON content
+        String json = "{\"bio_data_catalyst\":[{\"study_identifier\":\"Study1\",\"consent_group_code\":\"Consent1\"}]}";
+
+        // Create a ByteArrayResource with the JSON content (for testing purposes)
+        Resource resource = new ByteArrayResource(json.getBytes());
+
+        // Set the fenceMapping Resource directly (for testing purposes)
+        tagSearchResource.setFenceMapping(resource);
+
+        Map<String, Map> result = tagSearchResource.getFENCEMapping();
+
+        Map<String, Map> expected = new HashMap<>();
+        Map<String, Object> project = new HashMap<>();
+        project.put("study_identifier", "Study1");
+        project.put("consent_group_code", "Consent1");
+        expected.put("Study1.Consent1", project);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testGetFENCEMappingWithInvalidJson() throws Exception {
+        // Define invalid JSON content
+        String invalidJson = "Invalid JSON";
+
+        // Create a ByteArrayResource with the invalid JSON content (for testing purposes)
+        Resource resource = new ByteArrayResource(invalidJson.getBytes());
+
+        // Set the fenceMapping Resource directly (for testing purposes)
+        tagSearchResource.setFenceMapping(resource);
+
+        Map<String, Map> result = tagSearchResource.getFENCEMapping();
+
+        assertEquals(new HashMap<>(), result);
+    }
+
+    @Test
+    public void testGetFENCEMappingWithEmptyJson() throws Exception {
+        // Define an empty JSON content
+        String emptyJson = "{}";
+
+        // Create a ByteArrayResource with the empty JSON content (for testing purposes)
+        Resource resource = new ByteArrayResource(emptyJson.getBytes());
+
+        // Set the fenceMapping Resource directly (for testing purposes)
+        tagSearchResource.setFenceMapping(resource);
+
+        Map<String, Map> result = tagSearchResource.getFENCEMapping();
+
+        assertEquals(new HashMap<>(), result);
     }
 }
