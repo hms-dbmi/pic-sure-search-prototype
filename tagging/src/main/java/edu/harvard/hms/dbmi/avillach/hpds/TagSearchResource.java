@@ -3,6 +3,11 @@ package edu.harvard.hms.dbmi.avillach.hpds;
 import edu.harvard.hms.dbmi.avillach.hpds.model.*;
 import edu.harvard.hms.dbmi.avillach.hpds.model.domain.*;
 import lombok.SneakyThrows;
+import org.springframework.core.io.Resource;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -26,6 +31,10 @@ public class TagSearchResource implements IResourceRS {
     private SortedMap<String, TopmedDataTable> fhsDictionary;
     private static final String JAVABIN = "/usr/local/docker-config/search/dictionary.javabin";
     private static final int INITIAL_RESULTS_SIZE = 20;
+    private Map _projectMap;
+
+    @Value("file:/usr/local/docker-config/search/fence_mapping.json")
+    Resource fenceMapping;
 
     public TagSearchResource() {
         fhsDictionary = readDictionary();
@@ -106,7 +115,8 @@ public class TagSearchResource implements IResourceRS {
                 result.getScore() > 0 && (
                 result.getTag().toLowerCase().matches("dcc harmonized data set") ||
         		result.getTag().matches("PHS\\d{6}+.*") || 
-        		result.getTag().toUpperCase().matches("PHT\\d{6}+.*") || 
+        		result.getTag().toUpperCase().matches("PHT\\d{6}+.*") ||
+                getValueThatContainsKey(result.getTag().toUpperCase()) != null ||
                 	(result.getScore() > numVars * .05 && result.getScore() < numVars * .95)
                 ));
             }
@@ -191,5 +201,45 @@ public class TagSearchResource implements IResourceRS {
             e.printStackTrace();
         }
         return new TreeMap<>();
+    }
+
+    public Map<String, Map> getFENCEMapping(){
+        if(_projectMap == null || _projectMap.isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                // Use the fenceMapping Resource to read the JSON file and convert it to a Map
+                Map<String, Object> jsonMap = objectMapper.readValue(fenceMapping.getInputStream(), Map.class);
+                List<Map> projects = (List<Map>) jsonMap.get("bio_data_catalyst");
+                _projectMap = new HashMap<String, Map>(projects.size());
+                for(Map project : projects) {
+                    String consentVal = (project.get("consent_group_code") != null && project.get("consent_group_code") != "") ?
+                            "" + project.get("study_identifier") + "." + project.get("consent_group_code") :
+                            "" + project.get("study_identifier");
+                    _projectMap.put(consentVal, project);
+                }
+
+            } catch (Exception e) {
+                return new HashMap<String,Map>();
+            }
+        }
+
+        return _projectMap;
+    }
+
+    private Map getValueThatContainsKey(String tag) {
+        Map result = null;
+        if (getFENCEMapping() != null) {
+            for (String key : getFENCEMapping().keySet()) {
+                if (key.toUpperCase().contains(tag)) {
+                    result = getFENCEMapping().get(key);
+                    break; // Stop iterating after the first match is found
+                }
+            }
+        }
+        return result;
+    }
+
+    public void setFenceMapping(Resource fenceMapping) {
+        this.fenceMapping = fenceMapping;
     }
 }
