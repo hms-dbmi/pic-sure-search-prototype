@@ -33,7 +33,7 @@ public class TagSearchResource implements IResourceRS {
     private static final int INITIAL_RESULTS_SIZE = 20;
     private Map _projectMap;
 
-    @Value("classpath:fence_mapping.json")
+    @Value("file:/usr/local/docker-config/search/fence_mapping.json")
     Resource fenceMapping;
 
     public TagSearchResource() {
