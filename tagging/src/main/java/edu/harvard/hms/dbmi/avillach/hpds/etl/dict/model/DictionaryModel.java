@@ -111,6 +111,36 @@ public abstract class DictionaryModel {
 		this.data_hierarchy = defaultJsonDictionaryModel.data_hierarchy;
 		this.derived_variable_level_data = defaultJsonDictionaryModel.derived_variable_level_data;
 	}
+	
+	/**
+	 * Cloning method.
+	 * 
+	 * The Internal Json Dictionaries uses this to populate it's required fields.
+	 * This is a bit more straight forward
+	 * then other models. Could potentially switch other models to use the same
+	 * methodology.
+	 * 
+	 * @param datatableJsonDictionaryModel
+	 */
+	public DictionaryModel(DatatableJsonDictionaryModel datatableJsonDictionaryModel) {
+		this.derived_var_id = datatableJsonDictionaryModel.derived_var_id;
+		this.derived_var_name = datatableJsonDictionaryModel.derived_var_name;
+		this.derived_var_description = datatableJsonDictionaryModel.derived_var_description;
+		this.derived_group_id = datatableJsonDictionaryModel.derived_group_id;
+		this.derived_group_name = datatableJsonDictionaryModel.derived_group_name;
+		this.derived_group_description = datatableJsonDictionaryModel.derived_group_description;
+		this.derived_study_id = datatableJsonDictionaryModel.derived_study_id;
+		this.derived_study_description = datatableJsonDictionaryModel.derived_study_description;
+		this.columnmeta_data_type = datatableJsonDictionaryModel.columnmeta_data_type;
+		this.columnmeta_is_stigmatized = datatableJsonDictionaryModel.columnmeta_is_stigmatized;
+		this.columnmeta_min = datatableJsonDictionaryModel.columnmeta_min;
+		this.columnmeta_max = datatableJsonDictionaryModel.columnmeta_max;
+		this.columnmeta_observation_count = datatableJsonDictionaryModel.columnmeta_observation_count;
+		this.columnmeta_patient_count = datatableJsonDictionaryModel.columnmeta_patient_count;
+		this.columnmeta_hpds_path = datatableJsonDictionaryModel.columnmeta_hpds_path;
+		this.data_hierarchy = datatableJsonDictionaryModel.data_hierarchy;
+		this.derived_variable_level_data = datatableJsonDictionaryModel.derived_variable_level_data;
+	}
 
 	/**
 	 * base method to build dictionary models not used 
