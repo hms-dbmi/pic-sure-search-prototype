@@ -9,6 +9,7 @@ import com.google.common.hash.Hashing;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.ColumnMetaDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DBGAPDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DCCHarmonizedDictionaryModel;
+import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DatatableJsonDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryModel;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DefaultJsonDictionaryModel_NewFormat;
 import edu.harvard.hms.dbmi.avillach.hpds.etl.dict.model.DictionaryModel;
@@ -66,6 +67,9 @@ public class DictionaryFactory {
 		}
 		if(dictionaryModel.equalsIgnoreCase("DCCHarmonizedDictionaryModel")) {
 			return new DCCHarmonizedDictionaryModel();
+		}
+		if (dictionaryModel.equalsIgnoreCase("DatatableJSONDictionaryModel")) {
+			return new DatatableJsonDictionaryModel();
 		}
 		return null;
 	}
