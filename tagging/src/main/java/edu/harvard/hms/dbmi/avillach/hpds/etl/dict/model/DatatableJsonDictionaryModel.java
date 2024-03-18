@@ -358,23 +358,23 @@ public class DatatableJsonDictionaryModel extends DictionaryModel{
 		//baseDictionary.entrySet().forEach(entry -> {
 			
 		String dictphs = dict.derived_study_id;
-		
+		String dictTableId = dict.derived_group_id;
 		String dictVarId = dict.derived_var_id;
 		
 		//if(entry.getKey().equals("\\" + dictphs + "\\" + dictVarId + "\\")) {
-		String key = "\\" + dictphs + "\\" + dictVarId + "\\";
+		String key = "\\" + dictphs + "\\" + dictTableId + "\\" + dictVarId + "\\";
 		
 		DictionaryModel baseModel = null;
 		
 		if(baseDictionary.containsKey(key)) {
 			baseModel = baseDictionary.get(key);
 		} else {
-			key = "\\" + dictphs + "\\" + dictVarId.toUpperCase() + "\\";
+			key = "\\" + dictphs + "\\" + dictTableId + "\\" + dictVarId.toUpperCase() + "\\";
 			
 			if(baseDictionary.containsKey(key)) {
 				baseModel = baseDictionary.get(key);
 			} else {
-				key = "\\" + dictphs + "\\" + dictVarId.toLowerCase() + "\\";
+				key = "\\" + dictphs + "\\" + dictTableId + "\\" + dictVarId.toLowerCase() + "\\";
 				
 				if(baseDictionary.containsKey(key)) {
 					baseModel = baseDictionary.get(key);
@@ -410,8 +410,10 @@ public class DatatableJsonDictionaryModel extends DictionaryModel{
 			}
 		}
 		
-		baseDictionary.get(key).derived_study_description = dict.derived_study_description.isBlank() ? baseDictionary.get("\\" + dictphs + "\\" + dictVarId + "\\").derived_study_description: dict.derived_study_description;
-		baseDictionary.get(key).derived_group_id = dict.studyFullName;
+		baseDictionary.get(key).derived_study_description = dict.derived_study_description.isBlank() ? baseDictionary.get("\\" + dictphs + "\\" + dictTableId + "\\"
+                        + dictVarId + "\\").derived_study_description: dict.derived_study_description;
+		baseDictionary.get(key).derived_group_id = dict.derived_group_id.isBlank() ? baseDictionary.get("\\" + dictphs + "\\" + dictTableId + "\\"
+                        + dictVarId + "\\").derived_group_id: dict.derived_group_id;
 		
 		
 		}
