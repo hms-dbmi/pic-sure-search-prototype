@@ -149,8 +149,8 @@ public class DatatableJsonDictionaryModel extends DictionaryModel{
 		public Variable(JsonNode variableNode, DatatableJsonDictionaryModel datatableJsonDictionaryModel) {
 			//assumes RECOVER format of form name = dataset name/id
             
-			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
-			datatableJsonDictionaryModel.derived_var_id = this.variableId.toLowerCase();
+			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText().toLowerCase() : "";
+			datatableJsonDictionaryModel.derived_var_id = this.variableId;
 			datatableJsonDictionaryModel.derived_var_name = this.variableName;
 			datatableJsonDictionaryModel.data_hierarchy = variableNode.has("data_hierarchy") ? variableNode.get("data_hierarchy").asText() : "";
 			// currently variable_name is the encoded variable_id
@@ -316,8 +316,8 @@ public class DatatableJsonDictionaryModel extends DictionaryModel{
 			
 			for(Entry<String,DictionaryModel> baseEntry: baseDictionary.entrySet()) {
 				if(!phs.equals(baseEntry.getValue().derived_study_id)) continue;
-				if(!allVariableNamesInDictionary.contains(baseEntry.getValue().derived_var_name)) {
-					csvwriter.writeNext(new String[]{ baseEntry.getValue().derived_study_abv_name, baseEntry.getValue().derived_study_id, baseEntry.getValue().derived_var_name });
+				if(!allVariableNamesInDictionary.contains(baseEntry.getValue().derived_var_id)) {
+					csvwriter.writeNext(new String[]{ baseEntry.getValue().derived_study_abv_name, baseEntry.getValue().derived_study_id, baseEntry.getValue().derived_var_id });
 				}
 			}
 			csvwriter.flush();
@@ -347,7 +347,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel{
 		Set<String> set = new HashSet<String>();
 		
 		for(DatatableJsonDictionaryModel model: allModels) {
-			set.add(model.derived_var_name);
+			set.add(model.derived_var_id);
 		}
 		
 		return set;
