@@ -150,8 +150,8 @@ public class DatatableJsonDictionaryModel extends DictionaryModel{
 			//assumes RECOVER format of form name = dataset name/id
             
 			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
-			datatableJsonDictionaryModel.derived_var_id = this.variableId;
-			datatableJsonDictionaryModel.derived_var_name = this.variableId;
+			datatableJsonDictionaryModel.derived_var_id = this.variableId.toLowerCase();
+			datatableJsonDictionaryModel.derived_var_name = this.variableName;
 			datatableJsonDictionaryModel.data_hierarchy = variableNode.has("data_hierarchy") ? variableNode.get("data_hierarchy").asText() : "";
 			// currently variable_name is the encoded variable_id
 			// and variable name is the decoded variable_id stored in variable_name
