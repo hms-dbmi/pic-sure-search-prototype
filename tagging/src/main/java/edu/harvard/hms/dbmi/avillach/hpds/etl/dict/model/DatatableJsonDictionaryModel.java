@@ -149,7 +149,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel{
 		public Variable(JsonNode variableNode, DatatableJsonDictionaryModel datatableJsonDictionaryModel) {
 			//assumes RECOVER format of form name = dataset name/id
             
-			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText().toLowerCase() : "";
+			this.variableId = variableNode.has("variable_id") ? variableNode.get("variable_id").asText() : "";
 			datatableJsonDictionaryModel.derived_var_id = this.variableId;
 			datatableJsonDictionaryModel.derived_var_name = this.variableName;
 			datatableJsonDictionaryModel.data_hierarchy = variableNode.has("data_hierarchy") ? variableNode.get("data_hierarchy").asText() : "";
