@@ -157,10 +157,14 @@ public class ColumnMetaDictionaryModel extends DictionaryModel {
 	 * @return
 	 */
 	private String findDerivedGroupId(String[] hpdsNodes) {
-		for(String node: hpdsNodes) {
-			if(node.matches("pht[0-9]{6}")) {
+		for (String node : hpdsNodes) {
+			if (node.matches("pht[0-9]{6}")) {
 				return node;
 			}
+		}
+		//if no pht found, assume array > 2 has manual tables
+		if (hpdsNodes.length > 2) {
+			return hpdsNodes[hpdsNodes.length - 2];
 		}
 		// no group id found 
 		return "";
