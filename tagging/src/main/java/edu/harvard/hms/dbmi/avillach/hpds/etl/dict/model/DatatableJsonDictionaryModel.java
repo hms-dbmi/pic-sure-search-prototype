@@ -67,7 +67,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel {
 
 			// this.formGroupDesc = formGroupNode.has("form_group_description") ?
 			// formGroupNode.get("form_group_description").asText():"";
-			datatableJsonDictionaryModel.derived_group_description = this.formGroupDesc;
+			// datatableJsonDictionaryModel.derived_group_description = this.formGroupDesc;
 
 			if (formGroupNode.has("form")) {
 				JsonNode formNodes = formGroupNode.get("form");
@@ -202,8 +202,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel {
 				 * }
 				 */
 			}
-			// allModels.add(new
-			// DatatableJsonDictionaryModel(datatableJsonDictionaryModel));
+			allModels.add(new DatatableJsonDictionaryModel(datatableJsonDictionaryModel));
 
 		}
 	}
@@ -284,6 +283,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel {
 					continue;
 				if (!study.getName().endsWith("metadata.json"))
 					continue;
+				System.out.println("Processing dictionary file: " + study.getName());
 				DatatableJsonDictionaryModel dict = new DatatableJsonDictionaryModel(study.getAbsolutePath());
 				allModels.add(dict);
 			}
@@ -385,6 +385,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel {
 
 		// if(entry.getKey().equals("\\" + dictphs + "\\" + dictVarId + "\\")) {
 		String key = "\\" + dictphs + "\\" + dictTableId + "\\" + dictVarId + "\\";
+		System.out.println("Trying to find key " + key + " in columnmeta");
 
 		DictionaryModel baseModel = null;
 
