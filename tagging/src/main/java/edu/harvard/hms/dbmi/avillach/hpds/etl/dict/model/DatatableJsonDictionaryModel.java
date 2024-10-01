@@ -335,7 +335,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel {
 			for (Entry<String, DictionaryModel> baseEntry : baseDictionary.entrySet()) {
 				if (!phs.equals(baseEntry.getValue().derived_study_id))
 					continue;
-				if (!allVariableNamesInDictionary.contains(baseEntry.getValue().derived_var_id)) {
+				if (!allVariableNamesInDictionary.contains(baseEntry.getValue().derived_var_id.toLowerCase())) {
 					csvwriter.writeNext(new String[] { baseEntry.getValue().derived_study_abv_name,
 							baseEntry.getValue().derived_study_id, baseEntry.getValue().derived_var_id });
 				}
@@ -369,7 +369,7 @@ public class DatatableJsonDictionaryModel extends DictionaryModel {
 		Set<String> set = new HashSet<String>();
 
 		for (DatatableJsonDictionaryModel model : allModels) {
-			set.add(model.derived_var_id);
+			set.add(model.derived_var_id.toLowerCase());
 		}
 
 		return set;
@@ -393,11 +393,13 @@ public class DatatableJsonDictionaryModel extends DictionaryModel {
 			baseModel = baseDictionary.get(key);
 		} else {
 			key = "\\" + dictphs + "\\" + dictTableId + "\\" + dictVarId.toUpperCase() + "\\";
+			System.out.println("Trying to find key " + key + " in columnmeta");
 
 			if (baseDictionary.containsKey(key)) {
 				baseModel = baseDictionary.get(key);
 			} else {
 				key = "\\" + dictphs + "\\" + dictTableId + "\\" + dictVarId.toLowerCase() + "\\";
+				System.out.println("Trying to find key " + key + " in columnmeta");
 
 				if (baseDictionary.containsKey(key)) {
 					baseModel = baseDictionary.get(key);
