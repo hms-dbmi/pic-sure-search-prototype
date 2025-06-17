@@ -256,15 +256,13 @@ public class DictionaryImporterUtil {
 	    ObjectMapper mapper = new ObjectMapper();
 	    
 	    try {
+	        System.out.println("Writing json");
 			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
-			
+            System.out.println("JSON String is size: " + jsonOut.length());
 			Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut.getBytes());
 			
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+            System.out.println("JSON write error");
 			e.printStackTrace();
 		}
 	    
