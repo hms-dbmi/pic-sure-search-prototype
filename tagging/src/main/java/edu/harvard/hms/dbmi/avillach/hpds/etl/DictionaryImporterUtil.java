@@ -18,6 +18,7 @@ import java.util.zip.GZIPOutputStream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.RFC4180Parser;
@@ -257,9 +258,11 @@ public class DictionaryImporterUtil {
 	    
 	    try {
 	        System.out.println("Writing json");
-			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
-            System.out.println("JSON String is size: " + jsonOut.length());
-			Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut.getBytes());
+
+			//byte[] jsonOut = mapper.writeValueAsBytes(hpdsDictionaries);
+            //System.out.println("Byte array size = " + jsonOut.length);
+            Files.writeString(Paths.get(OUTPUT_DIR + "dictionary.json"),mapper.writeValueAsString(hpdsDictionaries));
+			//Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut);
 			
 		} catch (Exception e) {
             System.out.println("JSON write error");
