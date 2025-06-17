@@ -1,9 +1,6 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl;
 
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -261,8 +258,7 @@ public class DictionaryImporterUtil {
 
 			//byte[] jsonOut = mapper.writeValueAsBytes(hpdsDictionaries);
             //System.out.println("Byte array size = " + jsonOut.length);
-            Files.writeString(Paths.get(OUTPUT_DIR + "dictionary.json"),mapper.writeValueAsString(hpdsDictionaries));
-			//Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut);
+            mapper.writeValue(new File(OUTPUT_DIR + "dictionary.json"), hpdsDictionaries);
 			
 		} catch (Exception e) {
             System.out.println("JSON write error");
