@@ -1,9 +1,6 @@
 package edu.harvard.hms.dbmi.avillach.hpds.etl;
 
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -18,6 +15,7 @@ import java.util.zip.GZIPOutputStream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.RFC4180Parser;
@@ -256,15 +254,14 @@ public class DictionaryImporterUtil {
 	    ObjectMapper mapper = new ObjectMapper();
 	    
 	    try {
-			String jsonOut = mapper.writeValueAsString(hpdsDictionaries);
+	        System.out.println("Writing json");
+
+			//byte[] jsonOut = mapper.writeValueAsBytes(hpdsDictionaries);
+            //System.out.println("Byte array size = " + jsonOut.length);
+            mapper.writeValue(new File(OUTPUT_DIR + "dictionary.json"), hpdsDictionaries);
 			
-			Files.write(Paths.get(OUTPUT_DIR + "dictionary.json"), jsonOut.getBytes());
-			
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+            System.out.println("JSON write error");
 			e.printStackTrace();
 		}
 	    

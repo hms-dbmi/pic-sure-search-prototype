@@ -181,12 +181,16 @@ public class HPDSDictionarySerializer {
 			
 			dt = hpdsDictionary.get(dictKey);
 			
+/*
 			if(dt.variables.containsKey(varKey)) {
 				System.err.println("VARIABLE HAS ALREADY BEEN CREATED POSSIBLE DUPLICATES = " + varKey);
 			} else {
 				dt.variables.put(varKey, var);
 			}
-
+*/
+            if(!dt.variables.containsKey(varKey)) {
+                dt.variables.put(varKey, var);
+            }
 		} else {
 			dt.variables.put(varKey, var);
 			hpdsDictionary.put(dictKey, dt);
